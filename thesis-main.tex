@@ -136,62 +136,52 @@ In order to simplify the problem and focus on the core aspects of the GoT paradi
 \end{itemize}
 
 \section{The proposed approach}
-\subsection{Overview of the approach}
 The approach proposed in this thesis is based on the Graph of Thoughts paradigm. 
 In this framework, the reasoning process is modeled as a dynamic graph, where nodes represent intermediate thoughts and the Large Language Model (LLM) guides both the expansion of the graph and the decision of when to terminate the reasoning process.
 
 Given an input problem ($P$), the system incrementally constructs a graph according to a set of high-level rules. 
 These rules are designed to balance the exploration of multiple reasoning paths with the need for coherent and effective problem solving. Additionally, they encourage the use of external tools, which play a key role in improving traceability and interpretability of the reasoning process.
-At a high level, the approach can be described through the following phases:
-\begin{enumerate}
-\item \textbf{Initialization:} the input problem ($P$) is used to create the root node of the graph.
-\item \textbf{Graph expansion:} the system generates multiple nodes corresponding to different candidate reasoning paths.
-\item \textbf{Reasoning:} each path is progressively expanded by producing intermediate thoughts ($R$), until a candidate solution is reached.
-\item \textbf{Evaluation and refinement:} the generated solutions are evaluated, and the system may revise previous steps, explore alternative paths, or leverage external tools to improve the reasoning process.
-\item \textbf{Backtracking:} if a path leads to an unsatisfactory solution, the system can backtrack to previous nodes and explore alternative paths, giving also feedbacks for improving the reasoning process.
-\item \textbf{Crafting:} if the system identifies the need for a new tool to solve the problem, it can craft a new tool and use it in the reasoning process.
-\item \textbf{Divide Thought:} if the LLM has difficulties in solving the problem, it can decide to divide the problem into two subproblems.
-\item \textbf{Termination:} the process continues until a satisfactory solution is found or a predefined stopping condition is met ($S$).
-\end{enumerate}
-
-Some of the phases described above are sequential (e.g. Initialization $\rightarrow$ Graph expansion $\rightarrow$ Reasoning $\rightarrow$ Evaluation and refinement), while others can be explored in a more flexible way (e.g. Backtracking, Crafting, Divide Thought and Termination can be triggered during the evaluation phase).
 
 \subsection{Motivation for using GoT}
 The GoT paradigm is chosen for the potential that this structure offers in terms of exploration, combination of different resoning paths and the ability to backtrack in order to recover from errors.
 \\
 The second motivation about the use of GoT, as mentioned in the previous chapter, is the fact that the GoT research is still in its early stages, so its potential is not yet fully explored.
 
-\section{Formalizations}
-Now that we have described the proposed approach at a high level, we can provide a more formal description of what the system does, starting from the input and the expected output.
-
-\subsection{Graph of Thoughts Formalization}
-Before describing the graph algorithm in details, we need to formalize some aspects of the graph structure, in particular, the difference between static and dynamic graph.
-\subsubsection{Static Graph Structure}
+\subsection{Static Graph Structure}
 As \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. The static graph structure provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
 This structure can't be changed during the process and it represents the "rules" of the graph.
 \\\\
 The static graph structure is defined as $G_s = (S, T)$, where $S$ is the set of possible logical states (e.g. Evaluation, Backtracking, Crafting etc.) and $T$ is the set of possible transitions between these states. 
 The states are defined and they are the following:
 
-\begin{itemize}
-    \item \textbf{\_\_start\_\_ and \_\_end\_\_}: the start and end states of the process. The \texttt{\_\_start\_\_} is the first state reached and the \texttt{\_\_end\_\_} is the last reached in the process. These represent entry and exit points and are visited exactly once per execution.
-    \item \textbf{goal}: this is the first real state. The system starts with the user prompt and the \texttt{goal} represents the problem. From here, the system starts to generate thought paths that can be explored in order to solve the problem.
-    \item \textbf{tool\_reasoning}: this is the starting point of a reasoning path. From here the system starts to think about how to solve the problem without solving it directly in order to force the reasoning to the LLM. The main focus of this state is about how to use the tools or, in some cases, how to craft them.
-    \item \textbf{tool\_calling}: this state is reached after the \texttt{tool\_reasoning} and it represents the moment in which the system should call the tool or just generate the solution if the tool is not needed.
-    \item \textbf{response\_evaluation}: is reached after the \texttt{tool\_calling} or the \texttt{reasoning\_mode} and it represents the moment in which the system evaluates the generated response of the reasoning process. This moment is crucial in this structure because the evaluation decides what state must be reached next.  
-    \item \textbf{backtrack}: is reached when an evaluation doesn't satisfy the LLM criteria to become a solution. This state allows to backtrack to a previous non-visited reasoning path and explore it, giving also feedbacks to the LLM about what is wrong with the previous path.
-    \item \textbf{crafting}: is reached when, after an evaluation, the system identifies that a new tool is needed to solve the problem. In this state, the LLM tries to craft a tool that can solve or can helps solving the problem and then a new reasoning path is chosen for exploration.
-    \item \textbf{reasoning\_mode}: is a different approach to solve the problem. If the \texttt{tool\_reasoning} and \texttt{tool\_calling} states are focused on how to use the tools, the \texttt{reasoning\_mode} is focused on how to solve the problem using divide-et-impera system, so it is more focused on the reasoning capabilities of the LLM. This state is used when the system has difficulties in solving the problem.
-    \item \textbf{chat\_completion}: acts as a fallback mechanism to ensure that a response is provided even when complex reasoning paths fail. This state is reached when the system has explored all the possible paths and it is not able to find a solution, so it calls the LLM to generate a solution without any constraint, in order to guarantee the termination of the process.
-\end{itemize}
-
+\paragraph{\_\_start\_\_ and \_\_end\_\_}: the start and end states of the process. The \texttt{\_\_start\_\_} is the first state reached and the \texttt{\_\_end\_\_} is the last reached in the process. These represent entry and exit points and are visited exactly once per execution.
+\paragraph{goal}: this is the first real state. The system starts with the user prompt and the \texttt{goal} represents the problem. From here, the system starts to generate thought paths that can be explored in order to solve the problem. 
+\newline
+In particular, the system creates four different reasoning paths composed by three \texttt{tool\_reasoning} nodes and one \texttt{reasoning\_mode} node. The number of tool reasoning paths created is arbitrary, it is chosen by observing the system's behaviours during its runs. A higher number of reasoning paths can lead to more solutions, but the cost in terms of time and tokens increases.
+\paragraph{tool\_reasoning}: this is the starting point of a reasoning path. From here the system starts to think about how to solve the problem without solving it directly in order to force the reasoning to the LLM. The main focus of this state is about how to use the tools or, in some cases, how to craft them. The message history will be used to provide the context in the following states.
+\paragraph{tool\_calling}: this state is reached after the \texttt{tool\_reasoning} and it represents the moment in which the system should call the tool or just generate the solution if the tool is not needed. Since LLMs are stochastic auto-regressive models, we cannot deterministically predict the
+exact output; however, the system is designed to enforce instruction-following through the provided context. The expected behavior is for the model to generate a response that incorporates tool calls (if deemed necessary) or a direct solution, effectively bridging the gap between reasoning and action.
+\paragraph{response\_evaluation}: is reached after the \texttt{tool\_calling} or the \texttt{reasoning\_mode} and it represents the moment in which the system evaluates the generated response of the reasoning process. This moment is crucial in this structure because the evaluation decides what state must be reached next. The LLM-as-a-judge method is used to evaluate the response. The evaluation is based by the format of the response (sometimes the response should have a fixed format), the correctness of the result and the explanation of the process. The judge agent has the entire message history, so it has a full vision of the reasoning process. In order to evaluate the response, the LLM must score the solution to a number between 0 and 5, where 5 is the maximumn, and also give it a score to the problem complexity. These two parameters are used to decide if the response can pass or not. 
+    The evaluation threshold is dynamically adjusted based on the problem complexity:
+    \begin{equation}
+    S \geq 5.5 - 0.5 \cdot C
+    \end{equation}
+    Where $S$ is the score and $C \in [1,...,5]$ is the complexity. If the problem is too complex, a non-perfect response may be accepted. The logic behind it is that if the LLM has difficulty to find a solution, the logical soundness of the reasoning process is prioritized over the absolute precision of the final output.  
+    The LLM can also understand, usually hinted by the tool call response, that a new tool is needed. In this case the next node will be \texttt{crafting}. 
+\paragraph{backtrack}: is reached when an evaluation doesn't satisfy the LLM criteria to become a solution. This state allows to backtrack to a previous non-visited reasoning path and explore it, giving also feedbacks to the LLM about what is wrong with the previous path.
+\paragraph{crafting}: is reached when, after an evaluation, the system identifies that a new tool is needed to solve the problem. In this state, the LLM tries to craft a tool that can solve or can helps solving the problem and then a new reasoning path is chosen for exploration. In this state, a specialized crafter agent generates a new tool definition. This process uses the original problem context ($P$) and the judge's feedback as a specification. Once the tool is crafted, the system resumes the exploration by expanding a new reasoning path that can now leverage the newly created capability.
+\paragraph{reasoning\_mode}: is a different approach to solve the problem. If the \texttt{tool\_reasoning} and \texttt{tool\_calling} states are focused on how to use the tools, the \texttt{reasoning\_mode} is focused on how to solve the problem using \textit{divide-et-impera} system, so it is more focused on the reasoning capabilities of the LLM. This state is used when the system has difficulties in solving the problem. In the proposed approach, this state is reached when the response does not pass the evaluation and there is no \texttt{tool\_reasoning} node available. The system here has the possibility to divide the thought into two parallel sub-tasks in order
+to divide the complexity of the single prompt. The two prompt should
+be indipendent of each other.
+\paragraph{chat\_completion}: acts as a fallback mechanism to ensure that a response is provided even when complex reasoning paths fail. This state is reached when the system has explored all the possible paths and it is not able to find a solution, so it calls the LLM to generate a solution without any constraint, in order to guarantee the termination ofthe process.
+\\\\
 We partition the set of transitions $T$ into two disjoint subsets: $T = T_d \cup T_c$ where:
 \begin{itemize}
     \item $T_d$ is the set of deterministic transitions, where the next state is uniquely determined by the completion of the current state’s task.
     \item $T_c$ is the set of conditional transitions, where the next state is determined by a selection function $f: \text{output} \to S$, typically driven by the LLM's internal evaluation or a logic-based heuristic.
 \end{itemize}
 
-The static graph structure defines the possible paths that can be taken during the reasoning process, but it does not define which path will be taken in a specific execution.
+While some phases follow a strict sequence—such as the transition from Initialization to Reasoning—others like Backtracking or Crafting are triggered dynamically. Consequently, while the static graph structure defines the set of all possible paths, the actual trajectory is determined only during execution, reflecting the flexible nature of these operations.
 \newpage
 \begin{figure}[h!]
     \centering
@@ -200,10 +190,10 @@ The static graph structure defines the possible paths that can be taken during t
     \label{fig:static-graph}
 \end{figure}
 
-\subsubsection{Dynamic Graph Semantics}
+\subsection{Dynamic Graph}
 We represent the system as a directed graph $G = (N, E)$, where:
 \begin{itemize}
-    \item $N$ = $\{n_1, n_2, ..., n_m\}$ is the set of nodes, where each node $n_i$ is a 5-tuple: $n_i = (s_i, a_i, p_i, r_i, m_i)$, where $s_i$ is the state that the node represents, $a_i$ is the agent that executes the node, $p_i$ is the prompt sent to the LLM to generate the thought, $r_i$ is the reasoning process generated by the LLM in response to the prompt, and $m_i$ represent the metadata associated with the node, in particular the tool used during the thought generation.
+    \item $N$ = $\{n_1, n_2, ..., n_m\}$ is the set of nodes, where each node $n_i$ is a \textbf{runtime node}.  We treat the runtime node as an \textit{abstract base object} represented by the 3-tuple $n_i = (id, s_i, rs_i)$, where $id$ is the unique identifier of the node, $s_i$ is the state that the node represents, $rs_i$ is a binary value that represents if the node is resolved or not. This abstraction allows for \textbf{node specialization}: depending on the state $s_i$, a node may extend the base 3-tuple with additional specialized attributes (e.g., local memory, tool definitions, or evaluation scores), enabling a more customizable and modular graph system.
     \item $E$ = $\{e_1, e_2, ..., e_k\}$ is the set of directed edges, where each edge $e_j = (n_{i1}, n_{i2}, h_j) \in E$ represents a transition from node $n_{i1}$ to node $n_{i2}$ with the message history $h_j$. The message history $h_j$ is a sequence of interactions happened in the nodes before. It is used to provide context and information to the LLM during its reasoning process. The message history sometimes is manipulated by the system in order to provide the right behaviour to the LLM (e.g. crafting a tool instead of using it).
 \end{itemize}
 
@@ -211,8 +201,9 @@ We represent the system as a directed graph $G = (N, E)$, where:
 In the proposed system, we define multiple agents in order to manage different states of the graph and to provide a more customized behaviour for each state.
 Matematically we define an agent $a \in A$ as a function: 
 \begin{equation}
-    a: (h_j, p_i) \to (r_i, m_i)
+    a: (h_j, p_i, t_i) \to (r_i, m_i)
 \end{equation}
+where $t_i$ represents the set of tools available.
 In particular, we define the following agents:
 \begin{itemize}
     \item \textbf{Starting agent}: It is an expert of tool usage, but his role is to reason about how to solve the problem with the tools, if there is a need of a new tool or if the problem does not require them.  
@@ -223,32 +214,14 @@ In particular, we define the following agents:
     \item \textbf{Chat completition agent}: It is a generalist agent, it is used as a fallback mechanism to generate a solution without any constraint when the system has explored all the possible paths and it is not able to find a solution.
 \end{itemize}
 
-\subsection{Algorithm}
+\section{Formalizations}
+Now that we have described the proposed approach at a high level, we can provide a more formal description of what the system does, starting from the input and the expected output.
 
-\subsubsection{High-level Description}
-The algorithm follows the static graph's structure and in every state, it creates a new node of the dynamic graph.
-\\\\
-As we said previously, the system follows a set of rules (static graph) and its logical process is:
-\begin{enumerate}
-    \item Starting point: The user sends a prompt to the system that creates the \texttt{goal} node and four different reasoning paths composed by three \texttt{tool\_reasoning} nodes and one \texttt{reasoning\_mode} node. The number of tool reasoning paths created is arbitrary, it is chosen by observing the system's behaviours during its runs. A higher number of reasoning paths can lead to more solutions, but the cost in terms of time and tokens increases.
-    \item Tool reasoning: The system expands a \texttt{tool\_reasoning} node previously created and calls the LLM into it. The response is memorized in the message history and a new \texttt{tool\_call} node is created using the message hisotry as context.
-    \item Tool call: In this state, the LLM is expected to resolve the problem by leveraging the context provided by the preceding node. Since LLMs are stochastic auto-regressive models, we cannot deterministically predict the exact output; however, the system is designed to enforce instruction-following through the provided context. The expected behavior is for the model to generate a response that incorporates tool calls (if deemed necessary) or a direct solution, effectively bridging the gap between reasoning and action. The \texttt{response\_evaluation} node is created for the next step.
-    \item Evaluation: The LLM-as-a-judge method is used to evaluate the response. The evaluation is based by the format of the response (sometimes the response should have a fixed format), the correctness of the result and the explanation of the process. The judge agent has the entire message history, so it has a full vision of the reasoning process. In order to evaluate the response, the LLM must score the solution to a number between 0 and 5, where 5 is the maximumn, and also give it a score to the problem complexity. These two parameters are used to decide if the response can pass or not. 
-    The evaluation threshold is dynamically adjusted based on the problem complexity:
-    \begin{equation}
-    S \geq 5.5 - 0.5 \cdot C
-    \end{equation}
-    Where $S$ is the score and $C \in [1,...,5]$ is the complexity. If the problem is too complex, a non-perfect response may be accepted. The logic behind it is that if the LLM has difficulty to find a solution, the logical soundness of the reasoning process is prioritized over the absolute precision of the final output.  
-    The LLM can also understand, usually hinted by the tool call response, that a new tool is needed. In this case the next node will be \texttt{crafting}. 
-    \begin{enumerate}
-        \item Backtrack: If the response does not pass the evaluation and there is at least one \texttt{tool\_reasoning} node not expanded, the system backtracks in order to explore and expand another reasoning path. In this phase, the message history is manipulated, the system retains only the feedback the judge agent generates to improve the reasoning process.     
-        \item Crafting: If the judge agent identifies that the available tools are insufficient, it triggers a \texttt{crafting} state, provided there is at least one reasoning path available for exploration. In this state, a specialized crafter agent generates a new tool definition. This process uses the original problem context ($P$) and the judge's feedback as a specification. Once the tool is crafted, the system resumes the exploration by expanding a new reasoning path that can now leverage the newly created capability.
-        \item Reasoning: When the response does not pass the evaluation and there is no \texttt{tool\_reasoning} node available, the system explores the last path. In this case, the reasoning path is a different reasoning approach. It has the possibility to divide the thought into two parallel sub-tasks in order to divide the complexity of the single prompt. The two prompt should be indipendent of each other. 
-    \end{enumerate}
-    \item Chat completition: Once all reasoning paths have been explored and have failed to yield a correct solution, the last solution is the standard LLM response.
-\end{enumerate}
+\subsection{Graph of Thoughts Formalization}
+Before describing the graph algorithm in details, we need to formalize some aspects of the graph structure, in particular, the difference between static and dynamic graph.
 
-\subsubsection{Pseudocode}
+\subsection{Pseudocode}
+
 For a complete comprehention of the crucial steps of the system, some snippets of pseudocode are presented here.
 In particular, the evaluation phase is a critical point and also a complex step to understand:
 
