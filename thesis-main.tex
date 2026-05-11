@@ -125,6 +125,16 @@ In order to address these challenges, the requirements are formalized as follows
     \item \textbf{Structured and interpretable reasoning}: The reasoning process should be captured in a structured representation that enables traceability, interpretability, and evaluation of intermediate steps.
 \end{itemize}
 
+\subsection{Assumptions}
+In order to simplify the problem and focus on the core aspects of the GoT paradigm, we make the following assumptions:
+
+\begin{itemize}
+    \item \textbf{LLM capabilities}: We assume that the LLM has enough capabilities to use external tools, to craft tools if needed, to evaluate the generated solutions and to generate intermediate thoughts that are coherent and relevant to the problem at hand. This assumption is strictly dependent on the size of the LLM that we are using.
+    \item \textbf{Tool-Centric Problem Domain}: We assume the input problems belong to a class of tasks that cannot be solved through direct, zero-shot text generation alone. The problems are assumed to require non-trivial reasoning sequences and at least one interaction with an external environment or tool (e.g., a calculator, a search engine, or a code interpreter).    \
+    \item \textbf{Thought Atomicity}: We assume that each node in the graph represents an "atomic" step of reasoning or a single functional operation. While the internal process of the LLM remains a black box, the output of each node is treated as a discrete state in the problem-solving space.
+    \item \textbf{Resource Finiteness}: We assume the existence of an upper bound on the graph depth and the number of LLM invocations to ensure the termination of the process and to mitigate potential infinite loops caused by recursive backtracking. This assumptions is also valid for time and computational resources, which are limited and should be taken into account when designing the system.
+\end{itemize}
+
 \section{The proposed approach}
 \subsection{Overview of the approach}
 The approach proposed in this thesis is based on the Graph of Thoughts paradigm. 
@@ -154,16 +164,6 @@ The second motivation about the use of GoT, as mentioned in the previous chapter
 \section{Formalizations}
 Now that we have described the proposed approach at a high level, we can provide a more formal description of what the system does, starting from the input and the expected output.
 
-\subsection{Assumptions}
-In order to simplify the problem and focus on the core aspects of the GoT paradigm, we make the following assumptions:
-
-\begin{itemize}
-    \item \textbf{LLM capabilities}: We assume that the LLM has enough capabilities to use external tools, to craft tools if needed, to evaluate the generated solutions and to generate intermediate thoughts that are coherent and relevant to the problem at hand. This assumption is strictly dependent on the size of the LLM that we are using.
-    \item \textbf{Tool-Centric Problem Domain}: We assume the input problems belong to a class of tasks that cannot be solved through direct, zero-shot text generation alone. The problems are assumed to require non-trivial reasoning sequences and at least one interaction with an external environment or tool (e.g., a calculator, a search engine, or a code interpreter).    \
-    \item \textbf{Thought Atomicity}: We assume that each node in the graph represents an "atomic" step of reasoning or a single functional operation. While the internal process of the LLM remains a black box, the output of each node is treated as a discrete state in the problem-solving space.
-    \item \textbf{Resource Finiteness}: We assume the existence of an upper bound on the graph depth and the number of LLM invocations to ensure the termination of the process and to mitigate potential infinite loops caused by recursive backtracking. This assumptions is also valid for time and computational resources, which are limited and should be taken into account when designing the system.
-\end{itemize}
-
 \subsection{Graph of Thoughts Formalization}
 Before describing the graph algorithm in details, we need to formalize some aspects of the graph structure, in particular, the difference between static and dynamic graph.
 \subsubsection{Static Graph Structure}
@@ -192,8 +192,8 @@ We partition the set of transitions $T$ into two disjoint subsets: $T = T_d \cup
 \end{itemize}
 
 The static graph structure defines the possible paths that can be taken during the reasoning process, but it does not define which path will be taken in a specific execution.
-
-\begin{figure}
+\newpage
+\begin{figure}[h!]
     \centering
     \includegraphics[width=.8\linewidth]{figures/static_graph.png}
     \caption{Static Graph Structure: continuous lines represent direct transitions, while dashed ones represent conditional transitions.}
@@ -248,7 +248,6 @@ As we said previously, the system follows a set of rules (static graph) and its 
     \item Chat completition: Once all reasoning paths have been explored and have failed to yield a correct solution, the last solution is the standard LLM response.
 \end{enumerate}
 
-\newpage
 \subsubsection{Pseudocode}
 For a complete comprehention of the crucial steps of the system, some snippets of pseudocode are presented here.
 In particular, the evaluation phase is a critical point and also a complex step to understand:
@@ -307,12 +306,41 @@ The first workflow is focused on the \textbf{testing process}, it is triggered e
 \end{enumerate}
 
 The second workflow is focused on the \textbf{releasing process}, it is triggered every time a merge happens in the main branch. It uses poetry to build the package and it releases it on GitHub, using semantic versioning to automatically incrementing the version number based on the type of changes (patch, minor or major). 
-\subsection{Graph implementation}
-TODO: dynamic graph implementation
+
+\subsection{Dynamic Graph implementation}
+The graph implementation is a crucial part of the system, it is used to represent the reasoning process and to manage the different paths of the reasoning.
+\\\\
+The graph is implemented using a class called \texttt{runtime\_graph} that contains all the methods to create and manage the graph. 
+The class is composed by many components such as the \texttt{goal}, which represent the problem to solve, the \texttt{nodes}, which are the dictionary that contains all the nodes of the graph and their links to other nodes, the \texttt{temp\_node} which is the node that is currently being expanded, it is used mainly to have a reference to the current node, and the \texttt{temp\_response}, which is the last response generated by the LLM and it is used to provide a feedback to the LLM in case of crafting or to provide the final solution in case of termination.
+
+\subsubsection{LLM configuration}
+For a better customization of the agent performance, four different LLM configurations are defined for the different agents.
+
 \subsubsection{Runtime Node}
+In order to provide a better management of the nodes, a class called \texttt{runtime\_node} is implemented.
+\\
+The reasons behind the implementation comprehend the need to have an abstract class that can be extended to create different types of nodes, and the need to not be dependent to the current tecnhology used to call the LLM, so it is possible to change the libraries used to call the LLM without changing the structure of the nodes.
+The \texttt{runtime\_node} class is minimal as possible in order to provide a better flexibility in its extension. Its attributes are the unique \textbf{ID} and the \textbf{state} of the node, that can be resolved or not.
+\\\\
+The extended classes created are the following:
+\begin{itemize}
+    \item \textbf{GoalNode}: it contains the problem to solve, it is the first node created.
+    \item \textbf{Reasoning Node}: it contains the reasoning process generated by the LLM, it is used for the tool calling.
+    \item \textbf{Tool Node}: it contains the prompt used to call the node, the response generated.
+    \item \textbf{Test Node}: it is the node that contains the evaluation of the response, it is used to decide the next step. It is composed by the prompt used to call the judge agent, the response generated, the score, the problem complexity, the need to craft a new tool and the tool used in the reasoning process that is evaluated.
+    \item \textbf{Backtrack Node}: it contains only the feedback generated by the judge agent, which is used to improve the reasoning process in the next path.
+    \item \textbf{Crafting Node}: TODO
+    \item \textbf{Response Node}: It incapsulate the response of a reasoning path, it contains the response and the explanation of the reasoning process. It is the response evaluated by the judge agent and it can be a final solution. 
+\end{itemize}
+
 \subsubsection{LLM response format}
-
-
+In order to facilitate the management of the responses generated by the LLM, a specific format is defined for some steps of the process. In particular, two formats are defined: the \textbf{Response} and the \textbf{Score} format.
+\\\\
+The Response format contains the final answer and the explanation of it. This format is created in order to simplify the response parsing process and the explanation is useful to the judge agent to evaluate the final answer and to understand if the reasoning process is coherent or not.
+\\\\
+The Score format is used in the evaluation phase. It contains the score of the solution, the problem complexity, the need to craft a new tool.
+\\\\
+Each of these formats are used to fullfill the respective defined nodes.
 \subsection{Crafting methodology}
 The crafting process is a crucial aspect of the system. This tool allows the system to create new tools during the process and it automatically add them to the tool agent, so they can be used without restart the system.
 \\\\
@@ -324,6 +352,11 @@ This process is based on the following steps:
     \item \textbf{Saving}: If the code is correct, the code is saved in a defined file, called \texttt{ai\_tool.py}. This file contains all the crafted tools.
     \item \textbf{Importing}: The system create a new agent calling the \texttt{get\_crafted\_tools{}}, which is a function that import all the functions in the \texttt{ai\_tool.py} file, it wrap each of them with the \texttt{@tool} decorator and return them in a list.
 \end{enumerate}
+
+In order to ensure that the system has the necessary libraries to correctly use the tool crafted, a specific tool can be used to install new libraries.
+\\
+The \texttt{install\_dependency} tool takes as argument the name of the library to install and it uses \texttt{poetry add} to install it. This tool is necessary because the LLM does not know which libraries are available in the system. 
+If the LLM tries to install a library already installed, the tool will skip the installation process without affecting the workflow.
 
 \section{Tools, libraries, framework used}
 \subsection{Poetry}
@@ -389,11 +422,11 @@ The folder is mainly focused on the benchmarking of the system, but it can conta
 It is used for utility functions that are used in different parts of the code. The majority of the functions are related to the extraction of response from LLM calls or the formatting of the result in order to provide a clean response for the evaluation phase.  
 
 \chapter{Experiments}
-\section{Descrizione setup sperimentale (quali classi di benchmark, cosa testi per ogni benchmark, come lo misuri)}
-\section{Per ogni classse di benchmark:}
+\section{Experimental setup (quali classi di benchmark, cosa testi per ogni benchmark, come lo misuri)}
+\section{Hendrycks Math Benchmark}
 \subsection{Descrizione della classe di benchmark}
-\subsection{Risultati quantitativi (metriche, grafici, tabelle)}
-\subsection{Analisi qualitativa (esempi di output, errori comuni, casi di successo)}
+\subsection{Results (metriche, grafici, tabelle)}
+\subsection{Analysis (esempi di output, errori comuni, casi di successo)}
 
 \chapter{Discussion}
 \section{Interpretazione dei risultati (funziona bene in questi casi, funziona male in questi altri, suppongo sia perchè...)}
