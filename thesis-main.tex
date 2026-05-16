@@ -258,15 +258,97 @@ In particular, the evaluation phase is a critical point and also a complex step 
 \subsection{Illustrative Example}
 In order to fully clarify the system mechanics, the following section guides the reader through a practical, step-by-step execution example.
 \\
-The task taken as example involve math a problem which the system does not have the tools necessary to resolve it. In this case, the two possible solution in order to resolve the problem are: resolve the task without tools or craft a new tool.
+The task taken as example involve math a problem in which the system does not have the tools necessary to resolve it. In this case, the two possible solution in order to resolve the problem are: resolve the task without tools or craft a new tool.
 \\\\
 In particular the initial prompt is:
 \begin{quote}
     \textit{"Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"}
 \end{quote} 
-\subsubsection{Step-by-step Execution}
 
-\begin{figure}
+\subsubsection{Step-by-step Execution}
+At first, following the static graph, the \texttt{goal} node is visited, creating three tool reasoning paths and one reasoning mode path.
+\newline
+Then, a \texttt{tool\_reasoning} node is visited, calling the starting agent with the following conversation:
+\begin{itemize}
+    \item[\textbf{User:}] "Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{User:}] "Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
+    \item[\textbf{AI:}] "Craft a new tool: This problem requires solving an integral, which involves symbolic computation. The existing tools (`summing`, `minus`, `square\_root`, `multiply`, `divide`) are designed for basic arithmetic operations on numerical values and do not support symbolic integration. Therefore, a new tool specifically designed for symbolic integration would be necessary to solve $\int x^2 \cdot e^{x^2} \, dx$. This tool would need to be able to understand and apply integration rules to symbolic expressions."
+\end{itemize}
+
+At this point, the graph visits the \texttt{tool\_calling} node with the previous message history, asking for the generation of a solution:
+\begin{itemize}
+    \item[\textbf{System:}] "Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
+    \item[\textbf{AI:}] "Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
+    \newline 
+    Explanation: The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
+\end{itemize}
+
+The given response is taken for evaluation in the \texttt{response\_evaluation} node. In this case, the context given by the tool reasoning is eliminated in order to maintain a clean message history:
+\begin{itemize}
+    \item[\textbf{User:}] "Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{User:}] "Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
+    \item[\textbf{System:}] "Score this solution based on correctness and following instructions."
+    \item[\textbf{AI:}] "Tool used in the response: Response"
+    \item[\textbf{AI:}] "{ 'score': 1, 'description': 'The response correctly identifies the need for a new tool for symbolic integration, which is a valid assessment given the problem. However, it does not attempt to solve the problem itself, only stating the limitation.', 'need\_tool\_crafting': true, 'problem\_complexity': 4 }"
+\end{itemize}
+
+The response does not passed the evaluation and the judge agent identifies the need of crafting a new tool. Then, following the algorithm, a new \texttt{crafting} node is created.
+\newline
+The message history passed in the \texttt{crafting} node contains the goal and the explanation given in the response:
+\begin{itemize}
+    \item[\textbf{User:}] "Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{AI:}] "The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
+    \item[\textbf{System:}] "Use the context given to craft a tool to solve this problem using craft\_tool. It must be a function"
+    \item[\textbf{AI:}] It creates a new tool called \texttt{symbolic\_integration(expression: str, variable: str) -> str}
+    \item[\textbf{AI:}] It install the \texttt{sympy} dependencies
+    \item[\textbf{AI:}] Returning structured response: 
+    \begin{description}
+        \item[\texttt{response:}] ``I have created a tool that can solve the integral $\int x^2 \cdot e^{x^2} \, dx$, but it returns a complex solution involving the imaginary error function. Would you like me to provide this solution?'' 
+        \item[\texttt{explanation:}] ``The problem requires symbolic integration. I have crafted a tool \texttt{symbolic\_integration} that uses the \texttt{sympy} library to perform this. I then used this tool with the expression $x^2 \cdot e^{x^2}$ and variable \texttt{'x'}. The result from \texttt{sympy}'s integrate function for this specific integral is $\frac{x \cdot e^{x^2}}{2} - \frac{\sqrt{\pi} \cdot i \cdot \operatorname{erfi}(x)}{4}$. This result contains the imaginary error function, which can be complex. I am asking the user if they would like this complex solution.''
+    \end{description}
+\end{itemize}
+
+The system now pick an another tool reasoning path with the new tool crafted and the previous message history in order to give context of which tool is crafted and why.
+\newline
+The next \texttt{tool\_reasoning} node is visited:
+\begin{itemize}
+    \item[\textbf{PMH:}] Previous message history
+    \item[\textbf{User:}] "Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool."
+    \item[\textbf{AI:}] \texttt{symbolic\_integration} To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, the \texttt{symbolic\_integration} tool should be used. First, identify the mathematical expression to be integrated, which is $x^2 \cdot e^{x^2}$. Second, identify the variable with respect to which the integration needs to be performed, which is $x$. Finally, call the \texttt{symbolic\_integration} tool with these identified parameters.
+\end{itemize}
+
+The \texttt{tool\_calling} node is now visited:
+
+\begin{itemize}
+    \item[\textbf{PMH:}] Previous message history
+    \item[\textbf{System:}] "Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
+    \item[\textbf{AI:}] Tool agent calls \texttt{symbolic\_integration} 
+    \item[\textbf{AI:}] 
+    \begin{description}
+        \item[\texttt{response:}] ``The integral of $\int x^2 \cdot e^{x^2} \, dx$ is $\frac{x e^{x^2}}{2} - \frac{\sqrt{\pi}}{4} \operatorname{erfi}(x) + C$'' 
+        \item[\texttt{explanation:}] ``The \texttt{symbolic\_integration} tool was used with the expression $x^2 \cdot e^{x^2}$ and variable $x$ to calculate the indefinite integral.''
+    \end{description}
+\end{itemize}
+
+Now there is the evaluation phase:
+\begin{itemize}
+    \item[\textbf{User:}] "Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{User:}]     
+    \begin{description}
+        \item[\texttt{response:}] ``The integral of $\int x^2 \cdot e^{x^2} \, dx$ is $\frac{x e^{x^2}}{2} - \frac{\sqrt{\pi}}{4} \operatorname{erfi}(x) + C$'' 
+        \item[\texttt{explanation:}] ``The \texttt{symbolic\_integration} tool was used with the expression $x^2 \cdot e^{x^2}$ and variable $x$ to calculate the indefinite integral.''
+    \end{description}
+    \item[\textbf{System:}] "Score this solution based on correctness and following instructions."
+    \item[\textbf{AI:}] "Tool used in the response: \texttt{symbolic\_integration}, Response"
+    \item[\textbf{AI:}] "{ 'score': 5, 'description': 'The response correctly identifies and calculates the indefinite integral of the given function. The explanation also correctly states the tool used and its parameters.', 'need\_tool\_crafting': false, 'problem\_complexity': 2 }"
+\end{itemize}
+
+The system correctly find the right answer and the evaluation phase has correctly identify the solution. The response can now be the final answer of the system.
+\newline
+\newline
+The following diagram represents the described example. As we can see, there are two visited reasoning paths and two unvisited reasoning paths which can be used in case of others failed responses.
+
+\begin{figure}[h!]
     \centering
     \includegraphics[width=.5\linewidth]{figures/runtime_graph_example.png}
     \caption{Runtime graph example: green nodes represent visited nodes, red indicates TestNodes with low scores, and grey represents unvisited nodes.}
@@ -434,8 +516,50 @@ The \texttt{install\_dependency} tool takes as argument the name of the library 
 If the LLM tries to install a library already installed, the tool will skip the installation process without affecting the workflow.
 
 \subsection{Run the system}
+With the purpose of simplifying the execution of the system, a command line interface (CLI) has been created.
+This interface allows the user to configure the system's behavior through a set of specific arguments, which are detailed below:
+\begin{itemize}
+    \item \texttt{--mode} (\textit{string}, \textbf{required}): Specifies the reasoning architecture to deploy. The allowed values are \texttt{[standard, graph]}, but it can be easely expanded.
+    \item \texttt{--benchmark} (\textit{string}, \textbf{required}): Enables to choose which benchmark run: 
+    \begin{itemize}
+        \item \textbf{hendrycks\_math}
+        \item \textbf{gsm8k}
+        \item \textbf{gpqa}
+        \item \textbf{gaia}
+        \item \textbf{custom:} it permits to run custom prompt, it is used in a development environment
+    \end{itemize} 
+    \item \texttt{--max\_run} (\textit{integer}, \textit{optional}): Defines the number of prompt to execute in a benchmark, it has no effect in the custom mode. 
+    \begin{itemize}
+        \item \textbf{Default:} \texttt{1}
+    \end{itemize}
+    \item \texttt{--prompt} (\textit{string}, \textit{optional}): It is used with the custom mode, it specify the prompt that it will be sent to the LLM.
+    \begin{itemize}
+        \item \textbf{Default:} \texttt{empty}
+    \end{itemize}
+    \item \texttt{--category} (\textit{string}, \textit{optional}): In some benchmark, for example \texttt{hendryck\_math}, the dataset can have categories. To specify which category is tested, this argument is created.  
+    \begin{itemize}
+        \item \textbf{List:} \texttt{[algebra,
+            counting\_and\_probability,
+            geometry,
+            intermediate\_algebra,
+            number\_theory,
+            precalculus,
+            prealgebra]}
+    \end{itemize}
+\end{itemize}
 
 \subsubsection{Command example}
+The command line interface enables two types of execution: run a benchmark or run a custom prompt.
+\newline
+If we want to execute a benchmark, we need to specify which one, which architecture to use and the category if needed. We can also choose to specify or not the number of tasks to execute.
+For example, if we want to execute 10 prompts of the gsm8k benchmark with the graph architecture, the command will be:
+\begin{quote}
+    \item \texttt{python -m GoT --mode graph --benchmark gsm8k --max\_run 10}
+\end{quote}
+Instead, if we want to run a custom prompt like "what's the weather like?", the command will be:
+\begin{quote}
+    \item \texttt{python -m GoT --mode graph --benchmark custom --prompt "what's the weather like?"}
+\end{quote}
 
 \chapter{Experiments}
 \section{Experimental setup (quali classi di benchmark, cosa testi per ogni benchmark, come lo misuri)}
