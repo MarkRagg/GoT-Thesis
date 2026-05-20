@@ -22,6 +22,9 @@
 % Definition of acronyms
 \acrodef{GoT}[GoT]{Graph of Thought}
 \acrodef{LLM}{Large Language Model}
+\acrodef{AI}{Artificial Intelligence}
+\acrodef{GPU}{Graphics Processing Unit}
+\acrodef{API}{Application Programming Interface}
 \acrodef{IoT}{Internet of Thing}
 \acrodef{vm}[VM]{Virtual Machine}
 
@@ -73,21 +76,97 @@ you may need both \ac{vm} and \acp{vm}.
 
 \note{At the end, describe the structure of the paper}
 
-\chapter{Background (tutto e solo ciò che serve a capire la tesi)}
-I suggest referencing stuff as follows: \cref{fig:random-image} or \Cref{fig:random-image}
-
-\begin{figure}[ht]
+\chapter{Background}
+\section{Large Language Models}
+\acp{LLM} is a sub category of \ac{AI} and more specifically they belong to the field of Deep Learning. 
+In recent years, they have become extremely popular thanks to their ability to understand and generate natural language with a high level of fluency and coherence. 
+Their generalized knowledge and versatility make them perfect for a wide range of applications, from text generation and translation to code assistance, question answering, and conversational systems.
+\\\\
+The ability to generate natural language fits perfectly with the need to create systems that can be used by everyone without requiring specific technical knowledge. 
+Unlike traditional software interfaces, which often require predefined commands or structured inputs, \acp{LLM} allow users to interact using natural language, making human-computer interaction more intuitive and accessible.
+\\\\
+During the last years, after the release of ChatGPT, the average number of arXiv papers that contains \textit{"large language model"} title or abstract deduplicate \cite{zhao2026surveylargelanguagemodels}, leading to the development of increasingly powerful models such as GPT-4\cite{openai2024gpt4technicalreport}, LLaMA\cite{touvron2023llama2openfoundation}, Gemini, and Claude\cite{claude3modelcard}. 
+These systems are capable not only of understanding and generating text, but also of solving reasoning tasks, summarizing documents, writing code, and supporting decision-making processes, becoming more and more used in real world scenarios.
+\subsection{How they work}
+\acp{LLM} are autoregressive models that simply try to predict the next word in a sequence, based on the context.
+\newline
+The text given as input to the \ac{LLM} is preprocessed by the model, dividing it into smaller units called \textit{tokens}.
+A token may represents a word, part of a word, or even a symbol depending on the strategy chosen. The next step is to convert the tokens into numbers. This process permit to the neural network to process textual information mathematically.
+\begin{figure}[h!]
     \centering
-    \includegraphics[width=.8\linewidth]{figures/random-image.pdf}
-    \caption{Some random image}
-    \label{fig:random-image}
+    \includegraphics[width=.8\linewidth]{figures/tokenization.png}
+    \caption{Schematic workflow of an LLM tokenizer: from raw input text to token segmentation and subsequent mapping into vocabulary IDs.}
+    \label{fig:tokenization}
+\end{figure}
+\newline
+
+Modern \acp{LLM} are typically based on the Transformer architecture introduced by Vaswani \cite{vaswani2023attentionneed}. 
+The Transformer uses the self-attention mechanism to capture contextual relationships between tokens, allowing the model to understand long-range dependencies and generate coherent text.
+
+Once the tokenization is done, the text generation starts using autoregressive algorithm: a token is generated and appended to the input sequence and used to predict the following token. 
+By repeating this process multiple times, the model can generate complete sentences, paragraphs, or entire documents.
+
+Despite the apparent intelligence of these systems, \acp{LLM} do not possess real understanding or reasoning capabilities in the human sense. 
+Their outputs are generated through statistical pattern matching learned from training data, which explains their tendency to occasionally produce incorrect or hallucinated information\cite{xu2025hallucinationinevitableinnatelimitation} and the standardized phrases that often generates.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.7\linewidth]{figures/token_prediction.jpg}
+    \caption{Schematic overview of autoregressive decoding and probabilistic next-token prediction in an LLM.}
+    \label{fig:token-prediction}
 \end{figure}
 
-\section{Large Language Models}
-\subsection{How they work}
-\subsection{Agents}
-\subsection{Prompt Engineering}
+\subsubsection{Training}
+Training is the real important part of how \acp{LLM} are so good to generate text and respond to general knowledge questions.
 
+Since we have now explained how an \ac{LLM} works behind the scenes, we also 
+need to discuss their training to understand why they perform so well.
+
+The capabilities of modern \acp{LLM} are not the result of a single algorithmic 
+breakthrough, but rather the consequence of a dramatic and sustained growth in 
+the scale of training data.
+
+Before 2018, the growth of pre-training corpora was slow and models remained 
+limited in scope. The landscape began to shift with the release of models such 
+as GPT-2, but it was GPT-3 in 2020 that marked a turning point: 
+trained on hundreds of billions of tokens initially drawn from the webtext, books, Wikipedia, and other 
+sources, it demonstrated that scale alone could unlock new 
+capabilities~\cite{brown2020languagemodelsfewshotlearners}. We may note that the growing power of the \ac{GPU} plays an important role on the \acp{LLM} training speed.
+
+Nowadays, the emphasis on increasing model parameter counts is gradually giving way to research on higher-level capabilities, including autonomous agents and more effective prompting strategies.
+\subsection{Prompt Engineering}
+Prompt engineering is a relatively new field of research that refers to the practice of designing, refining, and implementing prompts or instructions that guide the output of \acp{LLM}. The main goal of Prompt Engineering is to optimize the \ac{LLM} output by solely refining the prompt.\cite{Mesk2023}.
+
+The prompt could comprehend a lot of components such as: \textit{Directives}, \textit{Examples}, \textit{Output formatting}, \textit{Style instructions}, \textit{Role} or \textit{Additional Information}\cite{schuloff2024prompt_engineer}. All of these components can help to improve the generated output in terms of a better style, accuracy in the response or even a more correct output.
+\subsection{Agents}
+The \acp{LLM} are now good enought to start thinking how automate some processes or how they can be used in more contexts.
+For these reasons, the agents are created. The formal definition is:
+\begin{quote}
+    ``An agent is anything that can be viewed as perceiving its environment through sensors and acting
+upon that environment through effectors."\cite{russell2010artificial}
+\end{quote}
+A high level description of an agent comprehend:
+\begin{itemize}
+    \item \textbf{Senses} the environment around it.
+    \item \textbf{Perceives} the information of that environment.
+    \item \textbf{Reasons} about how to act based on the input given.
+    \item \textbf{Acts} upon the environment through its actions (the output)\cite{russell2010artificial}.
+\end{itemize}
+In the \ac{LLM} context, the agent brain is supported by the \ac{LLM}, which reasons using the context given (it could be the environment as a text) and it acts generating an ouput or by calling the \textbf{tools}.
+
+Tools are external functions or \acp{API} that an agent can invoke at runtime to overcome the limitations of the LLM, such as the lack of up-to-date knowledge, the inability to execute code, or the absence of persistent memory. By selecting and calling the appropriate tool based on the user's intent, the agent extends its capabilities well beyond pure language generation.
+
+As we said before, \acp{LLM} can be unpredictable and lacks of transparency. In this sense, the usage of tools enhance the credibility of the decision of an agent, improving interpretability and robustness\cite{xi2023risepotentiallargelanguage}.
+\begin{figure}
+    \centering
+    \includegraphics[width=.8\linewidth]{figures/agents.png}
+    \caption{Representation of how an agents works.}
+    \label{fig:agent-workflow}
+\end{figure}
+
+A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need of human intervention and try to adapt by changing their behaviour based on feedbacks\cite{Kumar2024}. 
+\subsection{Open LLM problems}
+\subsubsection{Hallucinations}
+\subsubsection{Task Decomposition}
 \section{LangChain \& LangGraph}
 
 \section{Related Works}
@@ -208,6 +287,10 @@ Moreover, every agent has its own state machine defined by the framework used.
     \label{fig:agent-state-machine}
 \end{figure}
 \\ 
+As we see in the figure \cref{fig:agent-state-machine}, the agent has two states: \texttt{mode} and \texttt{tools}.
+The agent receives in input a prompt and the \texttt{mode} state can decide if use a tool or generate the output, finishing the process.
+In case of tool call, the result is sent in the \texttt{mode} state in order to generate the output or call again a tool if necessary.
+\\\\
 Matematically we define an agent $a \in A$ as a function: 
 \begin{equation}
     a: (h_j, p_i, t_i) \to (r_i, m_i)
@@ -264,7 +347,7 @@ The task taken as example involve math a problem in which the system does not ha
 \\\\
 In particular the initial prompt is:
 \begin{quote}
-    \textit{"Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"}
+    \textit{``Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"}
 \end{quote} 
 
 \subsubsection{Step-by-step Execution}
@@ -460,7 +543,7 @@ When the recursion limit is reached, the system raise an exception that is used 
 This reset mechanism forces the LLM to approach the original goal from a new perspective by providing a clean context and an explicit constraint:
 
 \begin{quote}
-\textit{"Divide the problem into smaller parts, you can't call the same tool twice."}
+\textit{``Divide the problem into smaller parts, you can't call the same tool twice."}
 \end{quote}
 
 By stripping away the redundant message history and injecting this meta-instruction, the system breaks the deterministic loop and encourages the model to employ a \textit{Divide and Conquer} strategy.
