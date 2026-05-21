@@ -78,20 +78,20 @@ you may need both \ac{vm} and \acp{vm}.
 
 \chapter{Background}
 \section{Large Language Models}
-\acp{LLM} is a sub category of \ac{AI} and more specifically they belong to the field of Deep Learning. 
+\acp{LLM} is a subcategory of \ac{AI}, and more specifically, they belong to the field of Deep Learning. 
 In recent years, they have become extremely popular thanks to their ability to understand and generate natural language with a high level of fluency and coherence. 
 Their generalized knowledge and versatility make them perfect for a wide range of applications, from text generation and translation to code assistance, question answering, and conversational systems.
 \\\\
 The ability to generate natural language fits perfectly with the need to create systems that can be used by everyone without requiring specific technical knowledge. 
 Unlike traditional software interfaces, which often require predefined commands or structured inputs, \acp{LLM} allow users to interact using natural language, making human-computer interaction more intuitive and accessible.
 \\\\
-During the last years, after the release of ChatGPT, the average number of arXiv papers that contains \textit{``large language model"} title or abstract deduplicate \cite{zhao2026surveylargelanguagemodels}, leading to the development of increasingly powerful models such as GPT-4\cite{openai2024gpt4technicalreport}, LLaMA\cite{touvron2023llama2openfoundation}, Gemini, and Claude\cite{claude3modelcard}. 
-These systems are capable not only of understanding and generating text, but also of solving reasoning tasks, summarizing documents, writing code, and supporting decision-making processes, becoming more and more used in real world scenarios.
+During the last years, after the release of ChatGPT, the average number of arXiv papers that contain the \textit{``large language model"} title or abstract are deduplicated \cite{zhao2026surveylargelanguagemodels}, leading to the development of increasingly powerful models such as GPT-4\cite{openai2024gpt4technicalreport}, LLaMA\cite{touvron2023llama2openfoundation}, Gemini, and Claude\cite{claude3modelcard}. 
+These systems are capable not only of understanding and generating text, but also of solving reasoning tasks, summarizing documents, writing code, and supporting decision-making processes, becoming more and more used in real-world scenarios.
 \subsection{How they work}
 \acp{LLM} are autoregressive models that simply try to predict the next word in a sequence, based on the context.
 \newline
 The text given as input to the \ac{LLM} is preprocessed by the model, dividing it into smaller units called \textit{tokens}.
-A token may represents a word, part of a word, or even a symbol depending on the strategy chosen. The next step is to convert the tokens into numbers. This process permit to the neural network to process textual information mathematically.
+A token may represent a word, part of a word, or even a symbol, depending on the strategy chosen. The next step is to convert the tokens into numbers. This process permits the neural network to process textual information mathematically.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.8\linewidth]{figures/tokenization.png}
@@ -116,7 +116,7 @@ Their outputs are generated through statistical pattern matching learned from tr
 \end{figure}
 
 \subsubsection{Training}
-Training is the real important part of how \acp{LLM} are so good to generate text and respond to general knowledge questions.
+Training is the really important part of how \acp{LLM} are so good at generating text and responding to general knowledge questions.
 
 Since we have now explained how an \ac{LLM} works behind the scenes, we also 
 need to discuss their training to understand why they perform so well.
@@ -125,47 +125,47 @@ The capabilities of modern \acp{LLM} are not the result of a single algorithmic
 breakthrough, but rather the consequence of a dramatic and sustained growth in 
 the scale of training data.
 
-Before 2018, the growth of pre-training corpora was slow and models remained 
+Before 2018, the growth of pre-training corpora was slow, and models remained 
 limited in scope. The landscape began to shift with the release of models such 
 as GPT-2, but it was GPT-3 in 2020 that marked a turning point: 
 trained on hundreds of billions of tokens initially drawn from the webtext, books, Wikipedia, and other 
 sources, it demonstrated that scale alone could unlock new 
-capabilities~\cite{brown2020languagemodelsfewshotlearners}. We may note that the growing power of the \ac{GPU} plays an important role on the \acp{LLM} training speed.
+capabilities~\cite{brown2020languagemodelsfewshotlearners}. We may note that the growing power of the \ac{GPU} plays an important role in the \acp{LLM} training speed.
 
 Nowadays, the emphasis on increasing model parameter counts is gradually giving way to research on higher-level capabilities, including autonomous agents and more effective prompting strategies.
 \subsection{Prompt Engineering}
 Prompt engineering is a relatively new field of research that refers to the practice of designing, refining, and implementing prompts or instructions that guide the output of \acp{LLM}. The main goal of Prompt Engineering is to optimize the \ac{LLM} output by solely refining the prompt\cite{Mesk2023}.
 
-The prompt could comprehend a lot of components such as: \textit{Directives}, \textit{Examples}, \textit{Output formatting}, \textit{Style instructions}, \textit{Role} or \textit{Additional Information}\cite{schuloff2024prompt_engineer}. All of these components can help to improve the generated output in terms of a better style, accuracy in the response or even a more correct output.
+The prompt could comprehend a lot of components, such as: \textit{Directives}, \textit{Examples}, \textit{Output formatting}, \textit{Style instructions}, \textit{Role} or \textit{Additional Information}\cite{schuloff2024prompt_engineer}. All of these components can help to improve the generated output in terms of a better style, accuracy in the response, or even a more correct output.
 
-One of the most popular and older prompt engineer techniques is the \textit{Few Shot Prompting}\cite{brown2020languagemodelsfewshotlearners}, in particular it has three sub categories:
+One of the most popular and older prompt engineering techniques is the \textit{Few Shot Prompting}\cite{brown2020languagemodelsfewshotlearners}, in particular, it has three sub categories:
 \begin{itemize}
-    \item \textbf{Few-Shot}: We referring to a prompt which comprehends a few examples of how the output should be structured with also the correct output. This context helps the \ac{LLM} to learn how to complete the task given, without updating the model parameters.
-    \item \textbf{One-Shot}: It is equal to the few shot prompting, with only one demonstration allowed and the natural language description of the problem.  
-    \item \textbf{Zero-Shot}: In this case, no demonstrations are allowed. The prompt contains only the natural language description of the task. This method has the maximum convenience, but could be challenging to apply, mainly due to the difficulty of imagine the format expected without producing examples.
+    \item \textbf{Few-Shot}: We are referring to a prompt that comprehends a few examples of how the output should be structured with also the correct output. This context helps the \ac{LLM} to learn how to complete the task given without updating the model parameters.
+    \item \textbf{One-Shot}: It is equal to the few-shot prompting, with only one demonstration allowed and the natural language description of the problem.  
+    \item \textbf{Zero-Shot}: In this case, no demonstrations are allowed. The prompt contains only the natural language description of the task. This method has the maximum convenience, but could be challenging to apply, mainly due to the difficulty of imagining the format expected without producing examples.
 \end{itemize}
-These methods are not meant to compete each other. They are three possibilities depending on the task that we require to the \ac{LLM}. In general, few-shot prompting tends to perform better on 
+These methods are not meant to compete with each other. There are three possibilities depending on the task that we require of the \ac{LLM}. In general, few-shot prompting tends to perform better on 
 structured or domain-specific tasks, while zero-shot prompting is often sufficient for simpler or well-known tasks\cite{brown2020languagemodelsfewshotlearners}.
 
 \subsection{Agents}
-The \acp{LLM} are now good enought to start thinking how automate some processes or how they can be used in more contexts.
+The \acp{LLM} are now good enough to start thinking about how to automate some processes or how they can be used in more contexts.
 For these reasons, the agents are created. The formal definition is:
 \begin{quote}
     ``An agent is anything that can be viewed as perceiving its environment through sensors and acting
 upon that environment through effectors."\cite{russell2010artificial}
 \end{quote}
-A high level description of an agent comprehend:
+A high-level description of an agent comprehends:
 \begin{itemize}
-    \item \textbf{Senses} the environment around it.
+    \item \textbf{Senses} the surrounding environment around it.
     \item \textbf{Perceives} the information of that environment.
     \item \textbf{Reasons} about how to act based on the input given.
     \item \textbf{Acts} upon the environment through its actions (the output)\cite{russell2010artificial}.
 \end{itemize}
-In the \ac{LLM} context, the agent brain is supported by the \ac{LLM}, which reasons using the context given (it could be the environment as a text) and it acts generating an ouput or by calling the \textbf{tools}.
+In the \ac{LLM} context, the agent brain is supported by the \ac{LLM}, which reasons using the context given (it could be the environment as a text), and it acts generating an output or by calling the \textbf{tools}.
 
 Tools are external functions or \acp{API} that an agent can invoke at runtime to overcome the limitations of the LLM, such as the lack of up-to-date knowledge, the inability to execute code, or the absence of persistent memory. By selecting and calling the appropriate tool based on the user's intent, the agent extends its capabilities well beyond pure language generation.
 
-As we said before, \acp{LLM} can be unpredictable and lacks of transparency. In this sense, the usage of tools enhance the credibility of the decision of an agent, improving interpretability and robustness\cite{xi2023risepotentiallargelanguage}.
+As we said before, \acp{LLM} can be unpredictable and lacks of transparency. In this sense, the usage of tools enhances the credibility of the decision of an agent, improving interpretability and robustness\cite{xi2023risepotentiallargelanguage}.
 \begin{figure}
     \centering
     \includegraphics[width=.8\linewidth]{figures/agents.png}
@@ -173,7 +173,7 @@ As we said before, \acp{LLM} can be unpredictable and lacks of transparency. In 
     \label{fig:agent-workflow}
 \end{figure}
 
-A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need of human intervention and try to adapt by changing their behaviour based on feedbacks\cite{Kumar2024}. 
+A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need for human intervention, and trying to adapt by changing their behavior based on feedbacks\cite{Kumar2024}. 
 \subsection{Open LLM problems}
 \subsubsection{Hallucinations}
 \subsubsection{Task Decomposition}
@@ -202,8 +202,8 @@ The reasoning representation $R$ is composed of multiple intermediate reasoning 
 LLMs are able to generate coherent text and perform reasoning, but as shown in the previous chapter, there are some limitations and challenges that need to be addressed:
 
 \begin{itemize}
-    \item \textbf{Limited explorations of alternatives}: The stardard approaches such as CoT and ToT generate a single linear solution, which may not be sufficient to generate a good solution, especially for complex problems that may require more attempts.
-    \item \textbf{Black box reasoning}: The reasoning process of LLMs is often difficult to understand and interpret, the generated text is auto regressive and the model does not have a clear representation of the reasoning process, which makes it difficult to debug and improve the model.
+    \item \textbf{Limited explorations of alternatives}: The standard approaches, such as CoT and ToT generate a single linear solution, which may not be sufficient to generate a good solution, especially for complex problems that may require more attempts.
+    \item \textbf{Black box reasoning}: The reasoning process of LLMs is often difficult to understand and interpret, the generated text is autoregressive and the model does not have a clear representation of the reasoning process, which makes it difficult to debug and improve the model.
     \item \textbf{Error propagation}: If there is an error in the early steps of the reasoning process, it will propagate to the solution. Without more exploration of alternatives, the model may not be able to recover from these errors and may produce incorrect solutions. 
 \end{itemize}
 
@@ -219,18 +219,18 @@ In order to address these challenges, the requirements are formalized as follows
 In order to simplify the problem and focus on the core aspects of the \ac{GoT} paradigm, we make the following assumptions:
 
 \begin{itemize}
-    \item \textbf{LLM capabilities}: We assume that the LLM has enough capabilities to use external tools, to craft tools if needed, to evaluate the generated solutions and to generate intermediate thoughts that are coherent and relevant to the problem at hand. This assumption is strictly dependent on the size of the LLM that we are using.
+    \item \textbf{LLM capabilities}: We assume that the LLM has enough capabilities to use external tools to craft tools if needed to evaluate the generated solutions and to generate intermediate thoughts that are coherent and relevant to the problem at hand. This assumption is strictly dependent on the size of the LLM that we are using.
     \item \textbf{Tool-Centric Problem Domain}: We assume the input problems belong to a class of tasks that cannot be solved through direct, zero-shot text generation alone. The problems are assumed to require non-trivial reasoning sequences and at least one interaction with an external environment or tool (e.g., a calculator, a search engine, or a code interpreter).    \
-    \item \textbf{Thought Atomicity}: We assume that each node in the graph represents an ``atomic" step of reasoning or a single functional operation. While the internal process of the LLM remains a black box, the output of each node is treated as a discrete state in the problem-solving space.
-    \item \textbf{Resource Finiteness}: We assume the existence of an upper bound on the graph depth and the number of LLM invocations to ensure the termination of the process and to mitigate potential infinite loops caused by recursive backtracking. This assumptions is also valid for time and computational resources, which are limited and should be taken into account when designing the system.
+    \item \textbf{Thought Atomicity}: We assume that each node in the graph represents an ``atomic" step of reasoning or a single functional operation. While the internal process of the LLM remains a black box; the output of each node is treated as a discrete state in the problem-solving space.
+    \item \textbf{Resource Finiteness}: We assume the existence of an upper bound on the graph depth and the number of LLM invocations to ensure the termination of the process and to mitigate potential infinite loops caused by recursive backtracking. These assumptions is also valid for time and computational resources, which are limited and should be taken into account when designing the system.
 \end{itemize}
 
 \section{The proposed approach}
 The approach proposed in this thesis is based on the \acp{GoT} paradigm. 
-In this framework, the reasoning process is modeled as a dynamic graph, where nodes represent intermediate thoughts and the Large Language Model (LLM) guides both the expansion of the graph and the decision of when to terminate the reasoning process.
+In this framework, the reasoning process is modeled as a dynamic graph, where nodes represent intermediate thoughts, and the Large Language Model (LLM) guides both the expansion of the graph and the decision of when to terminate the reasoning process.
 
 Given an input problem ($P$), the system incrementally constructs a graph according to a set of high-level rules. 
-These rules are designed to balance the exploration of multiple reasoning paths with the need for coherent and effective problem solving. Additionally, they encourage the use of external tools, which play a key role in improving traceability and interpretability of the reasoning process.
+These rules are designed to balance the exploration of multiple reasoning paths with the need for coherent and effective problem-solving. Additionally, they encourage the use of external tools, which play a key role in improving traceability and interpretability of the reasoning process.
 
 \subsection{Motivation for using GoT}
 The \ac{GoT} paradigm is chosen for the potential that this structure offers in terms of exploration, combination of different resoning paths and the ability to backtrack in order to recover from errors.
@@ -238,32 +238,32 @@ The \ac{GoT} paradigm is chosen for the potential that this structure offers in 
 The second motivation about the use of \ac{GoT}, as mentioned in the previous chapter, is the fact that the \ac{GoT} research is still in its early stages, so its potential is not yet fully explored.
 
 \subsection{Static Graph Structure}
-As \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. The static graph structure provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
-This structure can't be changed during the process and it represents the ``rules" of the graph.
+As a \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. The static graph structure provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
+This structure can't be changed during the process, and it represents the ``rules" of the graph.
 \\\\
 The static graph structure is defined as $G_s = (S, T)$, where $S$ is the set of possible logical states (e.g. Evaluation, Backtracking, Crafting etc.) and $T$ is the set of possible transitions between these states. 
-The states are defined and they are the following:
+The states are defined, and they are the following:
 
 \paragraph{\_\_start\_\_ and \_\_end\_\_}: the start and end states of the process. The \texttt{\_\_start\_\_} is the first state reached and the \texttt{\_\_end\_\_} is the last reached in the process. These represent entry and exit points and are visited exactly once per execution.
-\paragraph{goal}: this is the first real state. The system starts with the user prompt and the \texttt{goal} represents the problem. From here, the system starts to generate thought paths that can be explored in order to solve the problem. 
+\paragraph{goal}: This is the first real state. The system starts with the user prompt and the \texttt{goal} represents the problem. From here, the system starts to generate thought paths that can be explored in order to solve the problem. 
 \newline
-In particular, the system creates four different reasoning paths composed by three \texttt{tool\_reasoning} nodes and one \texttt{reasoning\_mode} node. The number of tool reasoning paths created is arbitrary, it is chosen by observing the system's behaviours during its runs. A higher number of reasoning paths can lead to more solutions, but the cost in terms of time and tokens increases.
-\paragraph{tool\_reasoning}: this is the starting point of a reasoning path. From here the system starts to think about how to solve the problem without solving it directly in order to force the reasoning to the LLM. The main focus of this state is about how to use the tools or, in some cases, how to craft them. The message history will be used to provide the context in the following states.
-\paragraph{tool\_calling}: this state is reached after the \texttt{tool\_reasoning} and it represents the moment in which the system should call the tool or just generate the solution if the tool is not needed. Since LLMs are stochastic auto-regressive models, we cannot deterministically predict the
+In particular, the system creates four different reasoning paths composed of three \texttt{tool\_reasoning} nodes and one \texttt{reasoning\_mode} node. The number of tool reasoning paths created are arbitrary; they are chosen by observing the system's behaviours during its runs. A higher number of reasoning paths can lead to more solutions, but the cost in terms of time and tokens increases.
+\paragraph{tool\_reasoning}: This is the starting point of a reasoning path. From here the system starts to think about how to solve the problem without solving it directly in order to force the reasoning to the LLM. The main focus of this state is about how to use the tools or, in some cases, how to craft them. The message history will be used to provide the context in the following states.
+\paragraph{tool\_calling}: This state is reached after the \texttt{tool\_reasoning} and it represents the moment in which the system should call the tool or just generate the solution if the tool is not needed. Since LLMs are stochastic auto-regressive models, we cannot deterministically predict the
 exact output; however, the system is designed to enforce instruction-following through the provided context. The expected behavior is for the model to generate a response that incorporates tool calls (if deemed necessary) or a direct solution, effectively bridging the gap between reasoning and action.
-\paragraph{response\_evaluation}: is reached after the \texttt{tool\_calling} or the \texttt{reasoning\_mode} and it represents the moment in which the system evaluates the generated response of the reasoning process. This moment is crucial in this structure because the evaluation decides what state must be reached next. The LLM-as-a-judge method is used to evaluate the response. The evaluation is based by the format of the response (sometimes the response should have a fixed format), the correctness of the result and the explanation of the process. The judge agent has the entire message history, so it has a full vision of the reasoning process. In order to evaluate the response, the LLM must score the solution to a number between 0 and 5, where 5 is the maximumn, and also give it a score to the problem complexity. These two parameters are used to decide if the response can pass or not. 
+\paragraph{response\_evaluation}: It is reached after the \texttt{tool\_calling} or the \texttt{reasoning\_mode}, and it represents the moment in which the system evaluates the generated response of the reasoning process. This moment is crucial in this structure because the evaluation decides what state must be reached next. The LLM-as-a-judge method is used to evaluate the response. The evaluation is based by the format of the response (sometimes the response should have a fixed format), the correctness of the result, and the explanation of the process. The judge agent has the entire message history, so it has a full vision of the reasoning process. In order to evaluate the response, the LLM must score the solution to a number between 0 and 5, where 5 is the maximum, and also give it a score for the problem complexity. These two parameters are used to decide if the response can pass or not. 
     The evaluation threshold is dynamically adjusted based on the problem complexity:
     \begin{equation}
     S \geq 5.5 - 0.5 \cdot C
     \end{equation}
-    Where $S$ is the score and $C \in [1,...,5]$ is the complexity. If the problem is too complex, a non-perfect response may be accepted. The logic behind it is that if the LLM has difficulty to find a solution, the logical soundness of the reasoning process is prioritized over the absolute precision of the final output.  
-    The LLM can also understand, usually hinted by the tool call response, that a new tool is needed. In this case the next node will be \texttt{crafting}. 
-\paragraph{backtrack}: is reached when an evaluation doesn't satisfy the LLM criteria to become a solution. This state allows to backtrack to a previous non-visited reasoning path and explore it, giving also feedbacks to the LLM about what is wrong with the previous path.
-\paragraph{crafting}: is reached when, after an evaluation, the system identifies that a new tool is needed to solve the problem. In this state, the LLM tries to craft a tool that can solve or can helps solving the problem and then a new reasoning path is chosen for exploration. In this state, a specialized crafter agent generates a new tool definition. This process uses the original problem context ($P$) and the judge's feedback as a specification. Once the tool is crafted, the system resumes the exploration by expanding a new reasoning path that can now leverage the newly created capability.
-\paragraph{reasoning\_mode}: is a different approach to solve the problem. If the \texttt{tool\_reasoning} and \texttt{tool\_calling} states are focused on how to use the tools, the \texttt{reasoning\_mode} is focused on how to solve the problem using \textit{divide-et-impera} system, so it is more focused on the reasoning capabilities of the LLM. This state is used when the system has difficulties in solving the problem. In the proposed approach, this state is reached when the response does not pass the evaluation and there is no \texttt{tool\_reasoning} node available. The system here has the possibility to divide the thought into two parallel sub-tasks in order
-to divide the complexity of the single prompt. The two prompt should
-be indipendent of each other.
-\paragraph{chat\_completion}: acts as a fallback mechanism to ensure that a response is provided even when complex reasoning paths fail. This state is reached when the system has explored all the possible paths and it is not able to find a solution, so it calls the LLM to generate a solution without any constraint, in order to guarantee the termination ofthe process.
+    Where $S$ is the score and $C \in [1,...,5]$ is the complexity. If the problem is too complex, a non-perfect response may be accepted. The logic behind it is that if the \ac{LLM} has difficulty finding a solution, the logical soundness of the reasoning process is prioritized over the absolute precision of the final output.  
+    The \ac{LLM} can also understand, usually hinted by the tool call response, that a new tool is needed. In this case the next node will be \texttt{crafting}. 
+\paragraph{backtrack}: It is reached when an evaluation doesn't satisfy the LLM criteria to become a solution. This state allows to backtrack to a previous non-visited reasoning path and explore it, giving also feedbacks to the LLM about what is wrong with the previous path.
+\paragraph{crafting}: It is reached when, after an evaluation, the system identifies that a new tool is needed to solve the problem. In this state, the \ac{LLM} tries to craft a tool that can solve or can helps solving the problem, and then a new reasoning path is chosen for exploration. In this state, a specialized crafter agent generates a new tool definition. This process uses the original problem context ($P$) and the judge's feedback as a specification. Once the tool is crafted, the system resumes the exploration by expanding a new reasoning path that can now leverage the newly created capability.
+\paragraph{reasoning\_mode}: It is a different approach to solve the problem. If the \texttt{tool\_reasoning} and \texttt{tool\_calling} states are focused on how to use the tools, the \texttt{reasoning\_mode} is focused on how to solve the problem using \textit{divide-et-impera} system, so it is more focused on the reasoning capabilities of the LLM. This state is used when the system has difficulties in solving the problem. In the proposed approach, this state is reached when the response does not pass the evaluation and there is no \texttt{tool\_reasoning} node available. The system here has the possibility to divide the thought into two parallel sub-tasks in order
+to divide the complexity of the single prompt. The two prompts should
+be independent of each other.
+\paragraph{chat\_completion}: Acts as a fallback mechanism to ensure that a response is provided even when complex reasoning paths fail. This state is reached when the system has explored all the possible paths, and it is not able to find a solution, so it calls the LLM to generate a solution without any constraint in order to guarantee the termination of the process.
 \\\\
 We partition the set of transitions $T$ into two disjoint subsets: $T = T_d \cup T_c$ where:
 \begin{itemize}
@@ -669,7 +669,7 @@ Evaluating a tool-augmented, graph-based reasoning system requires metrics that 
 To comprehensively capture the performance, efficiency, and robustness of the system, we measure three primary metrics:
 \begin{itemize}
     \item \textbf{Accuracy:} It is the fundamental metric. It is used to determined the percentage of successful answer. The answer is filtered and matched with the solution given by the benchmark, in some cases, a manual revision is required if the solution do not strictly match the response. A sub metric is defined to be more accurate in the analysis, which is the \textbf{Error rate} of the system. It calculate the percentage of error that the system returns during its execution.
-    \item \textbf{Resource consumption:} In real-world deployment, evaluating the economic and computational sustainability of a framework is crucial. For this reason, we track three sub metric: the \textbf{Time} spent during the generation of the final response and the \textbf{Token consumption}, which is fundamental for calculating the real cost of a single response. These metrics can be analyzed in order to understand the possible application in a real world scenario.
+    \item \textbf{Resource consumption:} In real-world deployment, evaluating the economic and computational sustainability of a framework is crucial. For this reason, we track three sub metric: the \textbf{Time} spent during the generation of the final response and the \textbf{Token consumption}, which is fundamental for calculating the real cost of a single response. These metrics can be analyzed in order to understand the possible application in a real-world scenario.
     \item \textbf{Tool invocation:} Considering the nature of the system, a tool metric is mandatory in order to really understand if the \ac{GoT} can have an advantage with the respect to others architectures. The sub metric chosen are the \textbf{Tool invocation}, representing how many tool are invoked and, in case of \ac{GoT}, the \textbf{Tool crafted} count, adding also an analysis if the tool crafted are reused over the tasks or not.
 \end{itemize}
 
