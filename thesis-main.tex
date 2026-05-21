@@ -85,7 +85,7 @@ Their generalized knowledge and versatility make them perfect for a wide range o
 The ability to generate natural language fits perfectly with the need to create systems that can be used by everyone without requiring specific technical knowledge. 
 Unlike traditional software interfaces, which often require predefined commands or structured inputs, \acp{LLM} allow users to interact using natural language, making human-computer interaction more intuitive and accessible.
 \\\\
-During the last years, after the release of ChatGPT, the average number of arXiv papers that contains \textit{"large language model"} title or abstract deduplicate \cite{zhao2026surveylargelanguagemodels}, leading to the development of increasingly powerful models such as GPT-4\cite{openai2024gpt4technicalreport}, LLaMA\cite{touvron2023llama2openfoundation}, Gemini, and Claude\cite{claude3modelcard}. 
+During the last years, after the release of ChatGPT, the average number of arXiv papers that contains \textit{``large language model"} title or abstract deduplicate \cite{zhao2026surveylargelanguagemodels}, leading to the development of increasingly powerful models such as GPT-4\cite{openai2024gpt4technicalreport}, LLaMA\cite{touvron2023llama2openfoundation}, Gemini, and Claude\cite{claude3modelcard}. 
 These systems are capable not only of understanding and generating text, but also of solving reasoning tasks, summarizing documents, writing code, and supporting decision-making processes, becoming more and more used in real world scenarios.
 \subsection{How they work}
 \acp{LLM} are autoregressive models that simply try to predict the next word in a sequence, based on the context.
@@ -95,7 +95,7 @@ A token may represents a word, part of a word, or even a symbol depending on the
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.8\linewidth]{figures/tokenization.png}
-    \caption{Schematic workflow of an LLM tokenizer: from raw input text to token segmentation and subsequent mapping into vocabulary IDs.}
+    \caption{Schematic workflow of an LLM tokenizer: from raw input text to token segmentation and subsequent mapping into vocabulary IDs. Source: \url{https://www.linkedin.com/pulse/llm-tokenizers-hidden-engine-behind-ai-language-models-natarajan-rmbsc}}
     \label{fig:tokenization}
 \end{figure}
 \newline
@@ -111,7 +111,7 @@ Their outputs are generated through statistical pattern matching learned from tr
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.7\linewidth]{figures/token_prediction.jpg}
-    \caption{Schematic overview of autoregressive decoding and probabilistic next-token prediction in an LLM.}
+    \caption{Schematic overview of autoregressive decoding and probabilistic next-token prediction in an LLM. Source: \url{https://albanna-tutorials.com/llm_agents.html}}
     \label{fig:token-prediction}
 \end{figure}
 
@@ -134,9 +134,19 @@ capabilities~\cite{brown2020languagemodelsfewshotlearners}. We may note that the
 
 Nowadays, the emphasis on increasing model parameter counts is gradually giving way to research on higher-level capabilities, including autonomous agents and more effective prompting strategies.
 \subsection{Prompt Engineering}
-Prompt engineering is a relatively new field of research that refers to the practice of designing, refining, and implementing prompts or instructions that guide the output of \acp{LLM}. The main goal of Prompt Engineering is to optimize the \ac{LLM} output by solely refining the prompt.\cite{Mesk2023}.
+Prompt engineering is a relatively new field of research that refers to the practice of designing, refining, and implementing prompts or instructions that guide the output of \acp{LLM}. The main goal of Prompt Engineering is to optimize the \ac{LLM} output by solely refining the prompt\cite{Mesk2023}.
 
 The prompt could comprehend a lot of components such as: \textit{Directives}, \textit{Examples}, \textit{Output formatting}, \textit{Style instructions}, \textit{Role} or \textit{Additional Information}\cite{schuloff2024prompt_engineer}. All of these components can help to improve the generated output in terms of a better style, accuracy in the response or even a more correct output.
+
+One of the most popular and older prompt engineer techniques is the \textit{Few Shot Prompting}\cite{brown2020languagemodelsfewshotlearners}, in particular it has three sub categories:
+\begin{itemize}
+    \item \textbf{Few-Shot}: We referring to a prompt which comprehends a few examples of how the output should be structured with also the correct output. This context helps the \ac{LLM} to learn how to complete the task given, without updating the model parameters.
+    \item \textbf{One-Shot}: It is equal to the few shot prompting, with only one demonstration allowed and the natural language description of the problem.  
+    \item \textbf{Zero-Shot}: In this case, no demonstrations are allowed. The prompt contains only the natural language description of the task. This method has the maximum convenience, but could be challenging to apply, mainly due to the difficulty of imagine the format expected without producing examples.
+\end{itemize}
+These methods are not meant to compete each other. They are three possibilities depending on the task that we require to the \ac{LLM}. In general, few-shot prompting tends to perform better on 
+structured or domain-specific tasks, while zero-shot prompting is often sufficient for simpler or well-known tasks\cite{brown2020languagemodelsfewshotlearners}.
+
 \subsection{Agents}
 The \acp{LLM} are now good enought to start thinking how automate some processes or how they can be used in more contexts.
 For these reasons, the agents are created. The formal definition is:
@@ -159,7 +169,7 @@ As we said before, \acp{LLM} can be unpredictable and lacks of transparency. In 
 \begin{figure}
     \centering
     \includegraphics[width=.8\linewidth]{figures/agents.png}
-    \caption{Representation of how an agents works.}
+    \caption{Representation of how an agents works. Source: \url{https://cobusgreyling.medium.com/how-would-the-architecture-for-an-llm-agent-platform-look-b07d7e004561}}
     \label{fig:agent-workflow}
 \end{figure}
 
@@ -211,7 +221,7 @@ In order to simplify the problem and focus on the core aspects of the \ac{GoT} p
 \begin{itemize}
     \item \textbf{LLM capabilities}: We assume that the LLM has enough capabilities to use external tools, to craft tools if needed, to evaluate the generated solutions and to generate intermediate thoughts that are coherent and relevant to the problem at hand. This assumption is strictly dependent on the size of the LLM that we are using.
     \item \textbf{Tool-Centric Problem Domain}: We assume the input problems belong to a class of tasks that cannot be solved through direct, zero-shot text generation alone. The problems are assumed to require non-trivial reasoning sequences and at least one interaction with an external environment or tool (e.g., a calculator, a search engine, or a code interpreter).    \
-    \item \textbf{Thought Atomicity}: We assume that each node in the graph represents an "atomic" step of reasoning or a single functional operation. While the internal process of the LLM remains a black box, the output of each node is treated as a discrete state in the problem-solving space.
+    \item \textbf{Thought Atomicity}: We assume that each node in the graph represents an ``atomic" step of reasoning or a single functional operation. While the internal process of the LLM remains a black box, the output of each node is treated as a discrete state in the problem-solving space.
     \item \textbf{Resource Finiteness}: We assume the existence of an upper bound on the graph depth and the number of LLM invocations to ensure the termination of the process and to mitigate potential infinite loops caused by recursive backtracking. This assumptions is also valid for time and computational resources, which are limited and should be taken into account when designing the system.
 \end{itemize}
 
@@ -229,7 +239,7 @@ The second motivation about the use of \ac{GoT}, as mentioned in the previous ch
 
 \subsection{Static Graph Structure}
 As \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. The static graph structure provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
-This structure can't be changed during the process and it represents the "rules" of the graph.
+This structure can't be changed during the process and it represents the ``rules" of the graph.
 \\\\
 The static graph structure is defined as $G_s = (S, T)$, where $S$ is the set of possible logical states (e.g. Evaluation, Backtracking, Crafting etc.) and $T$ is the set of possible transitions between these states. 
 The states are defined and they are the following:
@@ -283,7 +293,7 @@ Moreover, every agent has its own state machine defined by the framework used.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.5\linewidth]{figures/agent_model.png}
-    \caption{Agent state machine: the default agent state machine used in \ac{GoT} for agent call}
+    \caption{Agent state machine: the default agent state machine used in \ac{GoT} for agent call. Source: \url{https://docs.langchain.com/oss/python/langchain/agents\#model}}
     \label{fig:agent-state-machine}
 \end{figure}
 \\ 
@@ -317,7 +327,7 @@ In particular, the evaluation phase is a critical point and also a complex step 
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Procedure{evaluate}{message\_history}
-    \State $evaluation \gets$ judge\_agent.call("Evaluate this solution", message\_history)
+    \State $evaluation \gets$ judge\_agent.call(``Evaluate this solution", message\_history)
     \State $nodes\_avail \gets$ exist\_node\_tool\_available()
     \State $threshold \gets$ COMPLEXITY\_THRESHOLD $-$ COMPLEXITY\_COEFFICIENT $\cdot$ problem\_complexity
 
@@ -355,35 +365,35 @@ At first, following the static graph, the \texttt{goal} node is visited, creatin
 \newline
 Then, a \texttt{tool\_reasoning} node is visited, calling the starting agent with the following conversation:
 \begin{itemize}
-    \item[\textbf{User:}] "Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{User:}] "Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
-    \item[\textbf{AI:}] "Craft a new tool: This problem requires solving an integral, which involves symbolic computation. The existing tools (`summing`, `minus`, `square\_root`, `multiply`, `divide`) are designed for basic arithmetic operations on numerical values and do not support symbolic integration. Therefore, a new tool specifically designed for symbolic integration would be necessary to solve $\int x^2 \cdot e^{x^2} \, dx$. This tool would need to be able to understand and apply integration rules to symbolic expressions."
+    \item[\textbf{User:}] ``Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
+    \item[\textbf{AI:}] ``Craft a new tool: This problem requires solving an integral, which involves symbolic computation. The existing tools (`summing`, `minus`, `square\_root`, `multiply`, `divide`) are designed for basic arithmetic operations on numerical values and do not support symbolic integration. Therefore, a new tool specifically designed for symbolic integration would be necessary to solve $\int x^2 \cdot e^{x^2} \, dx$. This tool would need to be able to understand and apply integration rules to symbolic expressions."
 \end{itemize}
 
 At this point, the graph visits the \texttt{tool\_calling} node with the previous message history, asking for the generation of a solution:
 \begin{itemize}
-    \item[\textbf{System:}] "Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
-    \item[\textbf{AI:}] "Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
+    \item[\textbf{System:}] ``Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
+    \item[\textbf{AI:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
     \newline 
     Explanation: The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
 \end{itemize}
 
 The given response is taken for evaluation in the \texttt{response\_evaluation} node. In this case, the context given by the tool reasoning is eliminated in order to maintain a clean message history:
 \begin{itemize}
-    \item[\textbf{User:}] "Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{User:}] "Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
-    \item[\textbf{System:}] "Score this solution based on correctness and following instructions."
-    \item[\textbf{AI:}] "Tool used in the response: Response"
-    \item[\textbf{AI:}] "{ 'score': 1, 'description': 'The response correctly identifies the need for a new tool for symbolic integration, which is a valid assessment given the problem. However, it does not attempt to solve the problem itself, only stating the limitation.', 'need\_tool\_crafting': true, 'problem\_complexity': 4 }"
+    \item[\textbf{User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{User:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
+    \item[\textbf{System:}] ``Score this solution based on correctness and following instructions."
+    \item[\textbf{AI:}] ``Tool used in the response: Response"
+    \item[\textbf{AI:}] ``{ 'score': 1, 'description': 'The response correctly identifies the need for a new tool for symbolic integration, which is a valid assessment given the problem. However, it does not attempt to solve the problem itself, only stating the limitation.', 'need\_tool\_crafting': true, 'problem\_complexity': 4 }"
 \end{itemize}
 
 The response does not passed the evaluation and the judge agent identifies the need of crafting a new tool. Then, following the algorithm, a new \texttt{crafting} node is created.
 \newline
 The message history passed in the \texttt{crafting} node contains the goal and the explanation given in the response:
 \begin{itemize}
-    \item[\textbf{User:}] "Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{AI:}] "The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
-    \item[\textbf{System:}] "Use the context given to craft a tool to solve this problem using craft\_tool. It must be a function"
+    \item[\textbf{User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{AI:}] ``The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
+    \item[\textbf{System:}] ``Use the context given to craft a tool to solve this problem using craft\_tool. It must be a function"
     \item[\textbf{AI:}] It creates a new tool called \texttt{symbolic\_integration(expression: str, variable: str) -> str}
     \item[\textbf{AI:}] It install the \texttt{sympy} dependencies
     \item[\textbf{AI:}] Returning structured response: 
@@ -398,7 +408,7 @@ The system now pick an another tool reasoning path with the new tool crafted and
 The next \texttt{tool\_reasoning} node is visited:
 \begin{itemize}
     \item[\textbf{PMH:}] Previous message history
-    \item[\textbf{User:}] "Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool."
+    \item[\textbf{User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool."
     \item[\textbf{AI:}] \texttt{symbolic\_integration} To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, the \texttt{symbolic\_integration} tool should be used. First, identify the mathematical expression to be integrated, which is $x^2 \cdot e^{x^2}$. Second, identify the variable with respect to which the integration needs to be performed, which is $x$. Finally, call the \texttt{symbolic\_integration} tool with these identified parameters.
 \end{itemize}
 
@@ -406,7 +416,7 @@ The \texttt{tool\_calling} node is now visited:
 
 \begin{itemize}
     \item[\textbf{PMH:}] Previous message history
-    \item[\textbf{System:}] "Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
+    \item[\textbf{System:}] ``Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
     \item[\textbf{AI:}] Tool agent calls \texttt{symbolic\_integration} 
     \item[\textbf{AI:}] 
     \begin{description}
@@ -417,15 +427,15 @@ The \texttt{tool\_calling} node is now visited:
 
 Now there is the evaluation phase:
 \begin{itemize}
-    \item[\textbf{User:}] "Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
     \item[\textbf{User:}]     
     \begin{description}
         \item[\texttt{response:}] ``The integral of $\int x^2 \cdot e^{x^2} \, dx$ is $\frac{x e^{x^2}}{2} - \frac{\sqrt{\pi}}{4} \operatorname{erfi}(x) + C$'' 
         \item[\texttt{explanation:}] ``The \texttt{symbolic\_integration} tool was used with the expression $x^2 \cdot e^{x^2}$ and variable $x$ to calculate the indefinite integral.''
     \end{description}
-    \item[\textbf{System:}] "Score this solution based on correctness and following instructions."
-    \item[\textbf{AI:}] "Tool used in the response: \texttt{symbolic\_integration}, Response"
-    \item[\textbf{AI:}] "{ 'score': 5, 'description': 'The response correctly identifies and calculates the indefinite integral of the given function. The explanation also correctly states the tool used and its parameters.', 'need\_tool\_crafting': false, 'problem\_complexity': 2 }"
+    \item[\textbf{System:}] ``Score this solution based on correctness and following instructions."
+    \item[\textbf{AI:}] ``Tool used in the response: \texttt{symbolic\_integration}, Response"
+    \item[\textbf{AI:}] ``{ 'score': 5, 'description': 'The response correctly identifies and calculates the indefinite integral of the given function. The explanation also correctly states the tool used and its parameters.', 'need\_tool\_crafting': false, 'problem\_complexity': 2 }"
 \end{itemize}
 
 The system correctly find the right answer and the evaluation phase has correctly identify the solution. The response can now be the final answer of the system.
@@ -590,7 +600,7 @@ This process is based on the following steps:
 \begin{enumerate}
     \item \textbf{Crafting tool calling}: The LLM calls the crafting tool, the argument of the tool is the function that the system want to craft.
     \item \textbf{Sanification}: The \texttt{craft\_tool} function sanifies the function by removing whitespace and backticks. 
-    \item \textbf{Code checking}: The system checks if the code written is referring only to just a one function definition. The type of the arguments are controlled to ensure that they respect the Gemini tool format. This means that every argument must have the type definition and, in case of \texttt{list}, \texttt{dict} and \texttt{set}, the type of the elements must be defined. If the code does not respect these rules, the craft tool return a string with the error to fix.
+    \item \textbf{Code checking}: The system checks if the code written is referring only to just a one function definition. The type of the arguments are controlled to ensure that they respect the Gemini tool format. This means that every argument must have the type definition and, in case of \texttt{list}, \texttt{dict} and \texttt{set}, the type of the elements must be defined. The function must has a proper documentation. This is important not just for ensuring the format requested, but also for explaining to the \ac{LLM} what the tool does; it impacts directly to its probability to be called. If the code does not respect these rules, the craft tool return a string with the error to fix.
     \item \textbf{Saving}: If the code is correct, the code is saved in a defined file, called \texttt{ai\_tool.py}. This file contains all the crafted tools.
     \item \textbf{Importing}: The system create a new agent calling the \texttt{get\_crafted\_tools{}}, which is a function that import all the functions in the \texttt{ai\_tool.py} file, it wrap each of them with the \texttt{@tool} decorator and return them in a list.
 \end{enumerate}
