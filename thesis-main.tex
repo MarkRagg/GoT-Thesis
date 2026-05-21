@@ -284,11 +284,11 @@ While some phases follow a strict sequence—such as the transition from Initial
 We represent the system as a directed graph $G = (N, E)$, where:
 \begin{itemize}
     \item $N$ = $\{n_1, n_2, ..., n_m\}$ is the set of nodes, where each node $n_i$ is a \textbf{runtime node}.  We treat the runtime node as an \textit{abstract base object} represented by the 3-tuple $n_i = (id, s_i, rs_i)$, where $id$ is the unique identifier of the node, $s_i$ is the state that the node represents, $rs_i$ is a binary value that represents if the node is resolved or not. This abstraction allows for \textbf{node specialization}: depending on the state $s_i$, a node may extend the base 3-tuple with additional specialized attributes (e.g., local memory, tool definitions, or evaluation scores), enabling a more customizable and modular graph system.
-    \item $E$ = $\{e_1, e_2, ..., e_k\}$ is the set of directed edges, where each edge $e_j = (n_{i1}, n_{i2}, h_j) \in E$ represents a transition from node $n_{i1}$ to node $n_{i2}$ with the message history $h_j$. The message history $h_j$ is a sequence of interactions happened in the nodes before. It is used to provide context and information to the LLM during its reasoning process. The message history sometimes is manipulated by the system in order to provide the right behaviour to the LLM (e.g. crafting a tool instead of using it).
+    \item $E$ = $\{e_1, e_2, ..., e_k\}$ is the set of directed edges, where each edge $e_j = (n_{i1}, n_{i2}, h_j) \in E$ represents a transition from node $n_{i1}$ to node $n_{i2}$ with the message history $h_j$. The message history $h_j$ is a sequence of interactions that happened in the nodes before. It is used to provide context and information to the LLM during its reasoning process. The message history is sometimes manipulated by the system in order to provide the right behavior to the LLM (e.g., crafting a tool instead of using it).
 \end{itemize}
 
 \subsubsection{Agents Definition}
-In the proposed system, we define multiple agents in order to manage different states of the graph and to provide a more customized behaviour for each state.
+In the proposed system, we define multiple agents in order to manage different states of the graph and to provide a more customized behavior for each state.
 Moreover, every agent has its own state machine defined by the framework used.
 \begin{figure}[h!]
     \centering
@@ -298,22 +298,22 @@ Moreover, every agent has its own state machine defined by the framework used.
 \end{figure}
 \\ 
 As we see in the figure \cref{fig:agent-state-machine}, the agent has two states: \texttt{mode} and \texttt{tools}.
-The agent receives in input a prompt and the \texttt{mode} state can decide if use a tool or generate the output, finishing the process.
-In case of tool call, the result is sent in the \texttt{mode} state in order to generate the output or call again a tool if necessary.
+The agent receives as input a prompt, and the \texttt{mode} state can decide if it uses a tool or generate the output, finishing the process.
+In case of a tool call, the result is sent in the \texttt{mode} state in order to generate the output or call again a tool if necessary.
 \\\\
-Matematically we define an agent $a \in A$ as a function: 
+Mathematically we define an agent $a \in A$ as a function: 
 \begin{equation}
     a: (h_j, p_i, t_i) \to (r_i, m_i)
 \end{equation}
 where $t_i$ represents the set of tools available, $p_i$ the prompt given, $r_i$ the response generated and $m_i$ the metadata.
 In particular, we define the following agents:
 \begin{itemize}
-    \item \textbf{Starting agent}: It is an expert of tool usage, but his role is to reason about how to solve the problem with the tools, if there is a need of a new tool or if the problem does not require them.  
-    \item \textbf{Tool agent}: It is also an expert of tool usage. Its role is to follow the instructions of the starting agent and provide a solution by using the tools.
-    \item \textbf{Judge agent}: It is an expert of evaluation. This agent is crucial for the system because it is responsible for the judgement of the generated solution and decide it can be the final answer or it needs to be revised. This agent is also responsible for the decision if a new tool is needed. 
+    \item \textbf{Starting agent}: It is an expert in tool usage, but his role is to reason about how to solve the problem with the tools, if there is a need for a new tool or if the problem does not require them.  
+    \item \textbf{Tool agent}: It is also an expert in tool usage. Its role is to follow the instructions of the starting agent and provide a solution by using the tools.
+    \item \textbf{Judge agent}: It is an expert of evaluation. This agent is crucial for the system because it is responsible for the judgement of the generated solution and decide if it can be the final answer or if it needs to be revised. This agent is also responsible for the decision if a new tool is needed. 
     \item \textbf{Crafter agent}: It is an expert of tool crafting. It is used for crafting a new tool.
     \item \textbf{Reasoning agent}: It is an expert of reasoning. Its role is to analyze the problem and generate potential solutions using the divide-et-impera approach.
-    \item \textbf{Chat completition agent}: It is a generalist agent, it is used as a fallback mechanism to generate a solution without any constraint when the system has explored all the possible paths and it is not able to find a solution.
+    \item \textbf{Chat completition agent}: It is a generalist agent; it is used as a fallback mechanism to generate a solution without any constraint when the system has explored all the possible paths and is not able to find a solution.
 \end{itemize}
 
 \section{Formalizations}
@@ -321,7 +321,7 @@ Now that we have described the proposed approach at a high level, we can provide
 
 \subsection{Pseudocode}
 
-For a complete comprehention of the crucial steps of the system, some snippets of pseudocode are presented here.
+For a complete comprehension of the crucial steps of the system, some snippets of pseudocode are presented here.
 In particular, the evaluation phase is a critical point and also a complex step to understand:
 
 \begin{algorithm}
@@ -353,7 +353,7 @@ In particular, the evaluation phase is a critical point and also a complex step 
 \subsection{Illustrative Example}
 In order to fully clarify the system mechanics, the following section guides the reader through a practical, step-by-step execution example.
 \\
-The task taken as example involve math a problem in which the system does not have the tools necessary to resolve it. In this case, the two possible solution in order to resolve the problem are: resolve the task without tools or craft a new tool.
+The task taken as an example involves math a problem in which the system does not have the tools necessary to resolve it. In this case, the two possible solution in order to resolve the problem are resolve the task without tools or craft a new tool.
 \\\\
 In particular the initial prompt is:
 \begin{quote}
