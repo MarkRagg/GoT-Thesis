@@ -20,7 +20,10 @@
 \academicyear{2026-2027}
 
 % Definition of acronyms
-\acrodef{GoT}[GoT]{Graph of Thought}
+\acrodef{GoT}[GoT]{Graph of Thoughts}
+\acrodef{CoT}{Chain of Thoughts}
+\acrodef{CoT-SC}{Self consistency CoT}
+\acrodef{ToT}{Tree of Thoughts}
 \acrodef{LLM}{Large Language Model}
 \acrodef{AI}{Artificial Intelligence}
 \acrodef{GPU}{Graphics Processing Unit}
@@ -174,14 +177,34 @@ As we said before, \acp{LLM} can be unpredictable and lacks of transparency. In 
 \end{figure}
 
 A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need for human intervention, and trying to adapt by changing their behavior based on feedbacks\cite{Kumar2024}. 
-\subsection{Open LLM problems}
-\subsubsection{Hallucinations}
-\subsubsection{Task Decomposition}
 \section{LangChain \& LangGraph}
 
 \section{Related Works}
+While few-shot prompting improves performance by providing input-output 
+examples, it does not explicitly guide the model through the reasoning 
+process required to solve a task.
+The research in this field has been evolved, finding new ways to improve the output quality without changing the \ac{LLM} parameters.
 \subsection{Chain of Thought}
+Recently the \ac{CoT}\cite{weichainofthoughts} prompting is introduced. This prompting techniques reveals that, when \acp{LLM} produce the reasoning steps of a solution, the correct results increase drammatically.
+This leads to a lot of advantages:
+\begin{itemize}
+    \item \textbf{Accuracy}: As we said previously, the number of corrected answers increase\cite{weichainofthoughts}.
+    \item \textbf{Interpretability}: The \ac{LLM} remains a black box, but the final solution includes the steps, allowing to understand when the \ac{LLM} produces an error in the reasoning. 
+    \item \textbf{Transparency}: In some task categories, such as math problems, the \ac{CoT} techniques produces the intermediate reasoning which helps to indipendently reproduce the result given.   
+\end{itemize}
+The \ac{CoT} was firstly introduced as a few-shot approach, where the examples were used for enducing the multi steps reasoning. 
+Recently it has been proved that also a zero-shot \ac{CoT} increases the performance, introducing the ``Let's think step by step" phrase into the prompt\cite{kojimazeroshotcot}.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.9\linewidth]{figures/cot-prompting.png}
+    \caption{The differences between a normal prompt versus a few-shot \ac{CoT} and a zero-shot \ac{CoT}. Source: \cite{kojimazeroshotcot}\url{https://arxiv.org/abs/2205.11916}}
+    \label{fig:agent-workflow}
+\end{figure}
+
+Later on, the \ac{CoT-SC}\cite{selfconsistencycot} was developed as an evolution of the classic \ac{CoT}. The idea behind that was explore multiple reasoning paths in order to select the most accurate output. The empirical evaluation proved that \ac{CoT-SC} boost the performance of \ac{CoT} reasoning\cite{selfconsistencycot}.
 \subsection{Tree of Thought}
+The introduction of the \ac{CoT} approach, it paved the way for a new type of prompt engineering. From this method, the \ac{ToT} was developed\cite{yao2023tot}.
+
 \subsection{Graph of Thought}
 
 \chapter{Methodology / Design}
@@ -239,31 +262,30 @@ The second motivation about the use of \ac{GoT}, as mentioned in the previous ch
 
 \subsection{Static Graph Structure}
 As a \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. The static graph structure provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
-This structure can't be changed during the process, and it represents the ``rules" of the graph.
 \\\\
 The static graph structure is defined as $G_s = (S, T)$, where $S$ is the set of possible logical states (e.g. Evaluation, Backtracking, Crafting etc.) and $T$ is the set of possible transitions between these states. 
 The states are defined, and they are the following:
 
 \paragraph{\_\_start\_\_ and \_\_end\_\_}: the start and end states of the process. The \texttt{\_\_start\_\_} is the first state reached and the \texttt{\_\_end\_\_} is the last reached in the process. These represent entry and exit points and are visited exactly once per execution.
-\paragraph{goal}: This is the first real state. The system starts with the user prompt and the \texttt{goal} represents the problem. From here, the system starts to generate thought paths that can be explored in order to solve the problem. 
+\paragraph{goal} This is the first real state. The system starts with the user prompt and the \texttt{goal} represents the problem. From here, the system starts to generate thought paths that can be explored in order to solve the problem. 
 \newline
 In particular, the system creates four different reasoning paths composed of three \texttt{tool\_reasoning} nodes and one \texttt{reasoning\_mode} node. The number of tool reasoning paths created are arbitrary; they are chosen by observing the system's behaviours during its runs. A higher number of reasoning paths can lead to more solutions, but the cost in terms of time and tokens increases.
-\paragraph{tool\_reasoning}: This is the starting point of a reasoning path. From here the system starts to think about how to solve the problem without solving it directly in order to force the reasoning to the LLM. The main focus of this state is about how to use the tools or, in some cases, how to craft them. The message history will be used to provide the context in the following states.
-\paragraph{tool\_calling}: This state is reached after the \texttt{tool\_reasoning} and it represents the moment in which the system should call the tool or just generate the solution if the tool is not needed. Since LLMs are stochastic auto-regressive models, we cannot deterministically predict the
+\paragraph{tool\_reasoning} This is the starting point of a reasoning path. From here the system starts to think about how to solve the problem without solving it directly in order to force the reasoning to the LLM. The main focus of this state is about how to use the tools or, in some cases, how to craft them. The message history will be used to provide the context in the following states.
+\paragraph{tool\_calling} This state is reached after the \texttt{tool\_reasoning} and it represents the moment in which the system should call the tool or just generate the solution if the tool is not needed. Since LLMs are stochastic auto-regressive models, we cannot deterministically predict the
 exact output; however, the system is designed to enforce instruction-following through the provided context. The expected behavior is for the model to generate a response that incorporates tool calls (if deemed necessary) or a direct solution, effectively bridging the gap between reasoning and action.
-\paragraph{response\_evaluation}: It is reached after the \texttt{tool\_calling} or the \texttt{reasoning\_mode}, and it represents the moment in which the system evaluates the generated response of the reasoning process. This moment is crucial in this structure because the evaluation decides what state must be reached next. The LLM-as-a-judge method is used to evaluate the response. The evaluation is based by the format of the response (sometimes the response should have a fixed format), the correctness of the result, and the explanation of the process. The judge agent has the entire message history, so it has a full vision of the reasoning process. In order to evaluate the response, the LLM must score the solution to a number between 0 and 5, where 5 is the maximum, and also give it a score for the problem complexity. These two parameters are used to decide if the response can pass or not. 
+\paragraph{response\_evaluation} It is reached after the \texttt{tool\_calling} or the \texttt{reasoning\_mode}, and it represents the moment in which the system evaluates the generated response of the reasoning process. This moment is crucial in this structure because the evaluation decides what state must be reached next. The LLM-as-a-judge method is used to evaluate the response. The evaluation is based by the format of the response (sometimes the response should have a fixed format), the correctness of the result, and the explanation of the process. The judge agent has the entire message history, so it has a full vision of the reasoning process. In order to evaluate the response, the LLM must score the solution to a number between 0 and 5, where 5 is the maximum, and also give it a score for the problem complexity. These two parameters are used to decide if the response can pass or not. 
     The evaluation threshold is dynamically adjusted based on the problem complexity:
     \begin{equation}
     S \geq 5.5 - 0.5 \cdot C
     \end{equation}
     Where $S$ is the score and $C \in [1,...,5]$ is the complexity. If the problem is too complex, a non-perfect response may be accepted. The logic behind it is that if the \ac{LLM} has difficulty finding a solution, the logical soundness of the reasoning process is prioritized over the absolute precision of the final output.  
     The \ac{LLM} can also understand, usually hinted by the tool call response, that a new tool is needed. In this case the next node will be \texttt{crafting}. 
-\paragraph{backtrack}: It is reached when an evaluation doesn't satisfy the LLM criteria to become a solution. This state allows to backtrack to a previous non-visited reasoning path and explore it, giving also feedbacks to the LLM about what is wrong with the previous path.
-\paragraph{crafting}: It is reached when, after an evaluation, the system identifies that a new tool is needed to solve the problem. In this state, the \ac{LLM} tries to craft a tool that can solve or can helps solving the problem, and then a new reasoning path is chosen for exploration. In this state, a specialized crafter agent generates a new tool definition. This process uses the original problem context ($P$) and the judge's feedback as a specification. Once the tool is crafted, the system resumes the exploration by expanding a new reasoning path that can now leverage the newly created capability.
-\paragraph{reasoning\_mode}: It is a different approach to solve the problem. If the \texttt{tool\_reasoning} and \texttt{tool\_calling} states are focused on how to use the tools, the \texttt{reasoning\_mode} is focused on how to solve the problem using \textit{divide-et-impera} system, so it is more focused on the reasoning capabilities of the LLM. This state is used when the system has difficulties in solving the problem. In the proposed approach, this state is reached when the response does not pass the evaluation and there is no \texttt{tool\_reasoning} node available. The system here has the possibility to divide the thought into two parallel sub-tasks in order
+\paragraph{backtrack} It is reached when an evaluation doesn't satisfy the LLM criteria to become a solution. This state allows to backtrack to a previous non-visited reasoning path and explore it, giving also feedbacks to the LLM about what is wrong with the previous path.
+\paragraph{crafting} It is reached when, after an evaluation, the system identifies that a new tool is needed to solve the problem. In this state, the \ac{LLM} tries to craft a tool that can solve or can helps solving the problem, and then a new reasoning path is chosen for exploration. In this state, a specialized crafter agent generates a new tool definition. This process uses the original problem context ($P$) and the judge's feedback as a specification. Once the tool is crafted, the system resumes the exploration by expanding a new reasoning path that can now leverage the newly created capability.
+\paragraph{reasoning\_mode} It is a different approach to solve the problem. If the \texttt{tool\_reasoning} and \texttt{tool\_calling} states are focused on how to use the tools, the \texttt{reasoning\_mode} is focused on how to solve the problem using \textit{divide-et-impera} system, so it is more focused on the reasoning capabilities of the LLM. This state is used when the system has difficulties in solving the problem. In the proposed approach, this state is reached when the response does not pass the evaluation and there is no \texttt{tool\_reasoning} node available. The system here has the possibility to divide the thought into two parallel sub-tasks in order
 to divide the complexity of the single prompt. The two prompts should
 be independent of each other.
-\paragraph{chat\_completion}: Acts as a fallback mechanism to ensure that a response is provided even when complex reasoning paths fail. This state is reached when the system has explored all the possible paths, and it is not able to find a solution, so it calls the LLM to generate a solution without any constraint in order to guarantee the termination of the process.
+\paragraph{chat\_completion} Acts as a fallback mechanism to ensure that a response is provided even when complex reasoning paths fail. This state is reached when the system has explored all the possible paths, and it is not able to find a solution, so it calls the LLM to generate a solution without any constraint in order to guarantee the termination of the process.
 \\\\
 We partition the set of transitions $T$ into two disjoint subsets: $T = T_d \cup T_c$ where:
 \begin{itemize}
@@ -287,6 +309,17 @@ We represent the system as a directed graph $G = (N, E)$, where:
     \item $E$ = $\{e_1, e_2, ..., e_k\}$ is the set of directed edges, where each edge $e_j = (n_{i1}, n_{i2}, h_j) \in E$ represents a transition from node $n_{i1}$ to node $n_{i2}$ with the message history $h_j$. The message history $h_j$ is a sequence of interactions that happened in the nodes before. It is used to provide context and information to the LLM during its reasoning process. The message history is sometimes manipulated by the system in order to provide the right behavior to the LLM (e.g., crafting a tool instead of using it).
 \end{itemize}
 
+The runtime node extention created are the following:
+\begin{itemize}
+    \item \textbf{GoalNode}: it contains the problem to solve, it is the first node created.
+    \item \textbf{Reasoning Node}: it contains the reasoning process generated by the LLM, it is used for the tool calling.
+    \item \textbf{Tool Node}: it contains the prompt used to call the node, the response generated.
+    \item \textbf{Test Node}: it is the node that contains the evaluation of the response, it is used to decide the next step. It is composed by the prompt used to call the judge agent, the response generated, the score, the problem complexity, the need to craft a new tool and the tool used in the reasoning process that is evaluated.
+    \item \textbf{Backtrack Node}: it contains only the feedback generated by the judge agent, which is used to improve the reasoning process in the next path.
+    \item \textbf{Crafting Node}: it contains the definition of the tools crafted \newline (e.g. \texttt{solve\_equation(equation: str, variable: str) -> list[str]}) and the response of the LLM.
+    \item \textbf{Response Node}: It incapsulate the response of a reasoning path, it contains the response and the explanation of the reasoning process. It is the response evaluated by the judge agent and it can be a final solution. 
+\end{itemize}
+
 \subsubsection{Agents Definition}
 In the proposed system, we define multiple agents in order to manage different states of the graph and to provide a more customized behavior for each state.
 Moreover, every agent has its own state machine defined by the framework used.
@@ -297,9 +330,10 @@ Moreover, every agent has its own state machine defined by the framework used.
     \label{fig:agent-state-machine}
 \end{figure}
 \\ 
-As we see in the figure \cref{fig:agent-state-machine}, the agent has two states: \texttt{mode} and \texttt{tools}.
+As we see in the \cref{fig:agent-state-machine}, the agent has two states: \texttt{mode} and \texttt{tools}.
 The agent receives as input a prompt, and the \texttt{mode} state can decide if it uses a tool or generate the output, finishing the process.
 In case of a tool call, the result is sent in the \texttt{mode} state in order to generate the output or call again a tool if necessary.
+It is important to underline that every node of the Dynamic Graph that contains an agentic \ac{LLM} call, follows the state machine described in the \cref{fig:agent-state-machine}
 \\\\
 Mathematically we define an agent $a \in A$ as a function: 
 \begin{equation}
@@ -316,10 +350,7 @@ In particular, we define the following agents:
     \item \textbf{Chat completition agent}: It is a generalist agent; it is used as a fallback mechanism to generate a solution without any constraint when the system has explored all the possible paths and is not able to find a solution.
 \end{itemize}
 
-\section{Formalizations}
-Now that we have described the proposed approach at a high level, we can provide a more formal description of what the system does, starting from the input and the expected output.
-
-\subsection{Pseudocode}
+\section{Pseudocode}
 
 For a complete comprehension of the crucial steps of the system, some snippets of pseudocode are presented here.
 In particular, the evaluation phase is a critical point and also a complex step to understand:
@@ -349,7 +380,7 @@ In particular, the evaluation phase is a critical point and also a complex step 
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
-
+\newpage
 \subsection{Illustrative Example}
 In order to fully clarify the system mechanics, the following section guides the reader through a practical, step-by-step execution example.
 \\
@@ -451,7 +482,7 @@ The following diagram represents the described example. As we can see, there are
 \end{figure}
 
 \chapter{Implementation}
-\section{Dettagli da ingegnere del software}
+\section{Build Automation}
 \subsection{Git workflow}
 For a better management of the repository and to facilitate the possible future collaborations, the project follows a Git workflow based on the Git Flow model and the GitHub Actions. 
 \subsubsection{Git Flow}
@@ -474,141 +505,6 @@ The first workflow is focused on the \textbf{testing process}, it is triggered e
 \end{enumerate}
 
 The second workflow is focused on the \textbf{releasing process}, it is triggered every time a merge happens in the main branch. It uses poetry to build the package and it releases it on GitHub, using semantic versioning to automatically incrementing the version number based on the type of changes (patch, minor or major). 
-
-\subsection{System folders}
-\subsubsection{Core}
-As the name suggests, this folder contains the core of the system.
-\\
-In particular, it contains the implementation of the static graph structure, the dynamic graph implementation with all the classes related to the nodes and the LLM configuration and agents creation.
-\subsubsection{Agents}
-This folder contains the implementation of the agents, in this way it is possible to customize the behaviour of each agent in a more simple and separated way.
-\\
-It also contains the tools folder, which contains the implementation of the tools used by each agent. The tools are written in separate files based on their functionality, so it is easier to find and modify them.
-In these files there is also the \texttt{ai\_tool.py} file, which contains ai crafted tools.  
-\subsubsection{Cli}
-It is a folder created to separate the files related to the command line interface. It contains the parser of the cli arguments.
-\subsubsection{Experiments}
-It contains the implementation of the experiments, in particular the code related to the datasets loading, the format of the prompt for each dataset, the format of the expected output and the evaluation of the results.
-\\ 
-The folder is mainly focused on the benchmarking of the system, but it can contains also the implementation of some custom experiments that are not related to the benchmarking, but that can be useful for a better comprehension of the system and its behaviour.
-\subsubsection{Utils}
-It is used for utility functions that are used in different parts of the code. The majority of the functions are related to the extraction of response from LLM calls or the formatting of the result in order to provide a clean response for the evaluation phase.  
-
-\section{Tools, libraries, framework used}
-\subsection{Poetry}
-In order to create a virtual and reproducible environment, the project uses Poetry as dependency resolver.
-\subsection{LangChain/LangGraph}
-As mentioned in the previous chapter, LangChain is a framework that facilitates the integration with LLMs and the management of the reasoning process.
-\\
-In this project, LangChain is used in the following steps:
-\begin{itemize}
-    \item \textbf{LLM/agent calls}: LangChain provides classes and methods to call third part LLMs and to create agents with specific behaviours.  
-    \item \textbf{Tools management}: It offers a simple way to create and assign tools to the agents.
-    \item \textbf{Graph management}: LangGraph permits to create and manage the static graph structure.
-    \item \textbf{Message history management}: LangChain provides a sets of classes that permit to save and manipulate the message history in order to provide a different context to the different agents and to implement the backtracking mechanism. It is also used to classify the message in different categories: \textbf{System}, \textbf{AI} and \textbf{User} messages, which was useful for a better customization of the prompts.
-    \item \textbf{Call limits}: LangChain provides mechanisms to limit the number of calls to the LLMs, which is useful to control the cost and performance of the system. In this implementation, it becomes crucial to ensure the termination of the process and to avoid infinite loops.
-\end{itemize}
-
-\subsection{Gemini Framework}
-The Gemini framework is used to call the Gemini LLMs, which are the LLMs used in this project. In particular, the Gemini APIs offer the possibility to customize the format of the agent response.
-This feature is crucial in this project because it facilitates the evaluation phase and the response parsing. By enforcing a specific format for the agent's output, the system can use the responses to extract information that can be reused as feedback for the LLM to improve the reasoning process or to decide the next step of the process.
-\subsection{MLflow}
-MLflow is an open-source platform for managing the machine learning/LLM lifecycle,
- including experimentation, reproducibility and deployment. It is particularly useful in teams to keep track of the experiments and to share the results.
-\\\\
-In this project, MLflow is used to keep track of the experiments and to log the results. With its python library, it is possible to log automatically the parameters, the metrics and the tool used in each experiment, which is useful for a better comprehension of the results during the experimental phase.
-\\\\
-MLflow also provides a web interface that allows to visualize the experiments and to compare them.
-It also provides a bunch of metrics used in the evaluation phase, such as the number of tools used, the token usage and its average, the number of error and the latency of each call.  
-\subsection{Mermaid}
-It is a free web tool that allows to create and visualize diagrams.
-\\
-In this context it is used to visualize the static graph structure and the dynamic graph generated during the execution. 
-A visual representation of the graph is useful to comprehend easily the reasoning process happened during the execution. 
-For this reason, the static and dynamic graph have method to formulate their structure in a format that can be easily visualized with Mermaid.
-\subsection{LM Evaluation Harness}
-The LM Evaluation Harness is a library that provides a set of databases and evaluation metrics for evaluating the performance of LLMs on a variety of tasks.
-In this project, the LM Evaluation Harness was initially used for the evaluation of the system, but it was nextly abandoned because the for a custom models LM Evaluation Harness requires a custom implementation of the model wrapper.
-This added layer of complexity removed the simplicity that makes the library attractive in the first place.
-\\
-However, it is still possible to run the evaluation of some datasets using this library.
-\subsection{Hugging Face Datasets}
-Hugging Face is a platform that provides a large collection of open-source models and datasets published by the community. 
-The datasets are particularly useful for the experimental phase, because Hugging Face provides a simple way to download and use them and usually the datasets are contains all the relevant information for the experiments, such as the input, the expected output, the name of the attachment if the prompt requires it and even some hints. 
-
-
-\section{System Architecture}
-
-\subsection{LLM configuration}
-For a better customization of the agent performance, four different LLM configurations are defined: \textbf{remoteLLMStandard}, \textbf{remoteLLMReasoning}, \textbf{remoteLLMCrafter} and \textbf{remoteLLMEvaluator}.
-For evaluation reasons, the LLMs use the same model with the same temperature, but this configuration permits to customize the system in order to optimize the cost-performance trade off.
-
-\subsubsection{LLM calls}
-A known limitation of current LLMs including state-of-the-art models like Gemini, emerges when dealing with high-complexity tasks: the model may fall into an infinite execution loop. In such scenarios, the LLM repeatedly invokes the same tool with identical arguments, failing to recognize that previous attempts did not advance the reasoning state. 
-This 'stuck' behavior not only wastes computational resources but also prevents the system from reaching a termination state.
-To prevent such scenarios, a maximumn \texttt{recursion\_limit} is added to the agent calls.  
-\\
-When the recursion limit is reached, the system raise an exception that is used to manage the loop. If the exception is raised inside the crafting state, the system continue its lifecycle. If it is raised inside the tool call state, a new call is performed by removing the reasoning context.
-\\
-This reset mechanism forces the LLM to approach the original goal from a new perspective by providing a clean context and an explicit constraint:
-
-\begin{quote}
-\textit{``Divide the problem into smaller parts, you can't call the same tool twice."}
-\end{quote}
-
-By stripping away the redundant message history and injecting this meta-instruction, the system breaks the deterministic loop and encourages the model to employ a \textit{Divide and Conquer} strategy.
-
-\subsubsection{Agents system prompts}
-
-
-\subsection{Dynamic Graph implementation}
-The graph implementation is a crucial part of the system, it is used to represent the reasoning process and to manage the different paths of the reasoning.
-\\\\
-The graph is implemented using a class called \texttt{runtime\_graph} that contains all the methods to create and manage the graph. 
-The class is composed by many components such as the \texttt{goal}, which represent the problem to solve, the \texttt{nodes}, which are the dictionary that contains all the nodes of the graph and their links to other nodes, the \texttt{temp\_node} which is the node that is currently being expanded, it is used mainly to have a reference to the current node, and the \texttt{temp\_response}, which is the last response generated by the LLM and it is used to provide a feedback to the LLM in case of crafting or to provide the final solution in case of termination.
-
-\subsubsection{Runtime Node}
-In order to provide a better management of the nodes, a class called \texttt{runtime\_node} is implemented.
-\\
-The reasons behind the implementation comprehend the need to have an abstract class that can be extended to create different types of nodes, and the need to not be dependent to the current tecnhology used to call the LLM, so it is possible to change the libraries used to call the LLM without changing the structure of the nodes.
-The \texttt{runtime\_node} class is minimal as possible in order to provide a better flexibility in its extension. Its attributes are the unique \textbf{ID} and the \textbf{state} of the node, that can be resolved or not.
-\\\\
-The extended classes created are the following:
-\begin{itemize}
-    \item \textbf{GoalNode}: it contains the problem to solve, it is the first node created.
-    \item \textbf{Reasoning Node}: it contains the reasoning process generated by the LLM, it is used for the tool calling.
-    \item \textbf{Tool Node}: it contains the prompt used to call the node, the response generated.
-    \item \textbf{Test Node}: it is the node that contains the evaluation of the response, it is used to decide the next step. It is composed by the prompt used to call the judge agent, the response generated, the score, the problem complexity, the need to craft a new tool and the tool used in the reasoning process that is evaluated.
-    \item \textbf{Backtrack Node}: it contains only the feedback generated by the judge agent, which is used to improve the reasoning process in the next path.
-    \item \textbf{Crafting Node}: it contains the definition of the tools crafted \newline (e.g. \texttt{solve\_equation(equation: str, variable: str) -> list[str]}) and the response of the LLM.
-    \item \textbf{Response Node}: It incapsulate the response of a reasoning path, it contains the response and the explanation of the reasoning process. It is the response evaluated by the judge agent and it can be a final solution. 
-\end{itemize}
-
-\subsubsection{LLM response format}
-In order to facilitate the management of the responses generated by the LLM, a specific format is defined for some steps of the process. In particular, two formats are defined: the \textbf{Response} and the \textbf{Score} format.
-
-\paragraph{Response}
-The format contains the final answer and the explanation of it. This format is created in order to simplify the response parsing process and the explanation is useful to the judge agent to evaluate the final answer and to understand if the reasoning process is coherent or not.
-\paragraph{Score}
-The format is used in the evaluation phase. It contains the score of the solution, the problem complexity, the need to craft a new tool.
-\\\\
-Each of these formats are used to fullfill the respective defined nodes.
-\subsection{Crafting methodology}
-The crafting process is a crucial aspect of the system. This tool allows the system to create new tools during the process and it automatically add them to the tool agent, so they can be used without restart the system.
-\\\\
-This process is based on the following steps:
-\begin{enumerate}
-    \item \textbf{Crafting tool calling}: The LLM calls the crafting tool, the argument of the tool is the function that the system want to craft.
-    \item \textbf{Sanification}: The \texttt{craft\_tool} function sanifies the function by removing whitespace and backticks. 
-    \item \textbf{Code checking}: The system checks if the code written is referring only to just a one function definition. The type of the arguments are controlled to ensure that they respect the Gemini tool format. This means that every argument must have the type definition and, in case of \texttt{list}, \texttt{dict} and \texttt{set}, the type of the elements must be defined. The function must has a proper documentation. This is important not just for ensuring the format requested, but also for explaining to the \ac{LLM} what the tool does; it impacts directly to its probability to be called. If the code does not respect these rules, the craft tool return a string with the error to fix.
-    \item \textbf{Saving}: If the code is correct, the code is saved in a defined file, called \texttt{ai\_tool.py}. This file contains all the crafted tools.
-    \item \textbf{Importing}: The system create a new agent calling the \texttt{get\_crafted\_tools{}}, which is a function that import all the functions in the \texttt{ai\_tool.py} file, it wrap each of them with the \texttt{@tool} decorator and return them in a list.
-\end{enumerate}
-
-In order to ensure that the system has the necessary libraries to correctly use the tool crafted, a specific tool can be used to install new libraries.
-\\
-The \texttt{install\_dependency} tool takes as argument the name of the library to install and it uses \texttt{poetry add} to install it. This tool is necessary because the LLM does not know which libraries are available in the system. 
-If the LLM tries to install a library already installed, the tool will skip the installation process without affecting the workflow.
 
 \subsection{Run the system}
 With the purpose of simplifying the execution of the system, a command line interface (CLI) has been created.
@@ -655,6 +551,115 @@ Instead, if we want to run a custom prompt like "what's the weather like?", the 
 \begin{quote}
     \item \texttt{python -m GoT --mode graph --benchmark custom --prompt "what's the weather like?"}
 \end{quote}
+
+
+\subsection{System folders}
+\subsubsection{Core}
+As the name suggests, this folder contains the core of the system.
+\\
+In particular, it contains the implementation of the static graph structure, the dynamic graph implementation with all the classes related to the nodes and the LLM configuration and agents creation.
+\subsubsection{Agents}
+This folder contains the implementation of the agents, in this way it is possible to customize the behaviour of each agent in a more simple and separated way.
+\\
+It also contains the tools folder, which contains the implementation of the tools used by each agent. The tools are written in separate files based on their functionality, so it is easier to find and modify them.
+In these files there is also the \texttt{ai\_tool.py} file, which contains ai crafted tools.  
+\subsubsection{Cli}
+It is a folder created to separate the files related to the command line interface. It contains the parser of the cli arguments.
+\subsubsection{Experiments}
+It contains the implementation of the experiments, in particular the code related to the datasets loading, the format of the prompt for each dataset, the format of the expected output and the evaluation of the results.
+\\ 
+The folder is mainly focused on the benchmarking of the system, but it can contains also the implementation of some custom experiments that are not related to the benchmarking, but that can be useful for a better comprehension of the system and its behaviour.
+\subsubsection{Utils}
+It is used for utility functions that are used in different parts of the code. The majority of the functions are related to the extraction of response from LLM calls or the formatting of the result in order to provide a clean response for the evaluation phase.  
+
+\section{Tools, libraries, framework used}
+\subsection{Poetry}
+In order to create a virtual and reproducible environment, the project uses Poetry as dependency resolver.
+\subsection{LangChain/LangGraph}
+As mentioned in the previous chapter, LangChain is a framework that facilitates the integration with LLMs and the management of the reasoning process.
+\\
+In this project, LangChain is used in the following steps:
+\begin{itemize}
+    \item \textbf{LLM/agent calls}: LangChain provides classes and methods to call third part LLMs and to create agents with specific behaviours.  
+    \item \textbf{Tools management}: It offers a simple way to create and assign tools to the agents.
+    \item \textbf{Graph management}: LangGraph permits to create and manage the static graph structure.
+    \item \textbf{Message history management}: LangChain provides a sets of classes that permit to save and manipulate the message history in order to provide a different context to the different agents and to implement the backtracking mechanism. It is also used to classify the message in different categories: \textbf{System}, \textbf{AI} and \textbf{User} messages, which was useful for a better customization of the prompts.
+    \item \textbf{Call limits}: LangChain provides mechanisms to limit the number of calls to the LLMs, which is useful to control the cost and performance of the system. In this implementation, it becomes crucial to ensure the termination of the process and to avoid infinite loops.
+\end{itemize}
+\subsection{MLflow}
+MLflow is an open-source platform for managing the machine learning/LLM lifecycle,
+ including experimentation, reproducibility and deployment. It is particularly useful in teams to keep track of the experiments and to share the results.
+\\\\
+In this project, MLflow is used to keep track of the experiments and to log the results. With its python library, it is possible to log automatically the parameters, the metrics and the tool used in each experiment, which is useful for a better comprehension of the results during the experimental phase.
+\\\\
+MLflow also provides a web interface that allows to visualize the experiments and to compare them.
+It also provides a bunch of metrics used in the evaluation phase, such as the number of tools used, the token usage and its average, the number of error and the latency of each call.  
+\subsection{LM Evaluation Harness}
+The LM Evaluation Harness is a library that provides a set of databases and evaluation metrics for evaluating the performance of LLMs on a variety of tasks.
+In this project, the LM Evaluation Harness was initially used for the evaluation of the system, but it was nextly abandoned because the for a custom models LM Evaluation Harness requires a custom implementation of the model wrapper.
+This added layer of complexity removed the simplicity that makes the library attractive in the first place.
+\\
+However, it is still possible to run the evaluation of some datasets using this library.
+\subsection{Hugging Face Datasets}
+Hugging Face is a platform that provides a large collection of open-source models and datasets published by the community. 
+The datasets are particularly useful for the experimental phase, because Hugging Face provides a simple way to download and use them and usually the datasets are contains all the relevant information for the experiments, such as the input, the expected output, the name of the attachment if the prompt requires it and even some hints. 
+
+\section{LLM configuration}
+The Google GenAI models are used in this architecture, which represents the \acp{LLM} used in this project. In particular, the Gemini \acp{API} offers the possibility to customize the format of the agent response.
+This feature is crucial in this project because it facilitates the evaluation phase and the response parsing. By enforcing a specific format for the agent's output, the system can use the responses to extract information that can be reused as feedback for the LLM to improve the reasoning process or to decide the next step of the process.
+\\\\
+For a better customization of the agent performance, four different LLM configurations are defined: \textbf{remoteLLMStandard}, \textbf{remoteLLMReasoning}, \textbf{remoteLLMCrafter} and \textbf{remoteLLMEvaluator}.
+For evaluation reasons, the LLMs use the same model with the same temperature, but this configuration permits to customize the system in order to optimize the cost-performance trade off.
+
+\subsubsection{LLM calls}
+A known limitation of current LLMs including state-of-the-art models like Gemini, emerges when dealing with high-complexity tasks: the model may fall into an infinite execution loop. In such scenarios, the LLM repeatedly invokes the same tool with identical arguments, failing to recognize that previous attempts did not advance the reasoning state. 
+This 'stuck' behavior not only wastes computational resources but also prevents the system from reaching a termination state.
+To prevent such scenarios, a maximumn \texttt{recursion\_limit} is added to the agent calls.  
+\\
+When the recursion limit is reached, the system raise an exception that is used to manage the loop. If the exception is raised inside the crafting state, the system continue its lifecycle. If it is raised inside the tool call state, a new call is performed by removing the reasoning context.
+\\
+This reset mechanism forces the LLM to approach the original goal from a new perspective by providing a clean context and an explicit constraint:
+
+\begin{quote}
+\textit{``Divide the problem into smaller parts, you can't call the same tool twice."}
+\end{quote}
+
+By stripping away the redundant message history and injecting this meta-instruction, the system breaks the deterministic loop and encourages the model to employ a \textit{Divide and Conquer} strategy.
+
+\subsubsection{Agents system prompts}
+
+
+\subsection{Dynamic Graph implementation}
+The graph implementation is a crucial part of the system, it is used to represent the reasoning process and to manage the different paths of the reasoning.
+\\\\
+The graph is implemented using a class called \texttt{runtime\_graph} that contains all the methods to create and manage the graph. 
+The class is composed by many components such as the \texttt{goal}, which represent the problem to solve, the \texttt{nodes}, which are the dictionary that contains all the nodes of the graph and their links to other nodes, the \texttt{temp\_node} which is the node that is currently being expanded, it is used mainly to have a reference to the current node, and the \texttt{temp\_response}, which is the last response generated by the LLM and it is used to provide a feedback to the LLM in case of crafting or to provide the final solution in case of termination.
+
+\subsubsection{LLM response format}
+In order to facilitate the management of the responses generated by the LLM, a specific format is defined for some steps of the process. In particular, two formats are defined: the \textbf{Response} and the \textbf{Score} format.
+
+\paragraph{Response}
+The format contains the final answer and the explanation of it. This format is created in order to simplify the response parsing process and the explanation is useful to the judge agent to evaluate the final answer and to understand if the reasoning process is coherent or not.
+\paragraph{Score}
+The format is used in the evaluation phase. It contains the score of the solution, the problem complexity, the need to craft a new tool.
+\\\\
+Each of these formats are used to fullfill the respective defined nodes.
+\section{Crafting methodology}
+The crafting process is a crucial aspect of the system. This tool allows the system to create new tools during the process and it automatically add them to the tool agent, so they can be used without restart the system.
+\\\\
+This process is based on the following steps:
+\begin{enumerate}
+    \item \textbf{Crafting tool calling}: The LLM calls the crafting tool, the argument of the tool is the function that the system want to craft.
+    \item \textbf{Sanification}: The \texttt{craft\_tool} function sanifies the function by removing whitespace and backticks. 
+    \item \textbf{Code checking}: The system checks if the code written is referring only to just a one function definition. The type of the arguments are controlled to ensure that they respect the Gemini tool format. This means that every argument must have the type definition and, in case of \texttt{list}, \texttt{dict} and \texttt{set}, the type of the elements must be defined. The function must has a proper documentation. This is important not just for ensuring the format requested, but also for explaining to the \ac{LLM} what the tool does; it impacts directly to its probability to be called. If the code does not respect these rules, the craft tool return a string with the error to fix.
+    \item \textbf{Saving}: If the code is correct, the code is saved in a defined file, called \texttt{ai\_tool.py}. This file contains all the crafted tools.
+    \item \textbf{Importing}: The system create a new agent calling the \texttt{get\_crafted\_tools{}}, which is a function that import all the functions in the \texttt{ai\_tool.py} file, it wrap each of them with the \texttt{@tool} decorator and return them in a list.
+\end{enumerate}
+
+In order to ensure that the system has the necessary libraries to correctly use the tool crafted, a specific tool can be used to install new libraries.
+\\
+The \texttt{install\_dependency} tool takes as argument the name of the library to install and it uses \texttt{poetry add} to install it. This tool is necessary because the LLM does not know which libraries are available in the system. 
+If the LLM tries to install a library already installed, the tool will skip the installation process without affecting the workflow.
 
 \chapter{Experiments}
 \section{Experimental setup (quali classi di benchmark, cosa testi per ogni benchmark, come lo misuri)}
