@@ -26,6 +26,8 @@
 \acrodef{ToT}{Tree of Thoughts}
 \acrodef{LLM}{Large Language Model}
 \acrodef{AI}{Artificial Intelligence}
+\acrodef{BFS}{Breadth-first search}
+\acrodef{DFS}{Depth-first search}
 \acrodef{GPU}{Graphics Processing Unit}
 \acrodef{API}{Application Programming Interface}
 \acrodef{IoT}{Internet of Thing}
@@ -150,6 +152,18 @@ One of the most popular and older prompt engineering techniques is the \textit{F
 These methods are not meant to compete with each other. There are three possibilities depending on the task that we require of the \ac{LLM}. In general, few-shot prompting tends to perform better on 
 structured or domain-specific tasks, while zero-shot prompting is often sufficient for simpler or well-known tasks\cite{brown2020languagemodelsfewshotlearners}.
 
+\subsection{LLM-as-a-judge}
+During the Prompt Engineering discovery, a new way of improving the output is created, the LLM-as-a-judge technique\cite{Zheng2023llmasajudge}.
+The idea is to use Generative AI to judge another \ac{LLM} output; this method can benefits the output in scalability, explainability and has the advantage of limit the human involvement of the reasoning process. 
+\\\\
+The three approaches proposed to use the LLM-as-a-judge are:
+\begin{itemize}
+    \item \textbf{Pairwise comparison} The judge is presented with one question and two or multiple answers. Its goal is to choose which one is better.
+    \item \textbf{Single answer grading} It is directly asked to the \ac{LLM} judge to assign a grade to the solution.
+    \item \textbf{Reference-guided grading} In some cases, providing a reference solution may be beneficial.
+\end{itemize}
+
+This technique has also several bias such as \textbf{Position bias}, \textbf{Verbosity bias} and \textbf{Self-enhancement bias}. 
 \subsection{Agents}
 The \acp{LLM} are now good enough to start thinking about how to automate some processes or how they can be used in more contexts.
 For these reasons, the agents are created. The formal definition is:
@@ -184,7 +198,7 @@ While few-shot prompting improves performance by providing input-output
 examples, it does not explicitly guide the model through the reasoning 
 process required to solve a task.
 The research in this field has been evolved, finding new ways to improve the output quality without changing the \ac{LLM} parameters.
-\subsection{Chain of Thought}
+\subsection{Chain of Thoughts}
 Recently the \ac{CoT}\cite{weichainofthoughts} prompting is introduced. This prompting techniques reveals that, when \acp{LLM} produce the reasoning steps of a solution, the correct results increase drammatically.
 This leads to a lot of advantages:
 \begin{itemize}
@@ -202,10 +216,16 @@ Recently it has been proved that also a zero-shot \ac{CoT} increases the perform
 \end{figure}
 
 Later on, the \ac{CoT-SC}\cite{selfconsistencycot} was developed as an evolution of the classic \ac{CoT}. The idea behind that was explore multiple reasoning paths in order to select the most accurate output. The empirical evaluation proved that \ac{CoT-SC} boost the performance of \ac{CoT} reasoning\cite{selfconsistencycot}.
-\subsection{Tree of Thought}
-The introduction of the \ac{CoT} approach, it paved the way for a new type of prompt engineering. From this method, the \ac{ToT} was developed\cite{yao2023tot}.
-
-\subsection{Graph of Thought}
+\subsection{Tree of Thoughts}
+The introduction of the \ac{CoT} approach paved the way for a new type of prompt engineering. From this method, the \ac{ToT} was developed\cite{yao2023tot}.
+While the \ac{CoT} produces multiple steps with a single prompt, the \ac{ToT} is based on the idea of generating multiple thoughts for each step and evaluating the best of them; each step is a partial solution and the evaluation phase guarantee the refinement of it into the final response. In order to achieve the best result, the architecture comprehends four important parts:
+\begin{enumerate}
+    \item \textbf{Task decomposition}: In the \ac{ToT}, the task decomposition is an explicit part. This should helps the \ac{LLM} to decompose the problem until they are small enough to generate a satisfying solution.
+    \item \textbf{Thought generation}: There are two ways of generating thoughts. The \textit{Samples} is useful when the solution space is rich and the \textit{Propose} is more efficient when the solution space is restricted.
+    \item \textbf{State evaluator}: Two strategies were proposed in order to evaluate the thoughts. In the \textit{Value} strategy, the \acp{LLM} give a value to each thought from 1 to 10 and chose the higher one. In the \textit{Vote} strategy, each evaluator choose the best thought and who takes more votes become the winner.
+    \item \textbf{Search algorithm}: It is used to search the more accurate solution in the tree; the strategies proposed are the classics, \ac{BFS} that controls each node at every level of the tree, \ac{DFS} that explores the most promising state first until the final output is reached.
+\end{enumerate}
+\subsection{Graph of Thoughts}
 
 \chapter{Methodology / Design}
 This chapter presents the proposed approach in detail.
