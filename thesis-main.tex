@@ -548,24 +548,18 @@ The second workflow is focused on the \textbf{releasing process}, it is triggere
 With the purpose of simplifying the execution of the system, a command line interface (CLI) has been created.
 This interface allows the user to configure the system's behavior through a set of specific arguments, which are detailed below:
 \begin{itemize}
-    \item \texttt{--mode} (\textit{string}, \textbf{required}): Specifies the reasoning architecture to deploy. The allowed values are \texttt{[standard, graph]}, but it can be easely expanded.
-    \item \texttt{--benchmark} (\textit{string}, \textbf{required}): Enables to choose which benchmark run: 
+    \item \texttt{--mode} (\textit{string}, \textbf{required}): Specifies the reasoning architecture to deploy. The allowed values are \texttt{[standard, graph]}, but it can be easily expanded.
+    \item \texttt{--benchmark} (\textit{string}, \textbf{required}): Allows to choose which benchmark run. Some benchmarks are included even if they will not be used: 
     \begin{itemize}
-        \item \textbf{hendrycks\_math}
-        \item \textbf{gsm8k}
-        \item \textbf{gpqa}
-        \item \textbf{gaia}
+        \item \textbf{hendrycks\_math\cite{hendrycksmath2021}}
+        \item \textbf{gsm8k\cite{cobbe2021gsm8k}}: a benchmark of grade school math word problems
+        \item \textbf{gpqa\cite{rein2023gpqa}}:a graduate-level high quality and extremely difficult benchmark covering biology, chemistry and physics
+        \item \textbf{gaia\cite{mialon2023gaia}}: a benchmark for general AI assistants on real-world tasks
         \item \textbf{custom:} it permits to run custom prompt, it is used in a development environment
     \end{itemize} 
-    \item \texttt{--max\_run} (\textit{integer}, \textit{optional}): Defines the number of prompt to execute in a benchmark, it has no effect in the custom mode. 
-    \begin{itemize}
-        \item \textbf{Default:} \texttt{1}
-    \end{itemize}
-    \item \texttt{--prompt} (\textit{string}, \textit{optional}): It is used with the custom mode, it specify the prompt that it will be sent to the LLM.
-    \begin{itemize}
-        \item \textbf{Default:} \texttt{empty}
-    \end{itemize}
-    \item \texttt{--category} (\textit{string}, \textit{optional}): In some benchmark, for example \texttt{hendryck\_math}, the dataset can have categories. To specify which category is tested, this argument is created.  
+    \item \texttt{--max\_run} (\textit{integer}, \textit{optional}, default: \texttt{1}): Defines the number of prompts to execute in a benchmark, it has no effect in the custom mode. 
+    \item \texttt{--prompt} (\textit{string}, \textit{optional}, default: \texttt{empty}): It is used with the custom mode, it specifies the prompt that will be sent to the LLM.
+    \item \texttt{--category} (\textit{string}, \textit{optional}): In some benchmark, for example \texttt{hendrycks\_math}, the dataset can have categories. To specify which category is tested, this argument is created.  
     \begin{itemize}
         \item \textbf{List:} \texttt{[algebra,
             counting\_and\_probability,
