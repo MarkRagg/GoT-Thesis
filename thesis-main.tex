@@ -463,7 +463,7 @@ The message history passed in the \texttt{crafting} node contains the goal and t
     \item[\textbf{User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
     \item[\textbf{AI:}] ``The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
     \item[\textbf{System:}] ``Use the context given to craft a tool to solve this problem using craft\_tool. It must be a function"
-    \item[\textbf{AI:}] It creates a new tool called \texttt{symbolic\_integration(expression: str, variable: str) -> str}
+    \item[\textbf{AI:}] It creates a new tool called \texttt{symbolic\_integration(expression: str, variable: str) -> str} \cref{lst:crafted-tool}
     \item[\textbf{AI:}] It install the \texttt{sympy} dependencies
     \item[\textbf{AI:}] Returning structured response: 
     \begin{description}
@@ -584,26 +584,6 @@ Instead, if we want to run a custom prompt like "what's the weather like?", the 
     \item \texttt{python -m GoT --mode graph --benchmark custom --prompt "what's the weather like?"}
 \end{quote}
 
-
-\subsection{System folders}
-\subsubsection{Core}
-As the name suggests, this folder contains the core of the system.
-\\
-In particular, it contains the implementation of the static graph structure, the dynamic graph implementation with all the classes related to the nodes and the LLM configuration and agents creation.
-\subsubsection{Agents}
-This folder contains the implementation of the agents, in this way it is possible to customize the behaviour of each agent in a more simple and separated way.
-\\
-It also contains the tools folder, which contains the implementation of the tools used by each agent. The tools are written in separate files based on their functionality, so it is easier to find and modify them.
-In these files there is also the \texttt{ai\_tool.py} file, which contains ai crafted tools.  
-\subsubsection{Cli}
-It is a folder created to separate the files related to the command line interface. It contains the parser of the cli arguments.
-\subsubsection{Experiments}
-It contains the implementation of the experiments, in particular the code related to the datasets loading, the format of the prompt for each dataset, the format of the expected output and the evaluation of the results.
-\\ 
-The folder is mainly focused on the benchmarking of the system, but it can contains also the implementation of some custom experiments that are not related to the benchmarking, but that can be useful for a better comprehension of the system and its behaviour.
-\subsubsection{Utils}
-It is used for utility functions that are used in different parts of the code. The majority of the functions are related to the extraction of response from LLM calls or the formatting of the result in order to provide a clean response for the evaluation phase.  
-
 \section{Tools, libraries, framework used}
 \subsection{Poetry}
 In order to create a virtual and reproducible environment, the project uses Poetry as dependency resolver.
@@ -659,8 +639,17 @@ This reset mechanism forces the LLM to approach the original goal from a new per
 By stripping away the redundant message history and injecting this meta-instruction, the system breaks the deterministic loop and encourages the model to employ a \textit{Divide and Conquer} strategy.
 
 \subsubsection{Agents system prompts}
-
-
+In order to optimize the performance of the system, each agent has a specific system prompt that defines its behavior and its role in the process. This is crucial to ensure that each agent focuses on its specific task and to avoid confusion between the different agents.
+\newline The prompts can be found in the appendix \cref{appendix:agent-prompts}; in general each of it contains a description of the agent role, some instructions on how to perform its task and a set of rules to follow. 
+\newline The crafter agent prompt \cref{appendix:crafter-agent-prompt} contains a few shot examples of how to craft a new tool, including bad examples of how not to craft a tool, in order to help the LLM to understand the format and the rules to follow.
+\newline For example, the judge agent prompt \cref{appendix:judge-agent-prompt} contains instructions on how to evaluate the solution, how to score it and how to decide the next step of the process.
+\\\\
+Each agent also has a set of tools that it can use, in particular:
+\begin{itemize}
+    \item \textbf{Starting agent/Tool agent}: they have access to the basic tools, which are the following: \texttt{plus}, \texttt{minus}, \texttt{multiply}, \texttt{divide} and \texttt{square\_root}. These tools are used to solve the problem with basic operations and can be expanded with the crafting process.
+    \item \textbf{Crafter agent}: it has access to the \texttt{craft\_tool} and \texttt{install\_dependency}. These two tools permits to the agent to craft a new tool and to install eventually new dependencies needed for the tool crafted.
+    \item \textbf{Reasoning agent}: it has access to the \texttt{divide\_thought} tool, which essentially splits the problem into two smaller parts and call the reasoning agent for each of them, returning both results. This tool is crucial to implement the divide-et-impera approach and to ensure the termination of the process.
+\end{itemize}
 \subsection{Dynamic Graph implementation}
 The graph implementation is a crucial part of the system, it is used to represent the reasoning process and to manage the different paths of the reasoning.
 \\\\
@@ -752,8 +741,8 @@ Optional. Max 1 page.
 \begin{appendix}
 \chapter{Illustrative example tool crafted}
 The following figure shows the tool crafted during the execution of the example described in the chapter 4.
-\lstinputlisting[language=Python, caption={The tool crafted by the agent}, label={lst:script_python}]{listings/ai_tool.py}
-\chapter{Agent system prompts}
+\lstinputlisting[language=Python, caption={The tool crafted by the agent}, label={lst:crafted-tool}]{listings/ai_tool.py}
+\chapter{Agent system prompts} \label{appendix:agent-prompts}
 \section{Starting agent}
 \begin{quote}
     \textit{``You are an assistant specialized in tools. Your goal is not to resolve the problem, but only to make list with the best tool to use. If you are not sure of the tool you have, think also a generic tool to craft that could be useful to solve the problem (Specify the craft is needed). If the problem require too much steps with the current tools, consider crafting a new tool. The list MUST be in this format and it is not possible to format the tool\_name in any way: 
@@ -767,7 +756,7 @@ The following figure shows the tool crafted during the execution of the example 
     \textit{``You are an assistant specialized in tools. Your goal is to resolve the problem with the tool that the user indicates to you. You HAVE to use or craft the tool that the assistant indicates to you. Do not write natural language outside the function. If you fail to respect the format, the evaluation will fail.''}
 \end{quote}
 
-\section{Crafter agent}
+\section{Crafter agent} \label{appendix:crafter-agent-prompt}
 \begin{quote}
         \textit{``
             You are a specialized in coding and write new useful method.
@@ -787,7 +776,7 @@ The following figure shows the tool crafted during the execution of the example 
         \newline- No natural language.''}
 \end{quote}
 
-\section{Judge agent}
+\section{Judge agent} \label{appendix:judge-agent-prompt}
 \begin{quote}
     \textit{``You are an assistant specialized in validating responses, like an LLM-as-a-judge.
 \newline Your duty is to score, from 0 to 5, the response that user gives and assign a score.
