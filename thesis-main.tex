@@ -85,7 +85,7 @@ you may need both \ac{vm} and \acp{vm}.
 
 \chapter{Background}
 \section{Large Language Models}
-\acp{LLM} is a subcategory of \ac{AI}, and more specifically, they belong to the field of Deep Learning. 
+\acp{LLM} are a subcategory of \ac{AI}, and more specifically, they belong to the field of Deep Learning. 
 In recent years, they have become extremely popular thanks to their ability to understand and generate natural language with a high level of fluency and coherence. 
 Their generalized knowledge and versatility make them perfect for a wide range of applications, from text generation and translation to code assistance, question answering, and conversational systems.
 \\\\
@@ -201,12 +201,12 @@ examples, it does not explicitly guide the model through the reasoning
 process required to solve a task.
 The research in this field has been evolved, finding new ways to improve the output quality without changing the \ac{LLM} parameters.
 \subsection{Chain of Thoughts}
-Recently the \ac{CoT}\cite{weichainofthoughts} prompting is introduced. This prompting techniques reveals that, when \acp{LLM} produce the reasoning steps of a solution, the correct results increase drammatically.
+Recently the \ac{CoT}\cite{weichainofthoughts} prompting is introduced. This prompting techniques reveals that, when \acp{LLM} produce the reasoning steps of a solution, the correct results increase dramatically.
 This leads to a lot of advantages:
 \begin{itemize}
     \item \textbf{Accuracy}: As we said previously, the number of corrected answers increase\cite{weichainofthoughts}.
     \item \textbf{Interpretability}: The \ac{LLM} remains a black box, but the final solution includes the steps, allowing to understand when the \ac{LLM} produces an error in the reasoning. 
-    \item \textbf{Transparency}: In some task categories, such as math problems, the \ac{CoT} techniques produces the intermediate reasoning which helps to indipendently reproduce the result given.   
+    \item \textbf{Transparency}: In some task categories, such as math problems, the \ac{CoT} techniques produces the intermediate reasoning which helps to independently reproduce the result given.   
 \end{itemize}
 The \ac{CoT} was firstly introduced as a few-shot approach, where the examples were used for enducing the multi steps reasoning. 
 Recently it has been proved that also a zero-shot \ac{CoT} increases the performance, introducing the ``Let's think step by step" phrase into the prompt\cite{kojimazeroshotcot}.
@@ -248,7 +248,7 @@ The research demonstrates that the \ac{GoT} could perform better than the previo
 \chapter{Methodology / Design}
 This chapter presents the proposed approach in detail.
 We first formally define the problem and highlight the main challenges and requirements.
-Then, we describe the proposed \acp{GoT}, providing its formalization, including algorithmic details and execution strategies.
+Then, we describe the proposed \ac{GoT}, providing its formalization, including algorithmic details and execution strategies.
 Lastly, we illustrate the approach with a concrete example to demonstrate its application.
 
 
@@ -287,7 +287,7 @@ In order to simplify the problem and focus on the core aspects of the \ac{GoT} p
 \end{itemize}
 
 \section{The proposed approach}
-The approach proposed in this thesis is based on the \acp{GoT} paradigm. 
+The approach proposed in this thesis is based on the \ac{GoT} paradigm. 
 In this framework, the reasoning process is modeled as a dynamic graph, where nodes represent intermediate thoughts, and the Large Language Model (LLM) guides both the expansion of the graph and the decision of when to terminate the reasoning process.
 
 Given an input problem ($P$), the system incrementally constructs a graph according to a set of high-level rules. 
@@ -302,7 +302,7 @@ The second motivation about the use of \ac{GoT}, as mentioned in the previous ch
 As a \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. The static graph structure provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
 \\\\
 The static graph structure is defined as $G_s = (S, T)$, where $S$ is the set of possible logical states (e.g. Evaluation, Backtracking, Crafting etc.) and $T$ is the set of possible transitions between these states. 
-The states are defined, and they are the following:
+The states are the following:
 
 \paragraph{\_\_start\_\_ and \_\_end\_\_}: the start and end states of the process. The \texttt{\_\_start\_\_} is the first state reached and the \texttt{\_\_end\_\_} is the last reached in the process. These represent entry and exit points and are visited exactly once per execution.
 \paragraph{goal} This is the first real state. The system starts with the user prompt and the \texttt{goal} represents the problem. From here, the system starts to generate thought paths that can be explored in order to solve the problem. 
@@ -325,7 +325,7 @@ to divide the complexity of the single prompt. The two prompts should
 be independent of each other.
 \paragraph{chat\_completion} Acts as a fallback mechanism to ensure that a response is provided even when complex reasoning paths fail. This state is reached when the system has explored all the possible paths, and it is not able to find a solution, so it calls the LLM to generate a solution without any constraint in order to guarantee the termination of the process.
 \\\\
-We partition the set of transitions $T$ into two disjoint subsets: $T = T_d \cup T_c$ where:
+Having defined the states, we now formalize the transitions, we partition the set of transitions $T$ into two disjoint subsets: $T = T_d \cup T_c$ where:
 \begin{itemize}
     \item $T_d$ is the set of deterministic transitions, where the next state is uniquely determined by the completion of the current state’s task.
     \item $T_c$ is the set of conditional transitions, where the next state is determined by a selection function $f: \text{output} \to S$, typically driven by the LLM's internal evaluation or a logic-based heuristic.
@@ -358,7 +358,7 @@ The runtime node extention created are the following:
     \item \textbf{Response Node}: It incapsulate the response of a reasoning path, it contains the response and the explanation of the reasoning process. It is the response evaluated by the judge agent and it can be a final solution. 
 \end{itemize}
 
-\subsubsection{Agents Definition}
+\subsection{Agents Definition}
 In the proposed system, we define multiple agents in order to manage different states of the graph and to provide a more customized behavior for each state.
 Moreover, every agent has its own state machine defined by the framework used.
 \begin{figure}[h!]
@@ -532,7 +532,11 @@ The Git Flow model used in this project is based on three types of branches:
 \end{itemize}
 
 The merging policies are based on pull request, where the github actions tests the code and if the tests pass, the pull request can be merged. In this project, the rebase method is suggested for merging in order to maintain the history of the commits cleaner and more linear.
-\subsubsection{GitHub Actions}
+\subsection{Dependency management}
+In order to create a virtual and reproducible environment, the project uses \textbf{Poetry} as dependency resolver.
+Poetry manages the project dependencies through a \texttt{pyproject.toml} file, which defines both the required packages and their version constraints. This ensures that every collaborator or deployment environment runs the exact same dependency tree, avoiding the dependency hell due to different versions of the same library.
+
+\subsection{DevOps}
 In order to automate the testing and the releasing process, the project uses GitHub Actions.
 \\\\
 The first workflow is focused on the \textbf{testing process}, it is triggered every push on a branch and it has the following steps:
@@ -543,8 +547,20 @@ The first workflow is focused on the \textbf{testing process}, it is triggered e
 \end{enumerate}
 
 The second workflow is focused on the \textbf{releasing process}, it is triggered every time a merge happens in the main branch. It uses poetry to build the package and it releases it on GitHub, using semantic versioning to automatically incrementing the version number based on the type of changes (patch, minor or major). 
+\\\\
+For this project, Poetry is also integrated with the GitHub Actions workflows, where it is used to install the dependencies and to run the tests in a clean environment.
 
-\subsection{Run the system}
+\subsection{MLOps}
+MLflow is adopted as the MLOps tool to manage the machine learning/LLM lifecycle,
+ including experimentation, reproducibility and deployment. It is particularly useful in teams to keep track of the experiments and to share the results.
+\\\\
+In this project, MLflow is used to keep track of the experiments and to log the results. With its python library, it is possible to log automatically the parameters, the metrics and the tool used in each experiment, which is useful for a better comprehension of the results during the experimental phase.
+\\\\
+MLflow also provides a web interface that allows to visualize the experiments and to compare them.
+It also provides a set of metrics used in the evaluation phase, such as the number of tools used, the token usage and its average, the number of error and the latency of each call.  
+
+
+\subsection{Command Line Interface}
 With the purpose of simplifying the execution of the system, a command line interface (CLI) has been created.
 This interface allows the user to configure the system's behavior through a set of specific arguments, which are detailed below:
 \begin{itemize}
@@ -584,37 +600,30 @@ Instead, if we want to run a custom prompt like "what's the weather like?", the 
     \item \texttt{python -m GoT --mode graph --benchmark custom --prompt "what's the weather like?"}
 \end{quote}
 
-\section{Tools, libraries, framework used}
-\subsection{Poetry}
-In order to create a virtual and reproducible environment, the project uses Poetry as dependency resolver.
+\section{Agentic Frameworks}
 \subsection{LangChain/LangGraph}
 As mentioned in the previous chapter, LangChain is a framework that facilitates the integration with LLMs and the management of the reasoning process.
 \\
 In this project, LangChain is used in the following steps:
 \begin{itemize}
-    \item \textbf{LLM/agent calls}: LangChain provides classes and methods to call third part LLMs and to create agents with specific behaviours.  
-    \item \textbf{Tools management}: It offers a simple way to create and assign tools to the agents.
-    \item \textbf{Graph management}: LangGraph permits to create and manage the static graph structure.
-    \item \textbf{Message history management}: LangChain provides a sets of classes that permit to save and manipulate the message history in order to provide a different context to the different agents and to implement the backtracking mechanism. It is also used to classify the message in different categories: \textbf{System}, \textbf{AI} and \textbf{User} messages, which was useful for a better customization of the prompts.
+    \item \textbf{LLM/agent calls}: LangChain provides classes and methods to call third-party LLMs and to create agents with specific behaviours. In particular, the classes used are related to the \texttt{langchain\_google\_genai}. 
+    \item \textbf{Tools management}: It offers a simple way to create and assign tools to the agents. The functions provided by the framework plays a key role in the crafting phase, where the \texttt{tool} wrapper was crucial in order to wrap the function crafted into tools.
+    \item \textbf{Graph management}: LangGraph permits to create and manage the static graph structure thanks to its \texttt{StateGraph} class. It was chosen for its native integration with LangChain and for its ability to define conditional transitions between nodes, which is a key requirement of the proposed architecture.
+    \item \textbf{Message history management}: LangChain provides a set of classes that permit to save and manipulate the message history in order to provide a different context to the different agents and to implement the backtracking mechanism. It is also used to classify the message in different categories: \textbf{System}, \textbf{AI} and \textbf{User} messages, which was useful for a better customization of the prompts.
     \item \textbf{Call limits}: LangChain provides mechanisms to limit the number of calls to the LLMs, which is useful to control the cost and performance of the system. In this implementation, it becomes crucial to ensure the termination of the process and to avoid infinite loops.
 \end{itemize}
-\subsection{MLflow}
-MLflow is an open-source platform for managing the machine learning/LLM lifecycle,
- including experimentation, reproducibility and deployment. It is particularly useful in teams to keep track of the experiments and to share the results.
-\\\\
-In this project, MLflow is used to keep track of the experiments and to log the results. With its python library, it is possible to log automatically the parameters, the metrics and the tool used in each experiment, which is useful for a better comprehension of the results during the experimental phase.
-\\\\
-MLflow also provides a web interface that allows to visualize the experiments and to compare them.
-It also provides a bunch of metrics used in the evaluation phase, such as the number of tools used, the token usage and its average, the number of error and the latency of each call.  
 \subsection{LM Evaluation Harness}
 The LM Evaluation Harness is a library that provides a set of databases and evaluation metrics for evaluating the performance of LLMs on a variety of tasks.
-In this project, the LM Evaluation Harness was initially used for the evaluation of the system, but it was nextly abandoned because the for a custom models LM Evaluation Harness requires a custom implementation of the model wrapper.
+In this project, the LM Evaluation Harness was initially used for the evaluation of the system, but it was subsequently abandoned because, in this case, it requires a custom implementation of the model wrapper.
 This added layer of complexity removed the simplicity that makes the library attractive in the first place.
 \\
 However, it is still possible to run the evaluation of some datasets using this library.
 \subsection{Hugging Face Datasets}
 Hugging Face is a platform that provides a large collection of open-source models and datasets published by the community. 
-The datasets are particularly useful for the experimental phase, because Hugging Face provides a simple way to download and use them and usually the datasets are contains all the relevant information for the experiments, such as the input, the expected output, the name of the attachment if the prompt requires it and even some hints. 
+The datasets are particularly useful for the experimental phase, because Hugging Face provides a simple way to download and use them and usually the datasets are contain all the relevant information for the experiments, such as the input, the expected output, the name of the attachment if the prompt requires it and even some hints. 
+In this project, the datasets used are downloaded directly from Hugging Face, 
+including \texttt{hendrycks\_math},
+\texttt{gsm8k}, \texttt{gaia} and \texttt{gpqa}.
 
 \section{LLM configuration}
 The Google GenAI models are used in this architecture, which represents the \acp{LLM} used in this project. In particular, the Gemini \acp{API} offers the possibility to customize the format of the agent response.
@@ -623,7 +632,7 @@ This feature is crucial in this project because it facilitates the evaluation ph
 For a better customization of the agent performance, four different LLM configurations are defined: \textbf{remoteLLMStandard}, \textbf{remoteLLMReasoning}, \textbf{remoteLLMCrafter} and \textbf{remoteLLMEvaluator}.
 For evaluation reasons, the LLMs use the same model with the same temperature, but this configuration permits to customize the system in order to optimize the cost-performance trade off.
 
-\subsubsection{LLM calls}
+\subsection{Recursion Limit and Loop Recovery}
 A known limitation of current LLMs including state-of-the-art models like Gemini, emerges when dealing with high-complexity tasks: the model may fall into an infinite execution loop. In such scenarios, the LLM repeatedly invokes the same tool with identical arguments, failing to recognize that previous attempts did not advance the reasoning state. 
 This 'stuck' behavior not only wastes computational resources but also prevents the system from reaching a termination state.
 To prevent such scenarios, a maximumn \texttt{recursion\_limit} is added to the agent calls.  
@@ -638,7 +647,7 @@ This reset mechanism forces the LLM to approach the original goal from a new per
 
 By stripping away the redundant message history and injecting this meta-instruction, the system breaks the deterministic loop and encourages the model to employ a \textit{Divide and Conquer} strategy.
 
-\subsubsection{Agents system prompts}
+\subsection{Agents system prompts}
 In order to optimize the performance of the system, each agent has a specific system prompt that defines its behavior and its role in the process. This is crucial to ensure that each agent focuses on its specific task and to avoid confusion between the different agents.
 \newline The prompts can be found in the appendix \cref{appendix:agent-prompts}; in general each of it contains a description of the agent role, some instructions on how to perform its task and a set of rules to follow. 
 \newline The crafter agent prompt \cref{appendix:crafter-agent-prompt} contains a few shot examples of how to craft a new tool, including bad examples of how not to craft a tool, in order to help the LLM to understand the format and the rules to follow.
@@ -656,7 +665,7 @@ The graph implementation is a crucial part of the system, it is used to represen
 The graph is implemented using a class called \texttt{runtime\_graph} that contains all the methods to create and manage the graph. 
 The class is composed by many components such as the \texttt{goal}, which represent the problem to solve, the \texttt{nodes}, which are the dictionary that contains all the nodes of the graph and their links to other nodes, the \texttt{temp\_node} which is the node that is currently being expanded, it is used mainly to have a reference to the current node, and the \texttt{temp\_response}, which is the last response generated by the LLM and it is used to provide a feedback to the LLM in case of crafting or to provide the final solution in case of termination.
 
-\subsubsection{LLM response format}
+\subsection{LLM response format}
 In order to facilitate the management of the responses generated by the LLM, a specific format is defined for some steps of the process. In particular, two formats are defined: the \textbf{Response} and the \textbf{Score} format.
 
 \paragraph{Response}
@@ -684,7 +693,7 @@ If the LLM tries to install a library already installed, the tool will skip the 
 
 \chapter{Experiments}
 \section{Experimental setup (quali classi di benchmark, cosa testi per ogni benchmark, come lo misuri)}
-The purpose of this chapter is to evaluate the performance and efficiency of the proposed \acp{GoT} framework against baseline reasoning paradigms. Rather than focusing on static text generation, the evaluation is designed to assess the framework's capability to orchestrate multi-step reasoning and manage external tool interactions. 
+The purpose of this chapter is to evaluate the performance and efficiency of the proposed \ac{GoT} framework against baseline reasoning paradigms. Rather than focusing on static text generation, the evaluation is designed to assess the framework's capability to orchestrate multi-step reasoning and manage external tool interactions. 
 All experiments were conducted using Gemini models, in particular \texttt{gemini-2.5-flash}, \texttt{gemini-2.5-flash-lite} and \texttt{gemini-3.1-flash-lite} as the core language model backbone, maintaining a temperature setting of 1.0 as the Gemini standard suggest.
 
 \subsection{Problems in benchmark selection}
@@ -701,7 +710,7 @@ To comprehensively capture the performance, efficiency, and robustness of the sy
 
 \section{Hendrycks Math Benchmark}
 Experimental evaluation is conducted using the MATH benchmark \cite{hendrycksmath2021}, a widely recognized dataset designed to assess complex mathematical reasoning in LLMs. Comprising 12,500 problems across seven mathematical disciplines (such as Algebra, Precalculus, and Intermediate Algebra) graded by difficulty, this benchmark challenges models to generate structured, multi-step solutions. Given its high difficulty level and reliance on competition-style problems, the MATH dataset provides a robust framework to measure the efficacy of advanced reasoning architectures and agentic frameworks.
-In the context of a \acp{GoT} framework, the MATH benchmark provides a dual advantage. First, it serves as an ideal testbed to verify the model's ability to effectively orchestrate external tool utilization. Second, by mapping the problem-solving process onto a graph of discrete, traceable thoughts, it significantly mitigates the traditional black-box problem of Large Language Models.
+In the context of a \ac{GoT} framework, the MATH benchmark provides a dual advantage. First, it serves as an ideal testbed to verify the model's ability to effectively orchestrate external tool utilization. Second, by mapping the problem-solving process onto a graph of discrete, traceable thoughts, it significantly mitigates the traditional black-box problem of Large Language Models.
 \subsection{Descrizione della classe di benchmark}
 The Hendrycks Math Benchmark contains over 12.500 problems split in training and test dataset.
 Each split is divided again in categories:
@@ -729,8 +738,6 @@ Each split is divided again in categories:
 % BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
 
-\backmatter
-
 \bibliographystyle{alpha}
 \bibliography{bibliography}
 
@@ -738,7 +745,8 @@ Each split is divided again in categories:
 Optional. Max 1 page.
 \end{acknowledgements}
 
-\begin{appendix}
+\appendix
+
 \chapter{Illustrative example tool crafted}
 The following figure shows the tool crafted during the execution of the example described in the chapter 4.
 \lstinputlisting[language=Python, caption={The tool crafted by the agent}, label={lst:crafted-tool}]{listings/ai_tool.py}
@@ -807,9 +815,10 @@ Example:
     \textit{`` You are an assistant specialized in divide the complexity. 
 \newline Your goal is to resolve the problem with reasoning. You should to reason step by step and write all your reasoning.
 \newline You are forced to divide it into smaller parts. 
-\newline The parts must be indipendent from each other and must be solvable at the same time. 
+\newline The parts must be independent from each other and must be solvable at the same time. 
 \newline Respond with the indicated format.''}
 \end{quote}
-\end{appendix}
+ 
+\backmatter
 
 \end{document}
