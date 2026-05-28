@@ -196,6 +196,42 @@ As we said before, \acp{LLM} can be unpredictable and lacks of transparency. In 
 
 A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need for human intervention, and trying to adapt by changing their behavior based on feedbacks\cite{Kumar2024}. 
 \section{LangChain \& LangGraph}
+\subsection{LangChain}
+LangChain is an open-source framework launched in 2022 and designed to simplify the development of applications powered by \acp{LLM}. 
+The LangChain framework has two main declarated core focuses\cite{langchain_philosophy}:
+\paragraph{\ac{API} Abstraction}{Different providers expose different \acp{API}. The first goal of the framework is to standardize the way to interact with the main \acp{LLM} providers. 
+This approach allows developers to focus on the application logic rather than dealing with the low-level details of each provider.}
+\paragraph{Tool Integration}{\acp{LLM} are more than text generators, and the research is moving to the direction of creating agents that interact with the environment and communicate with tools. The second goal is to provide a simple way to define and integrate tools that \ac{LLM} can use, it include also the possibility of parsing and access to unstructured data. }
+\\\\
+The framework is designed with modularity as a core principle. 
+Rather than being distributed as a single package, LangChain is split 
+into independent components that can be installed separately, such as 
+\texttt{langchain-core}, \texttt{langchain-community}, and provider-specific 
+packages like \texttt{langchain-google-genai}. 
+This allows developers to include only the dependencies strictly required by their 
+application.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.6\linewidth]{figures/langchain.png}
+    \caption{Representation of the LangChain features. Source: \url{https://www.ksolves.com/blog/artificial-intelligence/power-of-langchain-features-and-benefits}}
+    \label{fig:langchain-arch}
+\end{figure}
+
+\subsection{LangGraph}
+In 2024, a new module called LangGraph was released.
+Rather than LangChain, which is focuses on simplifying the interaction with \acp{LLM} and neglet low-level details, LangGraph is a low-level framework, focuses entirely on agent orchestration.ù
+\\
+With LangGraph, developers can define complex agent workflows. 
+The core abstraction of LangGraph is the \textit{stateful directed graph}, where 
+each node represents a computational step and edges define the transitions between 
+them. 
+Transitions can be either deterministic, where the next node is uniquely determined 
+by the completion of the current step, or conditional, where the next node is 
+selected dynamically based on the output of the current one. 
+This makes LangGraph particularly well-suited for systems that require non-linear 
+control flow, such as backtracking, branching, or iterative refinement of 
+intermediate results. 
 
 \section{Related Works}
 While few-shot prompting improves performance by providing input-output 
