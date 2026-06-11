@@ -58,7 +58,7 @@ Optional. Max a few lines.
 \mainmatter
 
 %----------------------------------------------------------------------------------------
-\chapter{Intro (motivazione, contesto, obiettivi)}
+\chapter{Introduction}
 \label{chap:introduction}
 %----------------------------------------------------------------------------------------
 
@@ -84,36 +84,46 @@ you may need both \ac{vm} and \acp{vm}.
 
 \chapter{Background}
 \section{Large Language Models}
-\acp{LLM} are a subcategory of \ac{AI}, and more specifically, they belong to the field of Deep Learning. 
-In recent years, they have become extremely popular thanks to their ability to understand and generate natural language with a high level of fluency and coherence\cite{zhao2026surveylargelanguagemodels}. 
-Their generalized knowledge and versatility make them perfect for a wide range of applications, from text generation and translation to code assistance, question answering, and conversational systems.
+\acp{LLM} are a class of models which belong to Deep Learning,
+a sub-category of the broad field of \ac{AI}. 
+In recent years, they have become extremely popular thanks to their ability to understand and generate natural language with a high level of fluency and coherence~~\cite{zhao2026surveylargelanguagemodels}. 
+Their generalized knowledge and versatility make them perfect for a wide range of applications,
+from text generation and translation to code assistance,
+question answering,
+and conversational systems.
 \\\\
-The ability to generate natural language fits perfectly with the need to create systems that can be used by everyone without requiring specific technical knowledge. 
-Unlike traditional software interfaces, which often require predefined commands or structured inputs, \acp{LLM} allow users to interact using natural language, making human-computer interaction more intuitive and accessible.
+The ability to generate natural language fits perfectly with the need to create systems that can be used by everyone without requiring specific technical knowledge.
+%
+\acp{LLM} allow users to interact using natural language,
+which enables to access them through simple conversational interfaces, making human-computer interaction more intuitive and accessible.
 \\\\
-During the last years, after the release of ChatGPT, the average number of arXiv papers that contain the \textit{``large language model"} title or abstract are deduplicated \cite{zhao2026surveylargelanguagemodels}, leading to the development of increasingly powerful models such as GPT-4\cite{openai2024gpt4technicalreport}, LLaMA\cite{touvron2023llama2openfoundation}, Gemini, and Claude\cite{claude3modelcard}. 
+During the last years, after the release of ChatGPT, the average number of arXiv papers that contain the \textit{``large language model"} title or abstract are deduplicated ~\cite{zhao2026surveylargelanguagemodels}, leading to the development of increasingly powerful models such as GPT-4~\cite{openai2024gpt4technicalreport}, LLaMA~\cite{touvron2023llama2openfoundation}, Gemini\missingref{}, and Claude~\cite{claude3modelcard}. 
 These systems are capable not only of understanding and generating text, but also of solving reasoning tasks, summarizing documents, writing code, and supporting decision-making processes, becoming more and more used in real-world scenarios.
 \subsection{How they work}
-\acp{LLM} are autoregressive models that simply try to predict the next word in a sequence, based on the context.
+\acp{LLM} are autoregressive models that simply try to predict the next word in a sequence of characters,
+based on the context.
 \newline
-The text given as input to the \ac{LLM} is preprocessed by the model, dividing it into smaller units called \textit{tokens}.
-A token may represent a word, part of a word, or even a symbol, depending on the strategy chosen. The next step is to convert the tokens into numbers. This process permits the neural network to process textual information mathematically.
+The text given as input to the \ac{LLM} is preprocessed and divided into smaller units called \textit{tokens}.
+A token may represent a word, part of a word, or even a symbol, depending on the strategy chosen.
+%
+The next step is to convert the tokens into numbers, in such a way that a neural network can process them.
+
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.8\linewidth]{figures/tokenization.png}
     \caption{Schematic workflow of an LLM tokenizer: from raw input text to token segmentation and subsequent mapping into vocabulary IDs. Source: \url{https://www.linkedin.com/pulse/llm-tokenizers-hidden-engine-behind-ai-language-models-natarajan-rmbsc}}
     \label{fig:tokenization}
 \end{figure}
-\newline
 
-Modern \acp{LLM} are typically based on the Transformer architecture introduced by Vaswani \cite{vaswani2023attentionneed}. 
+Modern \acp{LLM} are typically based on the Transformer architecture introduced by Vaswani et al.~\cite{NIPS2017_Attention}. \mattiasidenote{quando citi un paper di più persone ma vuoi mettere solo un nome devi mettere anche `et al.'` (e altri)}
+\mattiasidenote{attention is all you need in realtà è del 2017 e pubblicato su NeurIPS, tu hai messo una versione di arxiv, in generale quando trovi un paper su arxiv, controlla sempre che non ci sia una versione pubblicata su conf o journal, e nel caso cita quella. controlla anche le altre citazioni}
 The Transformer uses the self-attention mechanism to capture contextual relationships between tokens, allowing the model to understand long-range dependencies and generate coherent text.
 
 Once the tokenization is done, the text generation starts using autoregressive algorithm: a token is generated and appended to the input sequence and used to predict the following token. 
 By repeating this process multiple times, the model can generate complete sentences, paragraphs, or entire documents.
 
 Despite the apparent intelligence of these systems, \acp{LLM} do not possess real understanding or reasoning capabilities in the human sense. 
-Their outputs are generated through statistical pattern matching learned from training data, which explains their tendency to occasionally produce incorrect or hallucinated information\cite{xu2025hallucinationinevitableinnatelimitation} and the standardized phrases that often generates.
+Their outputs are generated through statistical pattern matching learned from training data, which explains their tendency to occasionally produce incorrect or hallucinated information~\cite{xu2025hallucinationinevitableinnatelimitation} and the standardized phrases that often generates.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.7\linewidth]{figures/token_prediction.jpg}
@@ -122,7 +132,8 @@ Their outputs are generated through statistical pattern matching learned from tr
 \end{figure}
 
 \subsubsection{Training}
-Training is the really important part of how \acp{LLM} are so good at generating text and responding to general knowledge questions.
+\mattianote{sezione un po' inutile a mio parere... giusto per riempire il documento, ma non credo ci sia bisogno dato che il contenuto c'è, magari commentiamola}
+Training is the really important part of how \acp{LLM} excel at generating text and responding to general knowledge questions.
 
 Since we have now explained how an \ac{LLM} works behind the scenes, we also 
 need to discuss their training to understand why they perform so well.
@@ -140,21 +151,24 @@ capabilities~\cite{brown2020languagemodelsfewshotlearners}. We may note that the
 
 Nowadays, the emphasis on increasing model parameter counts is gradually giving way to research on higher-level capabilities, including autonomous agents and more effective prompting strategies.
 \subsection{Prompt Engineering}
-Prompt engineering is a relatively new field of research that refers to the practice of designing, refining, and implementing prompts or instructions that guide the output of \acp{LLM}. The main goal of Prompt Engineering is to optimize the \ac{LLM} output by solely refining the prompt\cite{Mesk2023}.
+Prompt engineering is a relatively new field of research that refers to the practice of designing and implementing prompts or instructions trying to guide the \ac{LLM} output. The main goal of prompt engineering is to optimize the \ac{LLM} output by solely refining the prompt~\cite{Mesk2023}.
 
-The prompt could include a lot of components, such as: \textit{Directives}, \textit{Examples}, \textit{Output formatting}, \textit{Style instructions}, \textit{Role} or \textit{Additional Information}\cite{schuloff2024prompt_engineer}. All of these components can help to improve the generated output in terms of a better style, accuracy in the response, or even a more correct output.
+The prompt could include a lot of components, such as: \textit{Directives}, \textit{Examples}, \textit{Output formatting}, \textit{Style instructions}, \textit{Role} or \textit{Additional Information}~\cite{schuloff2024prompt_engineer}. All of these components can help to improve the generated output in terms of a better style, accuracy in the response, or even a more correct output.
 
-One of the most popular and older prompt engineering techniques is the \textit{Few Shot Prompting}\cite{brown2020languagemodelsfewshotlearners}, in particular, it has three sub categories:
+One of the most popular and older prompt engineering techniques is the \textit{Few Shot Prompting}~\cite{brown2020languagemodelsfewshotlearners}, in particular, it has three sub categories:
 \begin{itemize}
     \item \textbf{Few-Shot}: We are referring to a prompt that includes a few examples of how the output should be structured with also the correct output. This context helps the \ac{LLM} to learn how to complete the task given without updating the model parameters.
-    \item \textbf{One-Shot}: It is equal to the few-shot prompting, with only one demonstration allowed and the natural language description of the problem.  
-    \item \textbf{Zero-Shot}: In this case, no demonstrations are allowed. The prompt contains only the natural language description of the task. This method has the maximum convenience, but could be challenging to apply, mainly due to the difficulty of imagining the format expected without producing examples.
+    \item \textbf{One-Shot}: It is equal to the few-shot prompting, with only one demonstration provided and the natural language description of the problem.  
+    \item \textbf{Zero-Shot}: In this case, no demonstrations are provided. The prompt contains only the natural language description of the task. This method has the maximum convenience, but could be challenging to apply, mainly due to the difficulty of imagining the format expected without producing examples.
 \end{itemize}
-These methods are not meant to compete with each other. There are three possibilities depending on the task that we require of the \ac{LLM}. In general, few-shot prompting tends to perform better on 
-structured or domain-specific tasks, while zero-shot prompting is often sufficient for simpler or well-known tasks\cite{brown2020languagemodelsfewshotlearners}.
+These methods are not meant to compete with each other.
+There are three possibilities depending on the task we are facing.
+In general, few-shot prompting tends to perform better on 
+structured or domain-specific tasks, while zero-shot prompting is often sufficient for simpler or well-known tasks~\cite{brown2020languagemodelsfewshotlearners}.
 
 \subsection{LLM-as-a-judge}
-During the Prompt Engineering discovery, a new way of improving the output is created, the LLM-as-a-judge technique\cite{Zheng2023llmasajudge}.
+\mattianote{rifraserei meglio questa sezione, prima partirei dal bisogno di un LLM-as-a-judge e perchè è stato ideato, poi spiegherei cosa è, infine pro e contro}
+During the prompt engineering discovery, a new way of improving the output is created, the LLM-as-a-judge technique~\cite{Zheng2023llmasajudge}.
 The idea is to use Generative AI to judge another \ac{LLM} output; this method can benefits the output in scalability, explainability and has the advantage of limit the human involvement of the reasoning process. 
 \\\\
 The three approaches proposed to use the LLM-as-a-judge are:
@@ -170,20 +184,21 @@ The \acp{LLM} are now good enough to start thinking about how to automate some p
 For these reasons, the agents are created. The formal definition is:
 \begin{quote}
     ``An agent is anything that can be viewed as perceiving its environment through sensors and acting
-upon that environment through effectors."\cite{russell2010artificial}
+upon that environment through effectors."~\cite{russell2010artificial}
 \end{quote}
 A high-level description of an agent consist of four main components:
 \begin{itemize}
     \item \textbf{Senses} the surrounding environment around it.
     \item \textbf{Perceives} the information of that environment.
     \item \textbf{Reasons} about how to act based on the input given.
-    \item \textbf{Acts} upon the environment through its actions (the output)\cite{russell2010artificial}.
+    \item \textbf{Acts} upon the environment through its actions (the output)~\cite{russell2010artificial}.
 \end{itemize}
 In the \ac{LLM} context, the agent brain is supported by the \ac{LLM}, which reasons using the context given (it could be the environment as a text), and it acts generating an output or by calling the \textbf{tools}.
 
 Tools are external functions or \acp{API} that an agent can invoke at runtime to overcome the limitations of the LLM, such as the lack of up-to-date knowledge, the inability to execute code, or the absence of persistent memory. By selecting and calling the appropriate tool based on the user's intent, the agent extends its capabilities well beyond pure language generation.
 
-As we said before, \acp{LLM} can be unpredictable and lacks of transparency. In this sense, the usage of tools enhances the credibility of the decision of an agent, improving interpretability and robustness\cite{xi2023risepotentiallargelanguage}.
+As previously mentioned,
+\acp{LLM} can be unpredictable and lacks of transparency. In this sense, the usage of tools enhances the credibility of the decision of an agent, improving interpretability and robustness~\cite{xi2023risepotentiallargelanguage}.
 \newpage
 
 \begin{figure}[h!]
@@ -192,14 +207,19 @@ As we said before, \acp{LLM} can be unpredictable and lacks of transparency. In 
     \caption{Representation of how an agents works. Source: \url{https://cobusgreyling.medium.com/how-would-the-architecture-for-an-llm-agent-platform-look-b07d7e004561}}
     \label{fig:agent-workflow}
 \end{figure}
+\mattiasidenote{se metti una figura la devi citare da qualche parte}
+\mattiasidenote{c'è un altra figura più avanti con la stessa label, forse un typo?}
 
-A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need for human intervention, and trying to adapt by changing their behavior based on feedbacks\cite{Kumar2024}. 
+A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need for human intervention, and trying to adapt by changing their behavior based on feedbacks~\cite{Kumar2024}. 
 \section{LangChain \& LangGraph}
 \subsection{LangChain}
 LangChain is an open-source framework launched in 2022 and designed to simplify the development of applications powered by \acp{LLM}. 
-The LangChain framework has two main declarated core focuses\cite{langchain_philosophy}:
+The LangChain framework has two main declarated core focuses~\cite{langchain_philosophy}:
+\mattiasidenote{se ciò che stai citando non è un paper ma per esempio un link, meglio mettere il riferimento in footnote}
+
 \paragraph{\ac{API} Abstraction}{Different providers expose different \acp{API}. The first goal of the framework is to standardize the way to interact with the main \acp{LLM} providers. 
 This approach allows developers to focus on the application logic rather than dealing with the low-level details of each provider.}
+
 \paragraph{Tool Integration}{\acp{LLM} are more than text generators, and the research is moving to the direction of creating agents that interact with the environment and communicate with tools. The second goal is to provide a simple way to define and integrate tools that \acp{LLM} can use, it includes also the possibility of parsing and access to unstructured data. }
 \\\\
 The framework is designed with modularity as a core principle. 
@@ -218,7 +238,7 @@ application.
 \end{figure}
 
 \subsection{LangGraph}
-In 2024, a new module called LangGraph was released\cite{langchain_philosophy}.
+In 2024, a new module called LangGraph was released~\cite{langchain_philosophy}.
 Rather than LangChain, which is focuses on simplifying the interaction with \acp{LLM} and neglet low-level details, LangGraph is a low-level framework, focuses entirely on agent orchestration.
 \\
 With LangGraph, developers can define complex agent workflows. 
@@ -233,30 +253,39 @@ control flow, such as backtracking, branching, or iterative refinement of
 intermediate results. 
 
 \section{Related Works}
+%
 While few-shot prompting improves performance by providing input-output 
 examples, it does not explicitly guide the model through the reasoning 
 process required to solve a task.
 The research in this field has been evolved, finding new ways to improve the output quality without changing the \ac{LLM} parameters.
+
 \subsection{Chain of Thoughts}
-Recently the \ac{CoT}\cite{weichainofthoughts} prompting is introduced. This prompting techniques reveals that, when \acp{LLM} produce the reasoning steps of a solution, the correct results increase dramatically.
-This leads to a lot of advantages:
+%
+\acl{CoT} is an important prompting techniques introduced in~\cite{weichainofthoughts}.
+%
+\Ac{CoT} reveals that, when \acp{LLM} produce the reasoning steps of a solution, the correct results increase dramatically.
+This leads to several advantages:
 \begin{itemize}
-    \item \textbf{Accuracy}: As we said previously, the number of corrected answers increase\cite{weichainofthoughts}.
+    \item \textbf{Accuracy}: As we said previously, the number of corrected answers increase~\cite{weichainofthoughts}.
     \item \textbf{Interpretability}: The \ac{LLM} remains a black box, but the final solution includes the steps, allowing to understand when the \ac{LLM} produces an error in the reasoning. 
     \item \textbf{Transparency}: In some task categories, such as math problems, the \ac{CoT} techniques produces the intermediate reasoning which helps to independently reproduce the result given.   
 \end{itemize}
-The \ac{CoT} was firstly introduced as a few-shot approach, where the examples were used for enducing the multi steps reasoning. 
-Recently it has been proved that also a zero-shot \ac{CoT} increases the performance, introducing the ``Let's think step by step" phrase into the prompt\cite{kojimazeroshotcot}.
+The \ac{CoT} was firstly introduced as a few-shot approach, where the examples were used for enducing\mattiasidenote{typo?} the multi steps reasoning.
+%
+Recently it has been proved that also a zero-shot \ac{CoT} increases the performance, introducing the ``Let's think step by step" phrase into the prompt~\cite{kojimazeroshotcot}.
+%
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.9\linewidth]{figures/cot-prompting.png}
-    \caption{The differences between a normal prompt versus a few-shot \ac{CoT} and a zero-shot \ac{CoT}. Source: \cite{kojimazeroshotcot}\url{https://arxiv.org/abs/2205.11916}}
+    \caption{The differences between a normal prompt versus a few-shot \ac{CoT} and a zero-shot \ac{CoT}. Source:~\cite{kojimazeroshotcot}\url{https://arxiv.org/abs/2205.11916}}
     \label{fig:agent-workflow}
 \end{figure}
 
-Later on, the \ac{CoT-SC}\cite{selfconsistencycot} was developed as an evolution of the classic \ac{CoT}. The idea behind that was explore multiple reasoning paths in order to select the most accurate output. The empirical evaluation proved that \ac{CoT-SC} boost the performance of \ac{CoT} reasoning\cite{selfconsistencycot}.
+Later on, the \ac{CoT-SC}~\cite{selfconsistencycot} was developed as an evolution of the classic \ac{CoT}. The idea behind that was explore multiple reasoning paths in order to select the most accurate output. The empirical evaluation proved that \ac{CoT-SC} boost the performance of \ac{CoT} reasoning~\cite{selfconsistencycot}.
+
 \subsection{Tree of Thoughts}
-The introduction of the \ac{CoT} approach paved the way for a new type of prompt engineering. From this method, the \ac{ToT} was developed\cite{yao2023tot}.
+
+The introduction of the \ac{CoT} approach paved the way for a new type of prompt engineering. From this method, the \ac{ToT} was developed~\cite{yao2023tot}.
 While the \ac{CoT} produces multiple steps with a single prompt, the \ac{ToT} is based on the idea of generating multiple thoughts for each step and evaluating the best of them; each step is a partial solution and the evaluation phase guarantee the refinement of it into the final response. In order to achieve the best result, the architecture includes four important parts:
 \begin{enumerate}
     \item \textbf{Task decomposition}: In the \ac{ToT}, the task decomposition is an explicit part. This should helps the \ac{LLM} to decompose the problem until they are small enough to generate a satisfying solution.
@@ -265,23 +294,26 @@ While the \ac{CoT} produces multiple steps with a single prompt, the \ac{ToT} is
     \item \textbf{Search algorithm}: It is used to search the more accurate solution in the tree; the strategies proposed are the classics, \ac{BFS} that controls each node at every level of the tree, \ac{DFS} that explores the most promising state first until the final output is reached.
 \end{enumerate}
 
-The studies proved that this approach obtains better results than \ac{CoT}, \ac{CoT-SC} and the not refined prompt\cite{yao2023tot}. 
+The studies proved that this approach obtains better results than \ac{CoT}, \ac{CoT-SC} and the not refined prompt~\cite{yao2023tot}. 
 \subsection{Graph of Thoughts} \label{sec:got}
-Another evolution of the \ac{CoT} is the \ac{GoT} architecture\cite{besta2024got}.
-Besta proposes an architecture where the \ac{LLM} reasoning process is seen as a graph of thoughts, where each vertex is represented by a thought and the edges are the dependecies. The thoughts dependecies and linking allow the creation of different operations: \textbf{Generation}, which produces new thoughts from one or more existing ones; \textbf{Aggregation}, which merges multiple thoughts into a single one; and \textbf{Refining}, which iteratively improves an existing thought based on self-feedback.. 
+Another evolution of the \ac{CoT} is the \ac{GoT} architecture~\cite{besta2024got}.
+%
+The authors propose an architecture where the \ac{LLM} reasoning process is seen as a graph of thoughts, where each vertex is represented by a thought and the edges are the dependencies. This structure allows the creation of different operations: \textbf{Generation}, which produces new thoughts from one or more existing ones; \textbf{Aggregation}, which merges multiple thoughts into a single one; and \textbf{Refining}, which iteratively improves an existing thought based on self-feedback. 
 
 Technically, the reasoning process consists of two main parts:
-\paragraph{\ac{GoO}} It is the planning part of the system. The \ac{GoO} is constructed before the execution starts and it can not be changed during the reasoning process. As the name suggests, it contains all the operations which will be completed during the execution. An important note is that the \ac{GoO} instance is not generated by the \ac{LLM}, but is created before by the user. 
-\paragraph{\ac{GRS}} It represents the graph that maintains all the information updated during the execution. The \ac{LLM} follows the instruction of the \ac{GoO}, the output produced is stored in the \ac{GRS}. Specifically, the \ac{GRS} tracks the executed operations, the \ac{LLM} outputs, the score and validity of each thought, along with additional metadata generated throughout the reasoning process.   
+\paragraph{\ac{GoO}.} It is the planning part of the system. The \ac{GoO} is constructed before the execution starts and it can not be changed during the reasoning process. As the name suggests, it contains all the operations which will be completed during the execution. Importantly, the \ac{GoO} instance is not generated by the \ac{LLM}, but is created before by the user. 
+\paragraph{\ac{GRS}.} It represents the graph that maintains all the information updated during the execution. The \ac{LLM} follows the instruction of the \ac{GoO}, the output produced is stored in the \ac{GRS}. Specifically, the \ac{GRS} tracks the executed operations, the \ac{LLM} outputs, the score and validity of each thought, along with additional metadata generated throughout the reasoning process.   
+\\\\
+Although the architecture just explained cannot be easily deployed in real-world scenarios by non-expert users due to the requirement of manual \ac{GoO} creation, research demonstrates that a proper implementation of \ac{GoT} can significantly outperform previously discussed architectures such as \ac{CoT} and \ac{ToT}~\cite{besta2024got}.
 
-Although the architecture just explained cannot be easily deployed in real-world scenarios by non-expert users due to the requirement of manual \ac{GoO} creation, research demonstrates that a proper implementation of \ac{GoT} can significantly outperform previously discussed architectures such as \ac{CoT} and \ac{ToT}\cite{besta2024got}.\begin{figure}[h!]
+\begin{figure}[h!]
     \centering
     \includegraphics[width=1\linewidth]{figures/graph_of_thoughts.png}
-    \caption{Representation of different prompt engineering architectures. Source: \cite{besta2024got}\url{https://arxiv.org/abs/2308.09687}}
+    \caption{Representation of different prompt engineering architectures. Source:~\cite{besta2024got}\url{https://arxiv.org/abs/2308.09687}}
     \label{fig:architectures-rep}
 \end{figure}
 
-\chapter{Methodology / Design}
+\chapter{Design}
 This chapter presents the proposed approach in detail.
 We first formally define the problem and highlight the main challenges and requirements.
 Then, we describe the proposed \ac{GoT}, providing its formalization, including algorithmic details and execution strategies.
@@ -602,10 +634,10 @@ This interface allows the user to configure the system's behavior through a set 
     \item \texttt{--mode} (\textit{string}, \textbf{required}): Specifies the reasoning architecture to deploy. The allowed values are \texttt{[standard, graph]}, but it can be easily expanded.
     \item \texttt{--benchmark} (\textit{string}, \textbf{required}): Allows to choose which benchmark run. Some benchmarks are included even if they will not be used: 
     \begin{itemize}
-        \item \textbf{hendrycks\_math\cite{hendrycksmath2021}}
-        \item \textbf{gsm8k\cite{cobbe2021gsm8k}}: a benchmark of grade school math word problems
-        \item \textbf{gpqa\cite{rein2023gpqa}}:a graduate-level high quality and extremely difficult benchmark covering biology, chemistry and physics
-        \item \textbf{gaia\cite{mialon2023gaia}}: a benchmark for general AI assistants on real-world tasks
+        \item \textbf{hendrycks\_math~\cite{hendrycksmath2021}}
+        \item \textbf{gsm8k~\cite{cobbe2021gsm8k}}: a benchmark of grade school math word problems
+        \item \textbf{gpqa~\cite{rein2023gpqa}}:a graduate-level high quality and extremely difficult benchmark covering biology, chemistry and physics
+        \item \textbf{gaia~\cite{mialon2023gaia}}: a benchmark for general AI assistants on real-world tasks
         \item \textbf{custom:} it permits to run custom prompt, it is used in a development environment
     \end{itemize} 
     \item \texttt{--max\_run} (\textit{integer}, \textit{optional}, default: \texttt{1}): Defines the number of prompts to execute in a benchmark, it has no effect in the custom mode. 
@@ -739,7 +771,7 @@ To comprehensively capture the performance, efficiency, and robustness of the sy
 \end{itemize}
 
 \section{Hendrycks Math Benchmark}
-Experimental evaluation is conducted using the MATH benchmark \cite{hendrycksmath2021}, a widely recognized dataset designed to assess complex mathematical reasoning in LLMs. Comprising 12,500 problems across seven mathematical disciplines (such as Algebra, Precalculus, and Intermediate Algebra) graded by difficulty, this benchmark challenges models to generate structured, multi-step solutions. Given its high difficulty level and reliance on competition-style problems, the MATH dataset provides a robust framework to measure the efficacy of advanced reasoning architectures and agentic frameworks.
+Experimental evaluation is conducted using the MATH benchmark ~\cite{hendrycksmath2021}, a widely recognized dataset designed to assess complex mathematical reasoning in LLMs. Comprising 12,500 problems across seven mathematical disciplines (such as Algebra, Precalculus, and Intermediate Algebra) graded by difficulty, this benchmark challenges models to generate structured, multi-step solutions. Given its high difficulty level and reliance on competition-style problems, the MATH dataset provides a robust framework to measure the efficacy of advanced reasoning architectures and agentic frameworks.
 In the context of a \ac{GoT} framework, the MATH benchmark provides a dual advantage. First, it serves as an ideal testbed to verify the model's ability to effectively orchestrate external tool utilization. Second, by mapping the problem-solving process onto a graph of discrete, traceable thoughts, it significantly mitigates the traditional black-box problem of Large Language Models.
 \subsection{Benchmark description}
 The Hendrycks Math Benchmark contains over 12.500 problems split in training and test dataset.
