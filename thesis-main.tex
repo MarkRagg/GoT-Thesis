@@ -5,8 +5,6 @@
 \usepackage{disi-thesis}
 \usepackage{code-lstlistings}
 \usepackage{notes}
-\usepackage{shortcuts}
-\usepackage{acronym}
 
 \school{\unibo}
 \programme{Corso di Laurea Magistrale in Ingegneria e Scienze Informatiche}
@@ -753,6 +751,23 @@ Each split is divided again in categories:
 \paragraph{Precalculus}{This final category bridges high-school math with university-level calculus, testing the model on trigonometry, vectors, matrices, logarithms, and infinite sequences.}
 
 \subsection{Results (metriche, grafici, tabelle)}
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{llccccc}
+    \toprule
+    \textbf{Model} & \textbf{Version} & \textbf{Accuracy} & \textbf{Avg Time (s)} & \textbf{Avg Cost (\$)} \\
+    \midrule
+    Gemini-2.5-flash-lite          & Graph & 69.17\% & 116.49 & \$ 0.01 \\
+    Gemini-2.5-flash-lite          & Zero-Shot CoT & 86.83\% & 11.30 &  $<$ \$ 0.01 \\
+    Gemini-2.5-flash    & Graph & 91.17\% & 92.67 & \$ 0.03 \\
+    Gemini-2.5-flash    & Zero-Shot CoT & 82.83\% & 14.62 & \$ 0.01 \\
+    Gemini-3.1-flash-lite  & Graph & 82.50\% & 29.58 & $<$ \$ 0.01 \\
+    Gemini-3.1-flash-lite  & Zero-Shot CoT & 61.50\% & 6.51 & $<$ \$ 0.01 \\
+    \bottomrule
+  \end{tabular}
+  \caption{LLM Benchmark Results}
+  \label{tab:benchmark}
+\end{table}
 \subsection{Analysis (esempi di output, errori comuni, casi di successo)}
 
 \chapter{Discussion}
