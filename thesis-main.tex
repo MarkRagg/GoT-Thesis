@@ -97,7 +97,7 @@ The ability to generate natural language fits perfectly with the need to create 
 \acp{LLM} allow users to interact using natural language,
 which enables to access them through simple conversational interfaces, making human-computer interaction more intuitive and accessible.
 \\\\
-During the last years, after the release of ChatGPT, the average number of arXiv papers that contain the \textit{``large language model"} title or abstract are deduplicated ~\cite{zhao2026surveylargelanguagemodels}, leading to the development of increasingly powerful models such as GPT-4~\cite{openai2024gpt4technicalreport}, LLaMA~\cite{touvron2023llama2openfoundation}, Gemini\missingref{}, and Claude~\cite{claude3modelcard}. 
+During the last years, after the release of ChatGPT, the average number of arXiv papers that contain the \textit{``large language model"} title or abstract are deduplicated ~\cite{zhao2026surveylargelanguagemodels}, leading to the development of increasingly powerful models such as GPT-4~\cite{openai2023_techreport}, LLaMA~\cite{llama2_foundation}, Gemini~\cite{gemini2025}, and Claude~\footnote{\url{https://assets.anthropic.com/m/61e7d27f8c8f5919/original/Claude-3-Model-Card.pdf}}. 
 These systems are capable not only of understanding and generating text, but also of solving reasoning tasks, summarizing documents, writing code, and supporting decision-making processes, becoming more and more used in real-world scenarios.
 \subsection{How they work}
 \acp{LLM} are autoregressive models that simply try to predict the next word in a sequence of characters,
@@ -116,7 +116,9 @@ The next step is to convert the tokens into numbers, in such a way that a neural
 \end{figure}
 
 Modern \acp{LLM} are typically based on the Transformer architecture introduced by Vaswani et al.~\cite{NIPS2017_Attention}. \mattiasidenote{quando citi un paper di più persone ma vuoi mettere solo un nome devi mettere anche `et al.'` (e altri)}
+\sidenote{Ok}
 \mattiasidenote{attention is all you need in realtà è del 2017 e pubblicato su NeurIPS, tu hai messo una versione di arxiv, in generale quando trovi un paper su arxiv, controlla sempre che non ci sia una versione pubblicata su conf o journal, e nel caso cita quella. controlla anche le altre citazioni}
+\sidenote{Fatto}
 The Transformer uses the self-attention mechanism to capture contextual relationships between tokens, allowing the model to understand long-range dependencies and generate coherent text.
 
 Once the tokenization is done, the text generation starts using autoregressive algorithm: a token is generated and appended to the input sequence and used to predict the following token. 
@@ -209,13 +211,15 @@ As previously mentioned,
 \end{figure}
 \mattiasidenote{se metti una figura la devi citare da qualche parte}
 \mattiasidenote{c'è un altra figura più avanti con la stessa label, forse un typo?}
+\sidenote{Fatto}
 
 A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need for human intervention, and trying to adapt by changing their behavior based on feedbacks~\cite{Kumar2024}. 
 \section{LangChain \& LangGraph}
 \subsection{LangChain}
 LangChain is an open-source framework launched in 2022 and designed to simplify the development of applications powered by \acp{LLM}. 
-The LangChain framework has two main declarated core focuses~\cite{langchain_philosophy}:
+The LangChain framework has two main declarated core focuses~\footnote{\url{https://docs.langchain.com/oss/python/langchain/philosophy}}:
 \mattiasidenote{se ciò che stai citando non è un paper ma per esempio un link, meglio mettere il riferimento in footnote}
+\sidenote{Fatto}
 
 \paragraph{\ac{API} Abstraction}{Different providers expose different \acp{API}. The first goal of the framework is to standardize the way to interact with the main \acp{LLM} providers. 
 This approach allows developers to focus on the application logic rather than dealing with the low-level details of each provider.}
@@ -238,7 +242,7 @@ application.
 \end{figure}
 
 \subsection{LangGraph}
-In 2024, a new module called LangGraph was released~\cite{langchain_philosophy}.
+In 2024, a new module called LangGraph was released~\footnote{\url{https://docs.langchain.com/oss/python/langchain/philosophy}}.
 Rather than LangChain, which is focuses on simplifying the interaction with \acp{LLM} and neglet low-level details, LangGraph is a low-level framework, focuses entirely on agent orchestration.
 \\
 With LangGraph, developers can define complex agent workflows. 
@@ -270,7 +274,7 @@ This leads to several advantages:
     \item \textbf{Interpretability}: The \ac{LLM} remains a black box, but the final solution includes the steps, allowing to understand when the \ac{LLM} produces an error in the reasoning. 
     \item \textbf{Transparency}: In some task categories, such as math problems, the \ac{CoT} techniques produces the intermediate reasoning which helps to independently reproduce the result given.   
 \end{itemize}
-The \ac{CoT} was firstly introduced as a few-shot approach, where the examples were used for enducing\mattiasidenote{typo?} the multi steps reasoning.
+The \ac{CoT} was firstly introduced as a few-shot approach, where the examples were used for inducing\mattiasidenote{typo?}\sidenote{Fatto} the multi steps reasoning.
 %
 Recently it has been proved that also a zero-shot \ac{CoT} increases the performance, introducing the ``Let's think step by step" phrase into the prompt~\cite{kojimazeroshotcot}.
 %
@@ -278,7 +282,7 @@ Recently it has been proved that also a zero-shot \ac{CoT} increases the perform
     \centering
     \includegraphics[width=.9\linewidth]{figures/cot-prompting.png}
     \caption{The differences between a normal prompt versus a few-shot \ac{CoT} and a zero-shot \ac{CoT}. Source:~\cite{kojimazeroshotcot}\url{https://arxiv.org/abs/2205.11916}}
-    \label{fig:agent-workflow}
+    \label{fig:cot-prompting}
 \end{figure}
 
 Later on, the \ac{CoT-SC}~\cite{selfconsistencycot} was developed as an evolution of the classic \ac{CoT}. The idea behind that was explore multiple reasoning paths in order to select the most accurate output. The empirical evaluation proved that \ac{CoT-SC} boost the performance of \ac{CoT} reasoning~\cite{selfconsistencycot}.
@@ -757,6 +761,8 @@ If the LLM tries to install a library already installed, the tool will skip the 
 \section{Experimental setup (quali classi di benchmark, cosa testi per ogni benchmark, come lo misuri)}
 The purpose of this chapter is to evaluate the performance and efficiency of the proposed \ac{GoT} framework against baseline reasoning paradigms. Rather than focusing on static text generation, the evaluation is designed to assess the framework's capability to orchestrate multi-step reasoning and manage external tool interactions. 
 All experiments were conducted using Gemini models, in particular \texttt{gemini-2.5-flash}, \texttt{gemini-2.5-flash-lite} and \texttt{gemini-3.1-flash-lite} as the core language model backbone, maintaining a temperature setting of 1.0 as the Gemini standard suggest.
+\\\\
+In order to guarantee a low variability of the results obtained, every benchmark or sub-category of the benchmark is tested twice, making the average of the two results.
 
 \subsection{Problems in benchmark selection}
 
@@ -787,7 +793,7 @@ Each split is divided again in categories:
   \centering
   \begin{tabular}{llccccc}
     \toprule
-    \textbf{Model} & \textbf{Version} & \textbf{Accuracy} & \textbf{Avg Time (s)} & \textbf{Avg Cost (\$)} \\
+    \textbf{Model} & \textbf{Version} & \textbf{Accuracy} & \textbf{Avg. Time (s)} & \textbf{Avg. Cost (\$)} \\
     \midrule
     Gemini-2.5-flash-lite          & Graph & 69.17\% & 116.49 & \$ 0.01 \\
     Gemini-2.5-flash-lite          & Zero-Shot CoT & 86.83\% & 11.30 &  $<$ \$ 0.01 \\
@@ -797,9 +803,16 @@ Each split is divided again in categories:
     Gemini-3.1-flash-lite  & Zero-Shot CoT & 61.50\% & 6.51 & $<$ \$ 0.01 \\
     \bottomrule
   \end{tabular}
-  \caption{LLM Benchmark Results}
-  \label{tab:benchmark}
+  \caption{LLM general benchmark results}
+  \label{tab:general-benchmark}
 \end{table}
+
+As shown in \cref{tab:general-benchmark}, \ac{GoT} performs better in larger models, while Gemini 2.5 Flash Lite has higher performance with the standard \ac{CoT} approach.
+
+The average time and cost are also taken into account, showing that the \ac{GoT} architecture has similar cost and remaining an affordable price for using such technologies.
+Nevertheless, the average time can increase up to 10x in some cases, making GoT less suitable for simple and time-sensitive tasks. 
+However, it remains a valuable tool for complex problems where multi-step reasoning and error recovery justify the additional overhead.
+
 \subsection{Analysis (esempi di output, errori comuni, casi di successo)}
 
 \chapter{Discussion}
