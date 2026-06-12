@@ -42,7 +42,34 @@
 \frontmatter\frontispiece
 
 \begin{abstract}	
-Max 2000 characters, strict.
+\ac{LLM} have demonstrated exceptional capabilities in solving complex problems,
+yet they exhibit structural limitations that reduce their reliability: opaque reasoning processes,
+and limited exploration of alternative solution paths.
+%
+Prompt engineering techniques, such as \ac{CoT}, 
+can improve the reasoning process and output quality,
+however,
+they rely on a single linear reasoning path,
+limiting the scalability of output quality.
+%
+This thesis introduces a \ac{GoT} architecture based on a runtime-generated graph,
+in which the \ac{LLM} reasoning process is guided by a directed graph constructed dynamically during execution.
+%
+Such graph contains various kinds of nodes, each representing a specific step: reasoning generation, tool invocation, response evaluation, and backtracking to alternative paths.
+%
+Moreover, this approach supports the dynamic tool crafting mechanism when no available tool is sufficient to solve the problem.
+%
+A dedicated agent generates and registers new tools at runtime,
+extending the system's capabilities without requiring human intervention.
+%
+Intermediate reasoning process is evaluated by an \ac{LLM} judge with an adaptive threshold based on the estimated complexity of the problem.
+%
+The framework is evaluated on the Hendrycks MATH benchmark, comparing the proposed architecture against a Zero-Shot \ac{CoT} baseline across three different Gemini models.
+%
+The results suggest that the \ac{GoT} can make more robust models with stronger reasoning capabilities,
+where the backtracking mechanism and multi-path exploration help recover from incorrect intermediate steps.
+%
+At the same time, the overhead introduced by the architecture tends to outweigh its benefits.
 \end{abstract}
 
 \begin{dedication} % this is optional
