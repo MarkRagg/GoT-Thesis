@@ -809,6 +809,7 @@ In the context of a \ac{GoT} framework, the MATH benchmark provides a dual advan
 The Hendrycks Math Benchmark contains over 12.500 problems split in training and test dataset.
 Each split is divided again in categories:
 \paragraph{Pre Algebra and Algebra}{Pre-Algebra problems involve basic arithmetic properties, fractions, ratios, and introductory equation solving, while Algebra extends into linear and quadratic equations, polynomial manipulation, systems of equations, and inequalities. Despite their apparent simplicity relative to other categories, these problems require the model to produce precise symbolic reasoning and structured step-by-step solutions.}
+\paragraph{Intermediate Algebra}{TODO}
 \paragraph{Counting and probability}{This category focuses on combinatorics, permutations, combinations, and discrete probability distributions, forcing the system to apply discrete logic and combinatorial reasoning rather than raw computation.}
 \paragraph{Geometry}{This subset includes Euclidean geometry problems involving angles, areas, volumes, and coordinate-based geometric proofs. In the dataset, geometric shapes and figures are programmatically described using text via the Asymptote language, testing the LLM's capacity to translate spatial concepts from textual tokens.}
 \paragraph{Number Theory}{Centered on the properties of integers, this section covers modular arithmetic, prime factorization, divisibility rules, and Diophantine equations, presenting problems that inherently require structured algorithmic logic.}
@@ -838,7 +839,26 @@ As shown in \cref{tab:general-benchmark}, \ac{GoT} performs better in larger mod
 The average time and cost are also taken into account, showing that the \ac{GoT} architecture has similar cost and remaining an affordable price for using such technologies.
 Nevertheless, the average time can increase up to 10x in some cases, making GoT less suitable for simple and time-sensitive tasks. 
 However, it remains a valuable tool for complex problems where multi-step reasoning and error recovery justify the additional overhead.
+\\\\
+Considering the models where the \ac{LLM} reaches a performance increasing, we examine in detail the result in order to understand where they are more consistent.
+\\\\
+Gemini 2.5 Flash shows in \cref{fig:gemini-2.5-flash} a substantial improvement in the Geometry outcome, while Number Theory, Precalculus and Intermediate Algebra have a lower improvement. However, Algebra and Counting \& Probability have the same performances of Zero-Shot CoT architecture.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.9\linewidth]{figures/Gemini-2.5-Flash.pdf}
+    \caption{Accuracy of Gemini 2.5 Flash in each category.}
+    \label{fig:gemini-2.5-flash}
+\end{figure}
 
+If we look at the Gemini 3.1 Flash Lite result in each category as in \cref{fig:gemini-3.1-flash-lite}, we see an overall performance increase, with Algebra and Number Theory categories nearing perfection.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.9\linewidth]{figures/Gemini-3.1-Flash-Lite.pdf}
+    \caption{Accuracy of Gemini 3.1 Flash Lite in each category.}
+    \label{fig:gemini-3.1-flash-lite}
+\end{figure}
+
+\newpage
 \subsection{Analysis (esempi di output, errori comuni, casi di successo)}
 
 \chapter{Discussion}
