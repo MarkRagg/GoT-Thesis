@@ -898,6 +898,18 @@ However, the majority of empty responses have \texttt{"finish\_reason": "STOP"};
 An output example is showed in the appendix \cref{lst:empty-response}.}
 
 \subsubsection{Crafting output}
+The \cref{tab:general-statistics} also shows the number of tool crafted for each model. Every \acp{LLM} demonstrate different approach on tool crafting and different results:
+
+\paragraph{Gemini 2.5 Flash Lite} This model has two critical issues that do not permit to use correctly the crafting tool. 
+First, it rarely consider the need of crafting a new tool, and when it does, the crafter agent usually negates the possibility to craft a tool saying ``I cannot craft new tool''.
+Second, if we analyze such tools, we notice that a large part of them does not respect the given standard. 
+In fact, there are a lot of placeholder functions that contain no codes, but only returned strings and duplicates, which are not considered tools because only one tool can have the same name. TODO APPENDIX
+Furthermore, the tools created are rarely used and if the model tries to use a placeholder function it will be convinced that the problem cannot be resolved, leading it to produce a wrong output.
+
+\paragraph{Gemini 2.5 Flash} In this case, we have the opposite problem. If the previous model does not be able to craft tools, Gemini 2.5 Flash overuse this possibility, creating a wide range of functions. 
+It is worth noting that the tool crafted statistic in \cref{tab:general-statistics} is heavily influenced by the Counting \& Probability category, which alone accounts for 265.5 crafted tools; excluding this outlier, the average number of crafted tools per category is significantly lower.
+TODO continuare.
+
 
 \chapter{Discussion}
 \section{Interpretazione dei risultati (funziona bene in questi casi, funziona male in questi altri, suppongo sia perchè...)}
