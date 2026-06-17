@@ -840,8 +840,28 @@ The average time and cost are also taken into account, showing that the \ac{GoT}
 Nevertheless, the average time can increase up to 10x in some cases, making GoT less suitable for simple and time-sensitive tasks. 
 However, it remains a valuable tool for complex problems where multi-step reasoning and error recovery justify the additional overhead.
 \\\\
-Considering the models where the \ac{LLM} reaches a performance increasing, we examine in detail the result in order to understand where they are more consistent.
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{llccccc}
+    \toprule
+    \textbf{Model} & \textbf{Version} & \textbf{Errors} & \textbf{Tool Invokation} & \textbf{Tool Crafted} \\
+    \midrule
+    Gemini-2.5-flash-lite          & Graph & 2.83\% & 4926.5 & 22 \\
+    Gemini-2.5-flash-lite          & Zero-Shot CoT & 1.83\% & 327.5 & N/A \\
+    Gemini-2.5-flash    & Graph & 1.33\% & 1428,5 & 413 \\
+    Gemini-2.5-flash    & Zero-Shot CoT & 5.83\% & 329 & N/A \\
+    Gemini-3.1-flash-lite  & Graph & 0.00\% & 704 & 50 \\
+    Gemini-3.1-flash-lite  & Zero-Shot CoT & 35.50\% & 2052 & N/A \\
+    \bottomrule
+  \end{tabular}
+  \caption{Errors and Tool statistics}
+  \label{tab:general-statistics}
+\end{table}
+
+Looking at \cref{tab:general-statistics}, it is clear that the majority of incorrect response of Gemini 3.1 Flash Lite CoT are due to the enormous numer of errors returned by the system, while the other models have the same error percentage or a lower discrepancy.
 \\\\
+Considering the models where the \ac{LLM} reaches a performance increasing, we examine in detail the result in order to understand where they are more consistent.
+%
 Gemini 2.5 Flash shows in \cref{fig:gemini-2.5-flash} a substantial improvement in the Geometry outcome, while Number Theory, Precalculus and Intermediate Algebra have a lower improvement. However, Algebra and Counting \& Probability have the same performances of Zero-Shot CoT architecture.
 \begin{figure}[h!]
     \centering
