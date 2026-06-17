@@ -1,0 +1,36 @@
+[
+  {
+    "content": "Answer the following math problem. Respond in the following format: \\boxed{answer}. Think step by step before answering.\n\nFind all real values of $a$ for which the quadratic equation\n\\[(3 - i) x^2 + (a + 4i) x - 115 + 5i = 0\\]has at least one real root.\n\nEnter all the possible values of $a,$ separated by commas.\nAnswer:",
+    "additional_kwargs": {},
+    "response_metadata": {},
+    "type": "human",
+    "name": null,
+    "id": "422b2a1f-548e-480c-8e42-f585ac879b93"
+  },
+  {
+    "content": "",
+    "additional_kwargs": {},
+    "response_metadata": {
+      "finish_reason": "STOP",
+      "model_name": "gemini-2.5-flash",
+      "safety_ratings": [],
+      "model_provider": "google_genai"
+    },
+    "type": "ai",
+    "name": null,
+    "id": "lc_run--019e897e-85ac-7b82-827d-2fcb21b8c2e5-0",
+    "tool_calls": [],
+    "invalid_tool_calls": [],
+    "usage_metadata": {
+      "input_tokens": 431,
+      "output_tokens": 1262,
+      "total_tokens": 1693,
+      "input_token_details": {
+        "cache_read": 0
+      },
+      "output_token_details": {
+        "reasoning": 1262
+      }
+    }
+  }
+]

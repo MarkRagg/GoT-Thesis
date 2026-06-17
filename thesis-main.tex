@@ -112,7 +112,7 @@ you may need both \ac{vm} and \acp{vm}.
 \section{Large Language Models}
 \acp{LLM} are a class of models which belong to Deep Learning,
 a sub-category of the broad field of \ac{AI}. 
-In recent years, they have become extremely popular thanks to their ability to understand and generate natural language with a high level of fluency and coherence~~\cite{zhao2026surveylargelanguagemodels}. 
+In recent years, they have become extremely popular thanks to their ability to understand and generate natural language with a high level of fluency and coherence~\cite{zhao2026surveylargelanguagemodels}. 
 Their generalized knowledge and versatility make them perfect for a wide range of applications,
 from text generation and translation to code assistance,
 question answering,
@@ -810,7 +810,7 @@ In the context of a \ac{GoT} framework, the MATH benchmark provides a dual advan
 The Hendrycks Math Benchmark contains over 12.500 problems split in training and test dataset.
 Each split is divided again in categories:
 \paragraph{Pre Algebra and Algebra}{Pre-Algebra problems involve basic arithmetic properties, fractions, ratios, and introductory equation solving, while Algebra extends into linear and quadratic equations, polynomial manipulation, systems of equations, and inequalities. Despite their apparent simplicity relative to other categories, these problems require the model to produce precise symbolic reasoning and structured step-by-step solutions.}
-\paragraph{Intermediate Algebra}{TODO}
+\paragraph{Intermediate Algebra}{Intermediate Algebra covers topics such as complex numbers, polynomial roots, sequences and series, logarithmic and exponential equations, and inequalities involving absolute values. These problems require the model to apply multi-step algebraic manipulation and to recognize structural patterns across different functional forms.}
 \paragraph{Counting and probability}{This category focuses on combinatorics, permutations, combinations, and discrete probability distributions, forcing the system to apply discrete logic and combinatorial reasoning rather than raw computation.}
 \paragraph{Geometry}{This subset includes Euclidean geometry problems involving angles, areas, volumes, and coordinate-based geometric proofs. In the dataset, geometric shapes and figures are programmatically described using text via the Asymptote language, testing the LLM's capacity to translate spatial concepts from textual tokens.}
 \paragraph{Number Theory}{Centered on the properties of integers, this section covers modular arithmetic, prime factorization, divisibility rules, and Diophantine equations, presenting problems that inherently require structured algorithmic logic.}
@@ -845,7 +845,7 @@ However, it remains a valuable tool for complex problems where multi-step reason
   \centering
   \begin{tabular}{llccccc}
     \toprule
-    \textbf{Model} & \textbf{Version} & \textbf{Errors} & \textbf{Tool Invokation} & \textbf{Tool Crafted} \\
+    \textbf{Model} & \textbf{Version} & \textbf{Errors} & \textbf{Tool Invocation} & \textbf{Tool Crafted} \\
     \midrule
     Gemini-2.5-flash-lite          & Graph & 2.83\% & 4926.5 & 22 \\
     Gemini-2.5-flash-lite          & Zero-Shot CoT & 1.83\% & 327.5 & N/A \\
@@ -881,6 +881,23 @@ If we look at the Gemini 3.1 Flash Lite result in each category as in \cref{fig:
 
 \newpage
 \subsection{Analysis (esempi di output, errori comuni, casi di successo)}
+\subsubsection{Output examples}
+\subsubsection{Common errors}
+\paragraph{GoT}{TODO}
+\paragraph{Zero-Shot CoT}{As outline previously, the \cref{tab:general-statistics} shows that Gemini 3.1 Flash Lite produces a large number of malfunctions. 
+In particular, these errors are \texttt{GRAPH\_RECURSION\_LIMIT}, which are raised by the system when an infinite tool call loop is running. 
+Indeed, this control is added for a Gemini issue that appeared when prompt is a complex problem and the model tries to resolve it with a tool call, 
+This critical issue justifies the high number of tool invocation of Gemini 3.1 Flash Lite Zero-Shot CoT as shows in \cref{tab:general-statistics}. 
+but the result does not satisfy the \ac{LLM}, so it call again the tool with the same parameters creating an infinite loop\footnote{\url{https://discuss.ai.google.dev/t/gemini-2-5-flash-stuck-in-a-tool-call-loop-when-using-both-tools-and-structured-output/110777}}. 
+\\\\
+While the table highlights the errors of the 3.1 model, Gemini 2.5 Flash CoT does not show the same amount of failed responses, but presents a significant number of malfunctions that are not captured in the table.
+In particular, the incorrect responses do not refer to wrong results, but are mainly due to empty outputs. 
+This error is not included in the \cref{tab:general-statistics} because the final response is sent as a correct package (status code 200) and the system does not automatically recognize the problem.
+In these cases, the package contains empty text with \texttt{"finish\_reason": "MALFORMED\_FUNCTION\_CALL"} which contains the same tools that in others prompt do not cause problems\footnote{\url{https://github.com/googleapis/python-genai/issues/1120}}. 
+However, the majority of empty responses have \texttt{"finish\_reason": "STOP"}; this is caused by another bug that changes \texttt{MALFORMED\_FUNCTION\_CALL} into \texttt{STOP} issue when using stream + tools + thinking\footnote{\url{https://github.com/BerriAI/litellm/issues/21744}}.
+An output example is showed in the appendix \cref{lst:empty-response}.}
+
+\subsubsection{Crafting output}
 
 \chapter{Discussion}
 \section{Interpretazione dei risultati (funziona bene in questi casi, funziona male in questi altri, suppongo sia perchè...)}
@@ -978,6 +995,9 @@ Example:
 \newline Respond with the indicated format.''}
 \end{quote}
  
+\section{Output examples}
+\lstinputlisting[language=json, caption={Example of empty response, finish reason field has STOP as a reason.}, label={lst:empty-response}]{listings/empty_response_example.json}
+
 \backmatter
 
 \end{document}
