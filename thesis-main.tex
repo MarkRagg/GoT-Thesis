@@ -141,10 +141,7 @@ The next step is to convert the tokens into numbers, in such a way that a neural
     \label{fig:tokenization}
 \end{figure}
 
-Modern \acp{LLM} are typically based on the Transformer architecture introduced by Vaswani et al.~\cite{NIPS2017_Attention}. \mattiasidenote{quando citi un paper di più persone ma vuoi mettere solo un nome devi mettere anche `et al.'` (e altri)}
-\sidenote{Ok}
-\mattiasidenote{attention is all you need in realtà è del 2017 e pubblicato su NeurIPS, tu hai messo una versione di arxiv, in generale quando trovi un paper su arxiv, controlla sempre che non ci sia una versione pubblicata su conf o journal, e nel caso cita quella. controlla anche le altre citazioni}
-\sidenote{Fatto}
+Modern \acp{LLM} are typically based on the Transformer architecture introduced by Vaswani et al.~\cite{NIPS2017_Attention}.
 The Transformer uses the self-attention mechanism to capture contextual relationships between tokens, allowing the model to understand long-range dependencies and generate coherent text.
 
 Once the tokenization is done, the text generation starts using autoregressive algorithm: a token is generated and appended to the input sequence and used to predict the following token. 
@@ -237,16 +234,12 @@ As previously mentioned,
     \label{fig:agent-workflow}
 \end{figure}
 \mattiasidenote{se metti una figura la devi citare da qualche parte}
-\mattiasidenote{c'è un altra figura più avanti con la stessa label, forse un typo?}
-\sidenote{Fatto}
 
 A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need for human intervention, and trying to adapt by changing their behavior based on feedbacks~\cite{Kumar2024}. 
 \section{LangChain \& LangGraph}
 \subsection{LangChain}
 LangChain is an open-source framework launched in 2022 and designed to simplify the development of applications powered by \acp{LLM}. 
 The LangChain framework has two main declarated core focuses~\footnote{\url{https://docs.langchain.com/oss/python/langchain/philosophy}}:
-\mattiasidenote{se ciò che stai citando non è un paper ma per esempio un link, meglio mettere il riferimento in footnote}
-\sidenote{Fatto}
 
 \paragraph{\ac{API} Abstraction}{Different providers expose different \acp{API}. The first goal of the framework is to standardize the way to interact with the main \acp{LLM} providers. 
 This approach allows developers to focus on the application logic rather than dealing with the low-level details of each provider.}
@@ -301,7 +294,7 @@ This leads to several advantages:
     \item \textbf{Interpretability}: The \ac{LLM} remains a black box, but the final solution includes the steps, allowing to understand when the \ac{LLM} produces an error in the reasoning. 
     \item \textbf{Transparency}: In some task categories, such as math problems, the \ac{CoT} techniques produces the intermediate reasoning which helps to independently reproduce the result given.   
 \end{itemize}
-The \ac{CoT} was firstly introduced as a few-shot approach, where the examples were used for inducing\mattiasidenote{typo?}\sidenote{Fatto} the multi steps reasoning.
+The \ac{CoT} was firstly introduced as a few-shot approach, where the examples were used for inducing the multi steps reasoning.
 %
 Recently it has been proved that also a zero-shot \ac{CoT} increases the performance, introducing the ``Let's think step by step" phrase into the prompt~\cite{kojimazeroshotcot}.
 %
@@ -385,7 +378,7 @@ In order to simplify the problem and focus on the core aspects of the \ac{GoT} p
 \end{itemize}
 
 \section{The proposed approach}
-The approach proposed in this thesis is based on the \ac{GoT} paradigm~\missingref{}. 
+The approach proposed in this thesis is based on the \ac{GoT} paradigm~\cite{besta2024got}. 
 In this framework, the reasoning process is modeled as a graph, where nodes represent intermediate thoughts, and the \ac{LLM} guides both the expansion of the graph and the decision of when to terminate the reasoning process.
 
 Given an input problem $P$, the system incrementally constructs a graph according to a set of high-level rules. 
@@ -399,8 +392,8 @@ The second motivation about the use of \ac{GoT}, as mentioned in the \cref{sec:g
 
 
 \subsection{Static Graph Structure}
-As a \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. The static graph structure provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
-\mattiasidenote{da qualche parte devi citare \cref{fig:static-graph}, questo è il posto giusto, non in fondo, ti ho spostato l'immagine.}
+As a \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. 
+\Cref{fig:static-graph} illustrates the static graph structure, which provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
 \mattianote{controlla tutte le altre immagini e assicurati di citarle nel posto giusto, e dove puoi ritaglia i contorni (togli lo spazio bianco) per guadagnare spazio}
 
 \begin{figure}
@@ -410,7 +403,7 @@ As a \textbf{static graph}, we refer to the graph structure that is defined at t
     \label{fig:static-graph}
 \end{figure}
 
-The static graph structure is defined as $G_s = (S, T)$, where $S$ is the set of possible logical\mattiasidenote{logical?} states (e.g. Evaluation, Backtracking, Crafting etc.) and $T$ is the set of possible transitions between these states. 
+The static graph structure is defined as $G_s = (S, T)$, where $S$ is the set of possible states (e.g. Evaluation, Backtracking, Crafting etc.) and $T$ is the set of possible transitions between these states. 
 The states are the following:
 
 \paragraph{\_\_start\_\_ and \_\_end\_\_.} 
@@ -435,7 +428,7 @@ The message history will be used to provide the context in the following states.
 %
 This step is crucial because the evaluation determines whether the response is ready to be accepted as a solution, whether the system needs to backtrack and explore alternative reasoning paths, or whether a new tool must be created to solve the task.
 %
-An LLM-as-a-judge is used to evaluate the response. The evaluation is based on the format of the response (sometimes the response should have a fixed format\mattiasidenote{sometimes should?}), the correctness of the result, and the explanation of the process.
+An LLM-as-a-judge is used to evaluate the response. The evaluation is based on the format of the response (the response needs to have a fixed format depending on the used benchmark), the correctness of the result, and the explanation of the process.
 %
 The judge has the entire message history, so it has a full vision of the reasoning process. In order to evaluate the response, the \ac{LLM} must score the solution to a number between 0 and 5, where 5 is the maximum, and also give it a score for the problem complexity. These two parameters are used to decide if the response can pass or not. 
 The evaluation threshold is dynamically adjusted based on the problem complexity:
@@ -458,8 +451,6 @@ Then a new reasoning path is chosen for exploration. In this state, a specialize
 \paragraph{chat\_completion.} Acts as a fallback mechanism to ensure that a response is provided even when complex reasoning paths fail. This state is reached when the system has explored all the possible paths, and it is not able to find a solution, so it calls the \ac{LLM} to generate a solution without any constraint in order to guarantee the termination of the process.
 \\
 \\
-\mattiasidenote{evita i gerundi in inglese accademico: 'Having defined', risulta solo una forma per allungare il brodo}
-% Having defined the states
 Now we formalize the edges of the graph as a set of transitions $T$ composed by two subsets: $T = T_d \cup T_c$ where:
 \begin{itemize}
     \item $T_d$ is the set of deterministic transitions, where the next state is uniquely determined by the execution of the current state’s task.
