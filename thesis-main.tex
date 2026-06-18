@@ -907,9 +907,20 @@ In fact, there are a lot of placeholder functions that contain no codes, but onl
 Furthermore, the tools created are rarely used and if the model tries to use a placeholder function it will be convinced that the problem cannot be resolved, leading it to produce a wrong output.
 
 \paragraph{Gemini 2.5 Flash} In this case, we have the opposite problem. If the previous model does not be able to craft tools, Gemini 2.5 Flash overuse this possibility, creating a wide range of functions. 
-It is worth noting that the tool crafted statistic in \cref{tab:general-statistics} is heavily influenced by the Counting \& Probability category, which alone accounts for 265.5 crafted tools; excluding this outlier, the average number of crafted tools per category is significantly lower.
-TODO continuare.
+It is worth noting that the tool crafted statistic in \cref{tab:general-statistics} is heavily influenced by the Counting \& Probability category, which alone accounts for 265.5 crafted tools. 
+Excluding this outlier, the average number of crafted tools per category is significantly lower.
+Comparing with the Lite version, the quality of the crafted functions is improved, allowing the model to effectively use such tools with a higher frequency.
+However, the crafting mechanism still presents some issues. 
+Placeholder functions still appear, although with a lower frequency, and tools with large useless comments and only one line of code are still generated. 
+Moreover, the high number of duplicate methods is the main reason behind the large amount of crafted tools in this model.
 
+\paragraph{Gemini 3.1 Flash Lite} Compared to the other models, it achieves the highest tool quality. The crafted functions generally respect the given constraints and the code is appropriately commented.
+Lower quality tools still appear, but they represent a minority, leading to a good trade-off between crafting tools and using them effectively. 
+\\\\
+The only critical issue that appears across all models is the creation of incorrectly formatted functions. This problem occurs rarely, but with a higher frequency in specific tasks where lists or tuples are required by the prompt.
+%
+The Gemini format for tools does not allow tuples or custom objects as function arguments, and if a malformed method is added to the agent's tool list, the entire request sent to the model will fail.
+This can become a serious problem, since without a proper fallback strategy the model may get stuck in a loop where every prompt is rejected due to the malformed tool.
 
 \chapter{Discussion}
 \section{Interpretazione dei risultati (funziona bene in questi casi, funziona male in questi altri, suppongo sia perchè...)}
