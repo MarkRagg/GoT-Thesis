@@ -883,7 +883,14 @@ If we look at the Gemini 3.1 Flash Lite result in each category as in \cref{fig:
 \subsection{Analysis (esempi di output, errori comuni, casi di successo)}
 \subsubsection{Output examples}
 \subsubsection{Common errors}
-\paragraph{GoT}{TODO}
+\paragraph{GoT}{The most common error in the GoT architecture is the wrong format of the final answer. The Hendrycks benchmark requires the response to be wrapped in a \texttt{$\backslash\backslash boxed\{answer\}$} format, and the evaluation is performed in parallel with the structured output described before.
+While the structured output is always respected, the lighter models struggle to also maintain the expected format, often answering without it. 
+For evaluation purposes, if the \ac{LLM} does not respect the format, the response is still counted as correct, but the process requires additional manual effort.
+\\\\
+Another important issue is related to the \texttt{divide\_complexity} tool.
+This method is used in specific cases and is designed to induce the \ac{LLM} to divide the task into subtasks, with the idea that simpler problems are more likely to be solved correctly.
+For correct usage, it is specified that the two parts must be independent from each other, but this constraint is often not respected by the \ac{LLM}, which usually produces two equivalent subtasks.
+}
 \paragraph{Zero-Shot CoT}{As outline previously, the \cref{tab:general-statistics} shows that Gemini 3.1 Flash Lite produces a large number of malfunctions. 
 In particular, these errors are \texttt{GRAPH\_RECURSION\_LIMIT}, which are raised by the system when an infinite tool call loop is running. 
 Indeed, this control is added for a Gemini issue that appeared when prompt is a complex problem and the model tries to resolve it with a tool call, 
