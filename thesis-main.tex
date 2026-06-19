@@ -992,8 +992,8 @@ What is the probability the game will be won before the fourth turn? Express you
 \\
 Message history:
 \begin{enumerate}
-    \item First reasoning process path: The first reason -> response -> evaluation path is failed due to the errors in the explanation logic.
-    \item Second reasoning process path: The second reason -> response -> evaluation path is failed due to the wrong format of the response.
+    \item First reasoning process path: The first reason $\rightarrow$ response $\rightarrow$ evaluation path is failed due to the errors in the explanation logic.
+    \item Second reasoning process path: The second reason $\rightarrow$ response $\rightarrow$ evaluation path is failed due to the wrong format of the response.
     \item Third reasoning process path: During the response generation phase, the \ac{LLM} enters in a loop caused by the continuous invoking of the same tools.
     Once the recursion limit is reached, the fallback strategy is triggered, invoking the \texttt{divide\_complexity} tool to split the original problem into two independent subtasks. 
     This changes the reasoning path and prevents the model from reproducing the same tool-calling loop. 
