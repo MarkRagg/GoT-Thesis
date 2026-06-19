@@ -151,7 +151,7 @@ Despite the apparent intelligence of these systems, \acp{LLM} do not possess rea
 Their outputs are generated through statistical pattern matching learned from training data, which explains their tendency to occasionally produce incorrect or hallucinated information~\cite{xu2025hallucinationinevitableinnatelimitation} and the standardized phrases that often generates.
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.7\linewidth]{figures/token_prediction.jpg}
+    \includegraphics[width=.7\linewidth]{figures/token_prediction.jpeg}
     \caption{Schematic overview of autoregressive decoding and probabilistic next-token prediction in an LLM. Source: \url{https://albanna-tutorials.com/llm_agents.html}}
     \label{fig:token-prediction}
 \end{figure}
@@ -225,11 +225,10 @@ Tools are external functions or \acp{API} that an agent can invoke at runtime to
 
 As previously mentioned,
 \acp{LLM} can be unpredictable and lacks of transparency. In this sense, the usage of tools enhances the credibility of the decision of an agent, improving interpretability and robustness~\cite{xi2023risepotentiallargelanguage}.
-\newpage
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.8\linewidth]{figures/agents.png}
+    \includegraphics[width=.8\linewidth]{figures/agents.jpeg}
     \caption{Representation of how an agents works. Source: \url{https://cobusgreyling.medium.com/how-would-the-architecture-for-an-llm-agent-platform-look-b07d7e004561}}
     \label{fig:agent-workflow}
 \end{figure}
@@ -256,7 +255,7 @@ application.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.6\linewidth]{figures/langchain.png}
+    \includegraphics[width=.6\linewidth]{figures/langchain.jpeg}
     \caption{Representation of the LangChain features. Source: \url{https://www.ksolves.com/blog/artificial-intelligence/power-of-langchain-features-and-benefits}}
     \label{fig:langchain-arch}
 \end{figure}
@@ -398,7 +397,7 @@ As a \textbf{static graph}, we refer to the graph structure that is defined at t
 
 \begin{figure}
     \centering
-    \includegraphics[width=.8\linewidth]{figures/static_graph.png}
+    \includegraphics[width=.7\linewidth]{figures/static_graph.jpeg}
     \caption{Static Graph Structure: continuous lines represent direct transitions, while dashed ones represent conditional transitions.}
     \label{fig:static-graph}
 \end{figure}
@@ -508,7 +507,7 @@ Each agent has its own state machine (see \cref{fig:agent-state-machine}) compos
 %
 \begin{figure}
     \centering
-    \includegraphics[width=.5\linewidth]{figures/agent_model.png}
+    \includegraphics[width=.4\linewidth]{figures/agent_model.jpeg}
     \caption{Agent state machine: the default agent state machine used in \ac{GoT} for tool call. Source: \url{https://docs.langchain.com/oss/python/langchain/agents}}
     \label{fig:agent-state-machine}
 \end{figure}
@@ -677,7 +676,7 @@ The following diagram represents the described example. As we can see, there are
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.5\linewidth]{figures/runtime_graph_example.png}
+    \includegraphics[width=.5\linewidth]{figures/runtime_graph_example.jpeg}
     \caption{Runtime graph example: green nodes represent visited nodes, red indicates TestNodes with low scores, and grey represents unvisited nodes.}
     \label{fig:runtime-graph-example}
 \end{figure}
@@ -856,9 +855,6 @@ All experiments were conducted using Gemini models, in particular \texttt{gemini
 \\\\
 In order to guarantee a low variability of the results obtained, every benchmark or sub-category of the benchmark is tested twice, making the average of the two results.
 
-\subsection{Problems in benchmark selection}
-
-
 \subsection{Metrics}
 Evaluating a tool-augmented, graph-based reasoning system requires metrics that goes beyond the simple accuracy.
 To comprehensively capture the performance, efficiency, and robustness of the system, we measure three primary metrics:
@@ -980,7 +976,7 @@ Message history:
     \item Initial reasoning: The agent suggests creating a new tool to optimize complex logarithmic expressions, describing the functionality that it should implement.
     \item Response: No tools are used, and the response highlights the need to craft a new tool.
     \item Judge agent: The agent chooses to proceed with the crafting node, giving a score of 1.
-    \item Craft: The \texttt{optimize\_log\_expression} is generated. TODO APPENDIX
+    \item Craft: The \texttt{optimize\_log\_expression} is generated \cref{lst:tool-crafted-example}. 
     \item Second reasoning: The agent suggests to use the crafted function.
     \item Tool using: The \ac{LLM} gives the corrected response using the \texttt{optimize\_log\_expression} function and the judge agent positively evaluates the answer.
     \item Final response: ``Response: $\backslash\backslash boxed\{4\}$ Explanation: I used the optimize\_log\_expression tool to find the minimum value of the given logarithmic expression. The expression was $2*log(x, 10) - log(1/100, x)$ and the constraint was $x > 1$. The tool returned a minimum value of 4.'' 
@@ -988,6 +984,16 @@ Message history:
 Initially, the \ac{LLM} does not have the tools to address the problem, but the system correctly identifies this limitation. 
 The generated function enables the system to solve the problem deterministically.
 }
+
+% \paragraph{Fallback strategy for infinite loop}{Model: Gemini 3.1 Flash Lite. Category: Intermediate Algebra
+% \\
+% Problem: ``Find the minimum value of $[2 \log_{10} x - \log_x \frac{1}{100}]$ for $x > 1.$''.
+% \\
+% Message history:
+% \begin{enumerate}
+
+% \end{enumerate}
+% }
 
 
 \subsubsection{Common errors}
@@ -1135,6 +1141,8 @@ Example:
  
 \section{Output examples}
 \lstinputlisting[language=json, caption={Example of empty response, finish reason field has STOP as a reason.}, label={lst:empty-response}]{listings/empty_response_example.json}
+
+\lstinputlisting[language=Python, caption={optimize\_log\_expression tool crafted}, label={lst:tool-crafted-example}]{listings/optimize_log_expression.py}
 
 \backmatter
 
