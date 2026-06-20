@@ -1056,7 +1056,21 @@ This can become a serious problem, since without a proper fallback strategy the 
 \section{Confronto con altri approcci (es. CoT, ToT)}
 \subsection{Se ho tempo riprodurre i test di altri esperimenti}
 \subsection{Altrimenti comparazione a parole}
-\section{Limiti del mio approccio (es. non funziona bene in questi casi, perchè...)}
+\section{Limitations and Future works}
+Despite the advantages of the architecture, it also has several limitations, which must be taken into account for a complete overview.
+\\\\
+The first constraint is about the power of the model. In order to gain benefit by this architecture, the \ac{LLM} must support agents, tools and structured outputs.
+Therefore, these constraints are fundamental for the correct functioning of the system, such as the tool generation and the score assignment. 
+For these reasons, the \ac{GoT} cannot currently be used with Small Language Models or old \acp{LLM}, where the basic functions are not well performed and the tool crafting mechanism cannot be effectively applied as demonstrated by the results of Gemini 2.5 Flash Lite.
+\\\\
+However, the time spent by the system plays also an important role. 
+While some \ac{LLM} (e.g. Gemini 3.1 Flash Lite) has a reasonable average time for an answer, others models require significantly more time, with peaks of 5 to 10 minutes per response.
+Even in these cases, the architecture can still be used, but if the time is considered more important than a perfect response, the architecture is not well suited for such tasks.
+\\\\
+The second limitation concerns the crafted tools. While the results show that they play an important role in the architecture, their management is still immature. 
+In particular, a well structured tool refinement system could lead to a higher tool quality, avoiding the addition of unused parameters, excessively verbose comments in the function or placeholder tools that decrease the performance of the architecture.
+Furthermore, a dedicated tool management mechanism, acting as a form of \textit{garbage collector}, could keep the toolset clean and efficient by identifying and removing duplicate or unused functions. 
+Such a component could also implement a fallback strategy for malformed tools that cause system failures, by removing them when the \ac{LLM} returns the corresponding error.
 
 \chapter{Conclusion}
 \section{Recap degli obiettivi e ricapitolo di come sono stati raggiunti}
