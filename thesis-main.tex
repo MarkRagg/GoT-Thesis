@@ -927,7 +927,7 @@ Considering the models where the \ac{LLM} reaches a performance increasing, we e
 Gemini 2.5 Flash shows in \cref{fig:gemini-2.5-flash} a substantial improvement in the Geometry outcome, while Number Theory, Precalculus and Intermediate Algebra have a lower improvement. However, Algebra and Counting \& Probability have the same performances of Zero-Shot CoT architecture.
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.9\linewidth]{figures/Gemini-2.5-Flash.pdf}
+    \includegraphics[width=.9\linewidth]{figures/gemini-2.5-flash.png}
     \caption{Accuracy of Gemini 2.5 Flash in each category.}
     \label{fig:gemini-2.5-flash}
 \end{figure}
@@ -935,7 +935,7 @@ Gemini 2.5 Flash shows in \cref{fig:gemini-2.5-flash} a substantial improvement 
 If we look at the Gemini 3.1 Flash Lite result in each category as in \cref{fig:gemini-3.1-flash-lite}, we see an overall performance increase, with Algebra and Number Theory categories nearing perfection.
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.9\linewidth]{figures/Gemini-3.1-Flash-Lite.pdf}
+    \includegraphics[width=.9\linewidth]{figures/gemini-3.1-flash-lite.png}
     \caption{Accuracy of Gemini 3.1 Flash Lite in each category.}
     \label{fig:gemini-3.1-flash-lite}
 \end{figure}
@@ -1063,14 +1063,14 @@ The first constraint is about the power of the model. In order to gain benefit b
 Therefore, these constraints are fundamental for the correct functioning of the system, such as the tool generation and the score assignment. 
 For these reasons, the \ac{GoT} cannot currently be used with Small Language Models or old \acp{LLM}, where the basic functions are not well performed and the tool crafting mechanism cannot be effectively applied as demonstrated by the results of Gemini 2.5 Flash Lite.
 \\\\
-However, the time spent by the system plays also an important role. 
-While some \ac{LLM} (e.g. Gemini 3.1 Flash Lite) has a reasonable average time for an answer, others models require significantly more time, with peaks of 5 to 10 minutes per response.
+However, the time spent by the system plays also a relevant role. 
+While some \ac{LLM} (e.g. Gemini 3.1 Flash Lite) has a reasonable average time for an answer, other models require significantly more time, with peaks of 5 to 10 minutes per response.
 Even in these cases, the architecture can still be used, but if the time is considered more important than a perfect response, the architecture is not well suited for such tasks.
 \\\\
 The second limitation concerns the crafted tools. While the results show that they play an important role in the architecture, their management is still immature. 
 In particular, a well structured tool refinement system could lead to a higher tool quality, avoiding the addition of unused parameters, excessively verbose comments in the function or placeholder tools that decrease the performance of the architecture.
 Furthermore, a dedicated tool management mechanism, acting as a form of \textit{garbage collector}, could keep the toolset clean and efficient by identifying and removing duplicate or unused functions. 
-Such a component could also implement a fallback strategy for malformed tools that cause system failures, by removing them when the \ac{LLM} returns the corresponding error.
+Such component could also implement a fallback strategy for malformed tools that cause system failures, by removing them when the \ac{LLM} returns the corresponding error.
 
 \chapter{Conclusion}
 \section{Recap degli obiettivi e ricapitolo di come sono stati raggiunti}
