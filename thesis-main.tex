@@ -4,6 +4,7 @@
 \usepackage{algorithm}
 \usepackage{disi-thesis}
 \usepackage{code-lstlistings}
+\usepackage{svg}
 \usepackage{notes}
 
 \school{\unibo}
@@ -1053,7 +1054,18 @@ This can become a serious problem, since without a proper fallback strategy the 
 
 \chapter{Discussion}
 \section{Results interpretation}
-Looking at the results, we may notice that the GoT architecture does not surpass the Zero-Shot \ac{CoT} with an higher accuracy in the responses, but it decrease the number of errors produced. 
+Looking at the results, we can observe that the \ac{GoT} architecture does not outperform the Zero-Shot \ac{CoT} in terms of accuracy. However, it reduces the number of generated errors.
+This can be explained by the fact that the judge agent, which is used to ensure the quality of the answers, has a reasoning capability comparable to the agent that generates the response.
+This leads to a reduced ability to correctly assess the correctness of the produced output.
+\\\\
+While the \ac{GoT} architecture does not lead to an increase in accuracy, it has a positive impact on tool usage, improving the transparency and the reproducibility of the generated responses. 
+This effect is mainly due to the nature of the system, in which the reasoning process focuses on deciding how to use the available toolset or how to generate new tools to solve the problem.
+For these reasons, the architecture is considered general-purpose, but its main applications involve problems that require or can be solved using tools.
+\\\\
+Moreover, the differences in performance across models do not seem to depend on the specific category of task in the benchmark. 
+Instead, they are mostly driven by the capability of the model. Stronger models are better at following the instructions given to the agents, which leads to fewer rule violations, more reliable tool usage, and overall better outputs. 
+On the other hand, weaker models tend to partially or fully ignore these instructions, which results in less consistent tool usage, lower accuracy and also the production of malfunctions. 
+Overall, this suggests that the effectiveness of the architecture depends more on the instruction following ability of the base model than on the nature of the task itself.
 \section{Confronto con altri approcci (es. CoT, ToT)}
 \subsection{Se ho tempo riprodurre i test di altri esperimenti}
 \subsection{Altrimenti comparazione a parole}
