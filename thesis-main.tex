@@ -4,7 +4,6 @@
 \usepackage{algorithm}
 \usepackage{disi-thesis}
 \usepackage{code-lstlistings}
-\usepackage{svg}
 \usepackage{notes}
 
 \school{\unibo}
@@ -130,7 +129,7 @@ These systems are capable not only of understanding and generating text, but als
 \acp{LLM} are autoregressive models that simply try to predict the next word in a sequence of characters,
 based on the context.
 \newline
-The text given as input to the \ac{LLM} is preprocessed and divided into smaller units called \textit{tokens}.
+As shown in \cref{fig:tokenization}, the text given as input to the \ac{LLM} is preprocessed and divided into smaller units called \textit{tokens}.
 A token may represent a word, part of a word, or even a symbol, depending on the strategy chosen.
 %
 The next step is to convert the tokens into numbers, in such a way that a neural network can process them.
@@ -149,7 +148,7 @@ Once the tokenization is done, the text generation starts using autoregressive a
 By repeating this process multiple times, the model can generate complete sentences, paragraphs, or entire documents.
 
 Despite the apparent intelligence of these systems, \acp{LLM} do not possess real understanding or reasoning capabilities in the human sense. 
-Their outputs are generated through statistical pattern matching learned from training data, which explains their tendency to occasionally produce incorrect or hallucinated information~\cite{xu2025hallucinationinevitableinnatelimitation} and the standardized phrases that often generates.
+Their outputs are generated through statistical pattern matching learned from training data (e.g. \cref{fig:token-prediction}), which explains their tendency to occasionally produce incorrect or hallucinated information~\cite{xu2025hallucinationinevitableinnatelimitation} and the standardized phrases that often generates.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.7\linewidth]{figures/token_prediction.jpeg}
@@ -227,15 +226,16 @@ Tools are external functions or \acp{API} that an agent can invoke at runtime to
 As previously mentioned,
 \acp{LLM} can be unpredictable and lacks of transparency. In this sense, the usage of tools enhances the credibility of the decision of an agent, improving interpretability and robustness~\cite{xi2023risepotentiallargelanguage}.
 
+\mattiasidenote{se metti una figura la devi citare da qualche parte}
+
+A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need for human intervention, and trying to adapt by changing their behavior based on feedbacks~\cite{Kumar2024}. 
+This process is commonly represented as a closed loop between perception, reasoning, and action, as shown in Figure~\ref{fig:agent-workflow}.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.8\linewidth]{figures/agents.jpeg}
     \caption{Representation of how an agents works. Source: \url{https://cobusgreyling.medium.com/how-would-the-architecture-for-an-llm-agent-platform-look-b07d7e004561}}
     \label{fig:agent-workflow}
 \end{figure}
-\mattiasidenote{se metti una figura la devi citare da qualche parte}
-
-A difference between pure \acp{LLM} and \ac{AI} agents is the autonomy. While \acp{LLM} goal is to generate a correct and coherent output, the agents try to perceive the autonomy, minimizing the need for human intervention, and trying to adapt by changing their behavior based on feedbacks~\cite{Kumar2024}. 
 \section{LangChain \& LangGraph}
 \subsection{LangChain}
 LangChain is an open-source framework launched in 2022 and designed to simplify the development of applications powered by \acp{LLM}. 
@@ -246,7 +246,7 @@ This approach allows developers to focus on the application logic rather than de
 
 \paragraph{Tool Integration}{\acp{LLM} are more than text generators, and the research is moving to the direction of creating agents that interact with the environment and communicate with tools. The second goal is to provide a simple way to define and integrate tools that \acp{LLM} can use, it includes also the possibility of parsing and access to unstructured data. }
 \\\\
-The framework is designed with modularity as a core principle. 
+The framework is designed with modularity as a core principle as shown in Figure~\ref{fig:langchain-arch} along with other relevant features.
 Rather than being distributed as a single package, LangChain is split 
 into independent components that can be installed separately, such as 
 \texttt{langchain-core}, \texttt{langchain-community}, and provider-specific 
@@ -298,10 +298,11 @@ The \ac{CoT} was firstly introduced as a few-shot approach, where the examples w
 %
 Recently it has been proved that also a zero-shot \ac{CoT} increases the performance, introducing the ``Let's think step by step" phrase into the prompt~\cite{kojimazeroshotcot}.
 %
+Figure~\ref{fig:cot-prompting} illustrates the differences between standard prompting, few-shot \ac{CoT}, and zero-shot \ac{CoT}, showing how these approaches improve the quality of the generated output.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.9\linewidth]{figures/cot-prompting.png}
-    \caption{The differences between a normal prompt versus a few-shot \ac{CoT} and a zero-shot \ac{CoT}. Source:~\cite{kojimazeroshotcot}\url{https://arxiv.org/abs/2205.11916}}
+    \caption{The differences between a normal prompt versus a few-shot \ac{CoT} and a zero-shot \ac{CoT}. Source:~\cite{kojimazeroshotcot}}
     \label{fig:cot-prompting}
 \end{figure}
 
@@ -322,7 +323,9 @@ The studies proved that this approach obtains better results than \ac{CoT}, \ac{
 \subsection{Graph of Thoughts} \label{sec:got}
 Another evolution of the \ac{CoT} is the \ac{GoT} architecture~\cite{besta2024got}.
 %
-The authors propose an architecture where the \ac{LLM} reasoning process is seen as a graph of thoughts, where each vertex is represented by a thought and the edges are the dependencies. This structure allows the creation of different operations: \textbf{Generation}, which produces new thoughts from one or more existing ones; \textbf{Aggregation}, which merges multiple thoughts into a single one; and \textbf{Refining}, which iteratively improves an existing thought based on self-feedback. 
+The authors propose an architecture where the \ac{LLM} reasoning process is seen as a graph of thoughts, where each vertex is represented by a thought and the edges are the dependencies. 
+The \ac{GoT} architecture and its comparison with previous approaches is shown in Figure~\ref{fig:architectures-rep}.
+This structure allows the creation of different operations: \textbf{Generation}, which produces new thoughts from one or more existing ones; \textbf{Aggregation}, which merges multiple thoughts into a single one; and \textbf{Refining}, which iteratively improves an existing thought based on self-feedback. 
 
 Technically, the reasoning process consists of two main parts:
 \paragraph{\ac{GoO}.} It is the planning part of the system. The \ac{GoO} is constructed before the execution starts and it can not be changed during the reasoning process. As the name suggests, it contains all the operations which will be completed during the execution. Importantly, the \ac{GoO} instance is not generated by the \ac{LLM}, but is created by the user at the very beginning.
@@ -333,7 +336,7 @@ Although the architecture just explained cannot be easily deployed in real-world
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1\linewidth]{figures/graph_of_thoughts.png}
-    \caption{Representation of different prompt engineering architectures. Source:~\cite{besta2024got}\url{https://arxiv.org/abs/2308.09687}}
+    \caption{Representation of different prompt engineering architectures. Source:~\cite{besta2024got}}
     \label{fig:architectures-rep}
 \end{figure}
 
