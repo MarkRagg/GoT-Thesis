@@ -927,7 +927,7 @@ Considering the models where the \ac{LLM} reaches a performance increasing, we e
 Gemini 2.5 Flash shows in \cref{fig:gemini-2.5-flash} a substantial improvement in the Geometry outcome, while Number Theory, Precalculus and Intermediate Algebra have a lower improvement. However, Algebra and Counting \& Probability have the same performances of Zero-Shot CoT architecture.
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.9\linewidth]{figures/gemini-2.5-flash.png}
+    \includegraphics[width=.9\linewidth]{figures/Gemini-2.5-Flash.pdf}
     \caption{Accuracy of Gemini 2.5 Flash in each category.}
     \label{fig:gemini-2.5-flash}
 \end{figure}
@@ -935,7 +935,7 @@ Gemini 2.5 Flash shows in \cref{fig:gemini-2.5-flash} a substantial improvement 
 If we look at the Gemini 3.1 Flash Lite result in each category as in \cref{fig:gemini-3.1-flash-lite}, we see an overall performance increase, with Algebra and Number Theory categories nearing perfection.
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.9\linewidth]{figures/gemini-3.1-flash-lite.png}
+    \includegraphics[width=.9\linewidth]{figures/Gemini-3.1-Flash-Lite.pdf}
     \caption{Accuracy of Gemini 3.1 Flash Lite in each category.}
     \label{fig:gemini-3.1-flash-lite}
 \end{figure}
@@ -1052,7 +1052,8 @@ The Gemini format for tools does not allow tuples or custom objects as function 
 This can become a serious problem, since without a proper fallback strategy the model may get stuck in a loop where every prompt is rejected due to the malformed tool.
 
 \chapter{Discussion}
-\section{Interpretazione dei risultati (funziona bene in questi casi, funziona male in questi altri, suppongo sia perchè...)}
+\section{Results interpretation}
+Looking at the results, we may notice that the GoT architecture does not surpass the Zero-Shot \ac{CoT} with an higher accuracy in the responses, but it decrease the number of errors produced. 
 \section{Confronto con altri approcci (es. CoT, ToT)}
 \subsection{Se ho tempo riprodurre i test di altri esperimenti}
 \subsection{Altrimenti comparazione a parole}
