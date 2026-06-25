@@ -403,7 +403,6 @@ The second motivation about the use of \ac{GoT}, as mentioned in the \cref{sec:g
 \subsection{Static Graph Structure}
 As a \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. 
 \Cref{fig:static-graph} illustrates the static graph structure, which provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
-\mattianote{controlla tutte le altre immagini e assicurati di citarle nel posto giusto, e dove puoi ritaglia i contorni (togli lo spazio bianco) per guadagnare spazio}
 
 \begin{figure}
     \centering
@@ -472,8 +471,15 @@ the actual trajectory is determined only during execution, reflecting the flexib
 
 
 \subsection{Dynamic Graph}
+TODO INTRODUCTION
 
-\mattianote{metterei subito l'immagine del dynamic graph (come ho scritto anche nella sezione di pseudocode)}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.8\linewidth]{figures/runtime.pdf}
+    \caption{Runtime graph example: green nodes represent visited nodes, red indicates TestNodes with low scores, and grey represents unvisited nodes.}
+    \label{fig:runtime-graph-example}
+\end{figure}
+
 \mattianote{qui ci vuole qualche frase in più di introduzione dicendo che il grafo statico descritto nella sezione precedente è soltanto una macchina a stati che guida il processo, ma l `actual' graph of thoughts generato a runtime è quello descritto in questa sezione. Potremmo anche pensare di rinominarlo (da dynamic a `runtime o generated qualcosa') per renderlo più chiaro.}
 We define the dynamic graph as a directed graph $G = (N, E)$, where:
 \begin{itemize}
@@ -532,31 +538,23 @@ Formally, we define an agent $a \in A$ as a function:
 \]
 \mattiasidenote{btw la defizione di agente è critica, farei vedere questa parte a Ciatto}
 where $h_j$ represents the message history provided to the agent, $p_i$ the prompt given, $t_i$ the set of available tools, $r_i$ the response generated and $m_i$ the metadata.
-In particular, we define the following agents:
-\mattianote{non mi convincono molto queste definizioni. è evidente che sono generate e sembrano tirate un po via. per ognuna basta anche solo una frase concisa, non generata, di quello che realmente fanno nel software. Poi spiegherei anche cosa li rende diversi, immagino solo il system prompt, ma è bene dirlo}
+\note{Questa parte ho cercato di cambiarla ma non convince ancora neanche me perché spiego le stesse cose che dico sopra, forse dovrei semplicemente specificare che ogni agente attualmente viene utilizzato in uno specifico stato, fare la lista degli agenti associandone ognuno al rispettivo stato e spiegare a quali tool ha accesso.}
+In particular, each agent has a distinct system prompt, which enables the creation of unique and well-defined behaviors. 
+Moreover, depending on its role, each agent has different set of tools. 
+These agents are described in the following list:
 \begin{itemize}
-    \item \textbf{Starting agent}: It is an expert in tool usage, but his role is to reason about how to solve the problem with the tools, if there is a need for a new tool or if the problem does not require them.  
-    \item \textbf{Tool agent}: It is also an expert in tool usage. Its role is to follow the instructions of the starting agent and provide a solution by using the tools.
-    \item \textbf{Judge agent}: It is an expert of evaluation. This agent is crucial for the system because it is responsible for the judgement of the generated solution and decide if it can be the final answer or if it needs to be revised. This agent is also responsible for the decision if a new tool is needed. 
-    \item \textbf{Crafter agent}: It is an expert of tool crafting. It is used for crafting a new tool.
-    \item \textbf{Reasoning agent}: It is an expert of reasoning. Its role is to analyze the problem and generate potential solutions using the divide-et-impera approach.
-    \item \textbf{Chat completition agent}: It is a generalist agent; it is used as a fallback mechanism to generate a solution without any constraint when the system has explored all the possible paths and is not able to find a solution.
+    \item \textbf{Starting agent}: Its role is to reason about how to solve the problem with the tools, and to determine whether a new tool is required or if the problem can be solved without tools. In particular, the starting agent must provide a list of tools useful for solving the problem, explaining how to use them. This agent has access to the entire toolset, except for the crafting tools.   
+    \item \textbf{Tool agent}: Its role is to generate a response by following the instructions provided by the starting agent and to produce a solution by using the tools. It has access the same tools of the starting agent.
+    \item \textbf{Judge agent}: This agent is crucial to the system because it is responsible for evaluating the generated solution and decide if it can be the final answer or if it needs to be revised. It is also responsible for determining if a new tool is required. However, it does not have access any tools.
+    \item \textbf{Crafter agent}: Its role is to craft new tools to solve the problem and it only has access to tools which permit the crafting.
+    \item \textbf{Reasoning agent}: This agent includes a tool that enable to divide the problem in two parts, it permits to try a different approach to solve the problem. 
+    \item \textbf{Chat completition agent}: It is used as a fallback mechanism to generate a solution without any constraint when the system has explored all the possible paths and is not able to find a solution.
 \end{itemize}
 
-\section{Pseudocode}
-\mattianote{questa sezione va un po' rivista:
-\\
-- toglierei la subsection sotto e chiamerei questa `Pseudocode and Execution Example' o qualcosa del genere
-\\
-- la parte di pseudocode riguarda solo l'evaluation, ma io lettore me lo aspetterei di tutto il workflow. Va bene anche solo l'evaluation, ma allora valutiamo di specificarlo e (forse) cambiare il titolo della sezione.
-\\
-- l'illustrative example è troppo lungo. Possiamo metterlo completo nell'appendice, ma qui basta una versione ridotta mettendo magari dei puntini (\ldots) al posto di parti meno rilevanti della conversazione.
-\\
-- l'immagine di esempio del dynamic graph la metterei sopra, dove si introduce il dynamic graph.
-}
+\section{Pseudocode and Execution Example}
 
-For a complete comprehension of the crucial steps of the system, some snippets of pseudocode are presented here.
-In particular, the evaluation phase is a critical point and also a complex step to understand:
+The evaluation phase is a critical point and also a complex stage of the framework, it may lead to different paths and it requires particular attention. 
+For this reason, the following pseudocode is provided to facilitate the understanding of its logic: 
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -584,7 +582,6 @@ In particular, the evaluation phase is a critical point and also a complex step 
 \end{algorithmic}
 \end{algorithm}
 \newpage
-\subsection{Illustrative Example}
 In order to fully clarify the system mechanics, the following section guides the reader through a practical, step-by-step execution example.
 \\
 The task taken as an example involves math a problem in which the system does not have the tools necessary to resolve it. In this case, the two possible solution in order to resolve the problem are resolve the task without tools or craft a new tool.
@@ -604,21 +601,19 @@ Then, a \texttt{tool\_reasoning} node is visited, calling the starting agent wit
 \begin{itemize}
     \item[\textbf{User:}] ``Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
     \item[\textbf{S. User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
-    \item[\textbf{AI:}] ``Craft a new tool: This problem requires solving an integral, which involves symbolic computation. The existing tools (`summing`, `minus`, `square\_root`, `multiply`, `divide`) are designed for basic arithmetic operations on numerical values and do not support symbolic integration. Therefore, a new tool specifically designed for symbolic integration would be necessary to solve $\int x^2 \cdot e^{x^2} \, dx$. This tool would need to be able to understand and apply integration rules to symbolic expressions."
+    \item[\textbf{AI:}] ``Craft a new tool: This problem requires solving an integral, which involves symbolic computation (...)"
 \end{itemize}
 
 At this point, the graph visits the \texttt{tool\_calling} node with the previous message history, asking for the generation of a solution:
 \begin{itemize}
     \item[\textbf{System:}] ``Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
-    \item[\textbf{AI:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
-    \newline 
-    Explanation: The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
+    \item[\textbf{AI:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted (...)"
 \end{itemize}
 
 The given response is taken for evaluation in the \texttt{response\_evaluation} node. In this case, the context given by the tool reasoning is eliminated in order to maintain a clean message history:
 \begin{itemize}
     \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{S. User:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
+    \item[\textbf{S. User:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted (...)''
     \item[\textbf{System:}] ``Score this solution based on correctness and following instructions."
     \item[\textbf{AI:}] ``Tool used in the response: Response"
     \item[\textbf{AI:}] ``{ 'score': 1, 'description': 'The response correctly identifies the need for a new tool for symbolic integration, which is a valid assessment given the problem. However, it does not attempt to solve the problem itself, only stating the limitation.', 'need\_tool\_crafting': true, 'problem\_complexity': 4 }"
@@ -635,8 +630,8 @@ The message history passed in the \texttt{crafting} node contains the goal and t
     \item[\textbf{AI:}] It install the \texttt{sympy} dependencies
     \item[\textbf{AI:}] Returning structured response: 
     \begin{description}
-        \item[\texttt{response:}] ``I have created a tool that can solve the integral $\int x^2 \cdot e^{x^2} \, dx$, but it returns a complex solution involving the imaginary error function. Would you like me to provide this solution?'' 
-        \item[\texttt{explanation:}] ``The problem requires symbolic integration. I have crafted a tool \texttt{symbolic\_integration} that uses the \texttt{sympy} library to perform this. I then used this tool with the expression $x^2 \cdot e^{x^2}$ and variable \texttt{'x'}. The result from \texttt{sympy}'s integrate function for this specific integral is $\frac{x \cdot e^{x^2}}{2} - \frac{\sqrt{\pi} \cdot i \cdot \operatorname{erfi}(x)}{4}$. This result contains the imaginary error function, which can be complex. I am asking the user if they would like this complex solution.''
+        \item[\texttt{response:}] ``I have created a tool that can solve the integral $\int x^2 \cdot e^{x^2} \, dx$ (...)'' 
+        \item[\texttt{explanation:}] ``The problem requires symbolic integration. I have crafted a tool \texttt{symbolic\_integration} (...)''
     \end{description}
 \end{itemize}
 
@@ -645,8 +640,8 @@ The system now pick an another tool reasoning path with the new tool crafted and
 The next \texttt{tool\_reasoning} node is visited:
 \begin{itemize}
     \item[\textbf{PMH:}] Previous message history
-    \item[\textbf{S. User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool."
-    \item[\textbf{AI:}] \texttt{symbolic\_integration} To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, the \texttt{symbolic\_integration} tool should be used. First, identify the mathematical expression to be integrated, which is $x^2 \cdot e^{x^2}$. Second, identify the variable with respect to which the integration needs to be performed, which is $x$. Finally, call the \texttt{symbolic\_integration} tool with these identified parameters.
+    \item[\textbf{S. User:}] ``Please, reason step by step (...)"
+    \item[\textbf{AI:}] ``\texttt{symbolic\_integration} To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, the \texttt{symbolic\_integration} tool should be used. (...)''
 \end{itemize}
 
 The \texttt{tool\_calling} node is now visited:
@@ -664,28 +659,12 @@ The \texttt{tool\_calling} node is now visited:
 
 Now there is the evaluation phase:
 \begin{itemize}
-    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{S. User:}]     
-    \begin{description}
-        \item[\texttt{response:}] ``The integral of $\int x^2 \cdot e^{x^2} \, dx$ is $\frac{x e^{x^2}}{2} - \frac{\sqrt{\pi}}{4} \operatorname{erfi}(x) + C$'' 
-        \item[\texttt{explanation:}] ``The \texttt{symbolic\_integration} tool was used with the expression $x^2 \cdot e^{x^2}$ and variable $x$ to calculate the indefinite integral.''
-    \end{description}
-    \item[\textbf{System:}] ``Score this solution based on correctness and following instructions."
-    \item[\textbf{AI:}] ``Tool used in the response: \texttt{symbolic\_integration}, Response"
+    \item[\textbf{Instructions:}] The agent instructions and the generated response are provided.
     \item[\textbf{AI:}] ``{ 'score': 5, 'description': 'The response correctly identifies and calculates the indefinite integral of the given function. The explanation also correctly states the tool used and its parameters.', 'need\_tool\_crafting': false, 'problem\_complexity': 2 }"
 \end{itemize}
 
 The system correctly find the right answer and the evaluation phase has correctly identify the solution. The response can now be the final answer of the system.
-\newline
-\newline
-The following diagram represents the described example. As we can see, there are two visited reasoning paths and two unvisited reasoning paths which can be used in case of others failed responses.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=.8\linewidth]{figures/runtime.pdf}
-    \caption{Runtime graph example: green nodes represent visited nodes, red indicates TestNodes with low scores, and grey represents unvisited nodes.}
-    \label{fig:runtime-graph-example}
-\end{figure}
+The complete message history can be found in the appendix~\ref{appendix:illustrative-example}
 
 \chapter{Implementation}
 \section{Build Automation}
@@ -1106,7 +1085,81 @@ Optional. Max 1 page.
 
 \appendix
 
-\chapter{Illustrative example tool crafted}
+\chapter{Illustrative example}\label{appendix:illustrative-example}
+\begin{itemize}
+    \item[\textbf{User:}] ``Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{S. User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
+    \item[\textbf{AI:}] ``Craft a new tool: This problem requires solving an integral, which involves symbolic computation. The existing tools (`summing`, `minus`, `square\_root`, `multiply`, `divide`) are designed for basic arithmetic operations on numerical values and do not support symbolic integration. Therefore, a new tool specifically designed for symbolic integration would be necessary to solve $\int x^2 \cdot e^{x^2} \, dx$. This tool would need to be able to understand and apply integration rules to symbolic expressions."
+\end{itemize}
+
+At this point, the graph visits the \texttt{tool\_calling} node with the previous message history, asking for the generation of a solution:
+\begin{itemize}
+    \item[\textbf{System:}] ``Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
+    \item[\textbf{AI:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
+    \newline 
+    Explanation: The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
+\end{itemize}
+
+The given response is taken for evaluation in the \texttt{response\_evaluation} node. In this case, the context given by the tool reasoning is eliminated in order to maintain a clean message history:
+\begin{itemize}
+    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{S. User:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
+    \item[\textbf{System:}] ``Score this solution based on correctness and following instructions."
+    \item[\textbf{AI:}] ``Tool used in the response: Response"
+    \item[\textbf{AI:}] ``{ 'score': 1, 'description': 'The response correctly identifies the need for a new tool for symbolic integration, which is a valid assessment given the problem. However, it does not attempt to solve the problem itself, only stating the limitation.', 'need\_tool\_crafting': true, 'problem\_complexity': 4 }"
+\end{itemize}
+
+The response does not passed the evaluation and the judge agent identifies the need of crafting a new tool. Then, following the algorithm, a new \texttt{crafting} node is created.
+\newline
+The message history passed in the \texttt{crafting} node contains the goal and the explanation given in the response:
+\begin{itemize}
+    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{AI:}] ``The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
+    \item[\textbf{System:}] ``Use the context given to craft a tool to solve this problem using craft\_tool. It must be a function"
+    \item[\textbf{AI:}] It creates a new tool called \texttt{symbolic\_integration(expression: str, variable: str) -> str} \cref{lst:crafted-tool}
+    \item[\textbf{AI:}] It install the \texttt{sympy} dependencies
+    \item[\textbf{AI:}] Returning structured response: 
+    \begin{description}
+        \item[\texttt{response:}] ``I have created a tool that can solve the integral $\int x^2 \cdot e^{x^2} \, dx$, but it returns a complex solution involving the imaginary error function. Would you like me to provide this solution?'' 
+        \item[\texttt{explanation:}] ``The problem requires symbolic integration. I have crafted a tool \texttt{symbolic\_integration} that uses the \texttt{sympy} library to perform this. I then used this tool with the expression $x^2 \cdot e^{x^2}$ and variable \texttt{'x'}. The result from \texttt{sympy}'s integrate function for this specific integral is $\frac{x \cdot e^{x^2}}{2} - \frac{\sqrt{\pi} \cdot i \cdot \operatorname{erfi}(x)}{4}$. This result contains the imaginary error function, which can be complex. I am asking the user if they would like this complex solution.''
+    \end{description}
+\end{itemize}
+
+The system now pick an another tool reasoning path with the new tool crafted and the previous message history in order to give context of which tool is crafted and why.
+\newline
+The next \texttt{tool\_reasoning} node is visited:
+\begin{itemize}
+    \item[\textbf{PMH:}] Previous message history
+    \item[\textbf{S. User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool."
+    \item[\textbf{AI:}] \texttt{symbolic\_integration} To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, the \texttt{symbolic\_integration} tool should be used. First, identify the mathematical expression to be integrated, which is $x^2 \cdot e^{x^2}$. Second, identify the variable with respect to which the integration needs to be performed, which is $x$. Finally, call the \texttt{symbolic\_integration} tool with these identified parameters.
+\end{itemize}
+
+The \texttt{tool\_calling} node is now visited:
+
+\begin{itemize}
+    \item[\textbf{PMH:}] Previous message history
+    \item[\textbf{System:}] ``Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
+    \item[\textbf{AI:}] Tool agent calls \texttt{symbolic\_integration} 
+    \item[\textbf{AI:}] 
+    \begin{description}
+        \item[\texttt{response:}] ``The integral of $\int x^2 \cdot e^{x^2} \, dx$ is $\frac{x e^{x^2}}{2} - \frac{\sqrt{\pi}}{4} \operatorname{erfi}(x) + C$'' 
+        \item[\texttt{explanation:}] ``The \texttt{symbolic\_integration} tool was used with the expression $x^2 \cdot e^{x^2}$ and variable $x$ to calculate the indefinite integral.''
+    \end{description}
+\end{itemize}
+
+Now there is the evaluation phase:
+\begin{itemize}
+    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{S. User:}]     
+    \begin{description}
+        \item[\texttt{response:}] ``The integral of $\int x^2 \cdot e^{x^2} \, dx$ is $\frac{x e^{x^2}}{2} - \frac{\sqrt{\pi}}{4} \operatorname{erfi}(x) + C$'' 
+        \item[\texttt{explanation:}] ``The \texttt{symbolic\_integration} tool was used with the expression $x^2 \cdot e^{x^2}$ and variable $x$ to calculate the indefinite integral.''
+    \end{description}
+    \item[\textbf{System:}] ``Score this solution based on correctness and following instructions."
+    \item[\textbf{AI:}] ``Tool used in the response: \texttt{symbolic\_integration}, Response"
+    \item[\textbf{AI:}] ``{ 'score': 5, 'description': 'The response correctly identifies and calculates the indefinite integral of the given function. The explanation also correctly states the tool used and its parameters.', 'need\_tool\_crafting': false, 'problem\_complexity': 2 }"
+\end{itemize}
+\section{Illustrative Example Tool crafted}
 The following figure shows the tool crafted during the execution of the example described in the chapter 4.
 \lstinputlisting[language=Python, caption={The tool crafted by the agent}, label={lst:crafted-tool}]{listings/ai_tool.py}
 \chapter{Agent system prompts} \label{appendix:agent-prompts}
