@@ -88,27 +88,31 @@ Optional. Max a few lines.
 \label{chap:introduction}
 %----------------------------------------------------------------------------------------
 
-Write your intro here.
-\sidenote{Add sidenotes in this way. They are named after the author of the thesis}
-
-You can use acronyms that your defined previously,
-such as \ac{IoT}.
-%
-If you use acronyms twice,
-they will be written in full only once
-(indeed, you can mention the \ac{IoT} now without it being fully explained).
-%
-In some cases, you may need a plural form of the acronym.
-%
-For instance,
-that you are discussing \acp{vm},
-you may need both \ac{vm} and \acp{vm}.
+TODO
 
 \paragraph{Structure of the Thesis}
+Chapter~\ref{chap:background} of this thesis 
+introduces the background, covering \acp{LLM}, prompt engineering
+techniques, and the related works that motivate this thesis.
+\\
+Then, with Chapter~\ref{chap:design}, the design of the proposed system,
+including the formal definition of the static and dynamic graph structures,
+the agent roles, and the execution model, will be presented.
+\\
+Chapter~\ref{chap:implementation} describes the implementation of the previous proposed design, detailing the build automation,
+the agentic frameworks adopted, and the crafting methodology.
+\\
+The effectiveness of the system is evaluated in Chapter~\ref{chap:experiments}, which reports the experimental
+results on the Hendrycks MATH benchmark, discussing performance, common errors, and representative case studies.
+\\
+Then, Chapter~\ref{chap:discussion} discusses the implications of the results and the limitations
+of the proposed approach.
+\\
+Eventually, Chapter~\ref{chap:conclusion} draws the conclusions and outlines directions for
+future work.
 
-\note{At the end, describe the structure of the paper}
-
-\chapter{Background}
+\chapter{Background} 
+\label{chap:background}
 \section{Large Language Models}
 \acp{LLM} are a class of models which belong to Deep Learning,
 a sub-category of the broad field of \ac{AI}. 
@@ -347,6 +351,7 @@ Although the architecture just explained cannot be easily deployed in real-world
 \end{figure}
 
 \chapter{Design}
+\label{chap:design}
 This chapter presents the proposed approach in detail.
 We first formally define the problem and highlight the main challenges and requirements.
 Then, we describe the proposed \ac{GoT}, providing its formalization, including algorithmic details and execution strategies.
@@ -463,10 +468,10 @@ Now we formalize the edges of the graph as a set of transitions $T$ composed by 
     \item $T_c$ is the set of conditional transitions, where the next state is determined by a selection function $f: \text{output} \to S$, typically driven by the \ac{LLM}'s internal evaluation or a logic-based heuristic.
 \end{itemize}
 
-While some phases follow a strict sequence—such as the transition from Initialization to Reasoning—others like Backtracking or Crafting are triggered dynamically.
+While some phases follow a strict sequence, e.g. the transition from Initialization to Reasoning, others such as Backtracking or Crafting are triggered dynamically.
 %
 Consequently,
-while the static graph structure defines the set of all possible paths,\mattiasidenote{ho capito cosa vuoi dire ma non è proprio corretto, prova a riformulare}
+while the static graph structure defines the possible state transitions, 
 the actual trajectory is determined only during execution, reflecting the flexible nature of these operations.
 
 
@@ -667,6 +672,7 @@ The system correctly find the right answer and the evaluation phase has correctl
 The complete message history can be found in the appendix~\ref{appendix:illustrative-example}
 
 \chapter{Implementation}
+\label{chap:implementation}
 \section{Build Automation}
 \subsection{Git workflow}
 For a better management of the repository and to facilitate the possible future collaborations, the project follows a Git workflow based on the Git Flow model and the GitHub Actions. 
@@ -834,6 +840,7 @@ The \texttt{install\_dependency} tool takes as argument the name of the library 
 If the LLM tries to install a library already installed, the tool will skip the installation process without affecting the workflow.
 
 \chapter{Experiments}
+\label{chap:experiments}
 \section{Experimental setup (quali classi di benchmark, cosa testi per ogni benchmark, come lo misuri)}
 The purpose of this chapter is to evaluate the performance and efficiency of the proposed \ac{GoT} framework against baseline reasoning paradigms. Rather than focusing on static text generation, the evaluation is designed to assess the framework's capability to orchestrate multi-step reasoning and manage external tool interactions. 
 All experiments were conducted using Gemini models, in particular \texttt{gemini-2.5-flash}, \texttt{gemini-2.5-flash-lite} and \texttt{gemini-3.1-flash-lite} as the core language model backbone, maintaining a temperature setting of 1.0 as the Gemini standard suggest.
@@ -1037,6 +1044,7 @@ The Gemini format for tools does not allow tuples or custom objects as function 
 This can become a serious problem, since without a proper fallback strategy the model may get stuck in a loop where every prompt is rejected due to the malformed tool.
 
 \chapter{Discussion}
+\label{chap:discussion}
 \section{Results interpretation}
 The differences in performance across models do not seem to depend on the specific category of task in the benchmark. 
 Instead, they are mostly driven by the capability of the model. Stronger models are better at following the instructions given to the agents, which leads to fewer rule violations, more reliable tool usage, and overall better outputs. 
@@ -1069,6 +1077,7 @@ Furthermore, a dedicated tool management mechanism, acting as a form of \textit{
 Such component could also implement a fallback strategy for malformed tools that cause system failures, by removing them when the \ac{LLM} returns the corresponding error.
 
 \chapter{Conclusion}
+\label{chap:conclusion}
 \section{Recap degli obiettivi e ricapitolo di come sono stati raggiunti}
 \section{Implicazioni future}
 
