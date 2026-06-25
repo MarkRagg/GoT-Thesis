@@ -444,8 +444,6 @@ The evaluation threshold is dynamically adjusted based on the problem complexity
 \[
     s \geq 5.5 - 0.5 \cdot c
 \]
-\mattiasidenote{usa begin equation solo se devi citare la formula}
-\mattiasidenote{qui le lettere è meglio che siano minuscole, ma occhio in generale perchè $S$ l'avevi già usata per gli stati del grafo}
 Where $s$ is the score and $c \in [1,...,5]$ is the complexity. If the problem is too complex, a non-perfect response may be accepted. The logic behind it is that if the \ac{LLM} has difficulty finding a solution, the logical soundness of the reasoning process is prioritized over the absolute precision of the final output.
 % The \ac{LLM} can also understand, usually hinted by the tool call response, that a new tool is needed. In this case the next node will be \texttt{crafting}. 
 
@@ -455,7 +453,7 @@ Where $s$ is the score and $c \in [1,...,5]$ is the complexity. If the problem i
 %
 Then a new reasoning path is chosen for exploration. In this state, a specialized crafter agent created the code of a new tool which is immediately registered. This process uses the original problem context ($P$) and the judge's feedback as a specification. Once the tool is crafted, the system resumes the exploration by expanding a new reasoning path that can now leverage the newly created capability.
 
-\paragraph{reasoning\_mode.} If \texttt{tool\_reasoning} and \texttt{tool\_calling} states are focused on how to use the tools, the \texttt{reasoning\_mode} is focused on how to solve the problem using a \textit{divide-et-impera} approach, so it is more focused on the reasoning capabilities of the \ac{LLM}. This state is helpful when the system struggles in solving the problem, e.g., when the response does not pass the evaluation and there is no \texttt{tool\_reasoning} node available\mattiasidenote{cosa intendi con tool reasoning node available?}. The system here has the possibility to divide the thought into two parallel sub-tasks in order to divide the complexity of the single prompt.
+\paragraph{reasoning\_mode.} If \texttt{tool\_reasoning} and \texttt{tool\_calling} states are focused on how to use the tools, the \texttt{reasoning\_mode} is focused on how to solve the problem using a \textit{divide-et-impera} approach, so it is more focused on the reasoning capabilities of the \ac{LLM}. This state is helpful when the system struggles to solve the problem, e.g., when the response does not pass the evaluation and all \texttt{tool\_reasoning} node has already been explored. The system here has the possibility to divide the thought into two parallel sub-tasks in order to divide the complexity of the single prompt.
 
 \paragraph{chat\_completion.} Acts as a fallback mechanism to ensure that a response is provided even when complex reasoning paths fail. This state is reached when the system has explored all the possible paths, and it is not able to find a solution, so it calls the \ac{LLM} to generate a solution without any constraint in order to guarantee the termination of the process.
 \\
@@ -522,8 +520,6 @@ Each agent has its own state machine (see \cref{fig:agent-state-machine}) compos
     \label{fig:agent-state-machine}
 \end{figure}
 %
-\mattiasidenote{ma non era `model' invece di `mode'? (anche nell immagine)}
-\mattiasidenote{`as we see' non si usa in inglese accademico} 
 When the agent receives the input prompt, the \texttt{model} state determines -- through \ac{LLM} reasoning -- whether it is better to call a tool or to generate a response directly.
 In case of a tool call, the result is sent in the \texttt{model} state in order to generate the output or call again a tool if necessary.
 
@@ -534,9 +530,8 @@ Formally, we define an agent $a \in A$ as a function:
 \[
     a: (h_j, p_i, t_i) \to (r_i, m_i)
 \]
-\mattiasidenote{ti sei scordato $h_j$? andrei in ordine con le definizioni, prima $h_j$ poi $p_i$ ecc..}
 \mattiasidenote{btw la defizione di agente è critica, farei vedere questa parte a Ciatto}
-where $t_i$ represents the set of tools available, $p_i$ the prompt given, $r_i$ the response generated and $m_i$ the metadata.
+where $h_j$ represents the message history provided to the agent, $p_i$ the prompt given, $t_i$ the set of available tools, $r_i$ the response generated and $m_i$ the metadata.
 In particular, we define the following agents:
 \mattianote{non mi convincono molto queste definizioni. è evidente che sono generate e sembrano tirate un po via. per ognuna basta anche solo una frase concisa, non generata, di quello che realmente fanno nel software. Poi spiegherei anche cosa li rende diversi, immagino solo il system prompt, ma è bene dirlo}
 \begin{itemize}
@@ -600,14 +595,15 @@ In particular the initial prompt is:
 \end{quote} 
 
 \subsubsection{Step-by-step Execution}
+Once the user sends the prompt to the system, the user does not interact with the \ac{LLM} again until the final response is produced. However, the conversation may include artificial user messages that are internally generated to improve the quality of the final response.
+In order to specify this difference, we define \textbf{User} as the real user prompt and \textbf{Simulated User} or the abbreviation \textbf{S. User} for artificial user messages.
+\\\\ 
 At first, following the static graph, the \texttt{goal} node is visited, creating three tool reasoning paths and one reasoning mode path.
 \newline
 Then, a \texttt{tool\_reasoning} node is visited, calling the starting agent with the following conversation:
 \begin{itemize}
     \item[\textbf{User:}] ``Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \mattiasidenote{qua intendi l'utente reale}
-    \item[\textbf{User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
-    \mattiasidenote{ma qua con \textbf{User:} intendi semplicemente il tipo di prompt dato all llm giusto? in tal caso bisogna chiarirlo. Ossia dev essere chiaro che l'utente interagisce una volta sola all'inizio quando fornisce il problema, e poi è il framework che prosegue la conversazione con l'LLM, seguendo il GoT framework.}
+    \item[\textbf{S. User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
     \item[\textbf{AI:}] ``Craft a new tool: This problem requires solving an integral, which involves symbolic computation. The existing tools (`summing`, `minus`, `square\_root`, `multiply`, `divide`) are designed for basic arithmetic operations on numerical values and do not support symbolic integration. Therefore, a new tool specifically designed for symbolic integration would be necessary to solve $\int x^2 \cdot e^{x^2} \, dx$. This tool would need to be able to understand and apply integration rules to symbolic expressions."
 \end{itemize}
 
@@ -621,8 +617,8 @@ At this point, the graph visits the \texttt{tool\_calling} node with the previou
 
 The given response is taken for evaluation in the \texttt{response\_evaluation} node. In this case, the context given by the tool reasoning is eliminated in order to maintain a clean message history:
 \begin{itemize}
-    \item[\textbf{User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{User:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
+    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{S. User:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
     \item[\textbf{System:}] ``Score this solution based on correctness and following instructions."
     \item[\textbf{AI:}] ``Tool used in the response: Response"
     \item[\textbf{AI:}] ``{ 'score': 1, 'description': 'The response correctly identifies the need for a new tool for symbolic integration, which is a valid assessment given the problem. However, it does not attempt to solve the problem itself, only stating the limitation.', 'need\_tool\_crafting': true, 'problem\_complexity': 4 }"
@@ -632,7 +628,7 @@ The response does not passed the evaluation and the judge agent identifies the n
 \newline
 The message history passed in the \texttt{crafting} node contains the goal and the explanation given in the response:
 \begin{itemize}
-    \item[\textbf{User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
     \item[\textbf{AI:}] ``The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
     \item[\textbf{System:}] ``Use the context given to craft a tool to solve this problem using craft\_tool. It must be a function"
     \item[\textbf{AI:}] It creates a new tool called \texttt{symbolic\_integration(expression: str, variable: str) -> str} \cref{lst:crafted-tool}
@@ -649,7 +645,7 @@ The system now pick an another tool reasoning path with the new tool crafted and
 The next \texttt{tool\_reasoning} node is visited:
 \begin{itemize}
     \item[\textbf{PMH:}] Previous message history
-    \item[\textbf{User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool."
+    \item[\textbf{S. User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool."
     \item[\textbf{AI:}] \texttt{symbolic\_integration} To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, the \texttt{symbolic\_integration} tool should be used. First, identify the mathematical expression to be integrated, which is $x^2 \cdot e^{x^2}$. Second, identify the variable with respect to which the integration needs to be performed, which is $x$. Finally, call the \texttt{symbolic\_integration} tool with these identified parameters.
 \end{itemize}
 
@@ -668,8 +664,8 @@ The \texttt{tool\_calling} node is now visited:
 
 Now there is the evaluation phase:
 \begin{itemize}
-    \item[\textbf{User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{User:}]     
+    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{S. User:}]     
     \begin{description}
         \item[\texttt{response:}] ``The integral of $\int x^2 \cdot e^{x^2} \, dx$ is $\frac{x e^{x^2}}{2} - \frac{\sqrt{\pi}}{4} \operatorname{erfi}(x) + C$'' 
         \item[\texttt{explanation:}] ``The \texttt{symbolic\_integration} tool was used with the expression $x^2 \cdot e^{x^2}$ and variable $x$ to calculate the indefinite integral.''
