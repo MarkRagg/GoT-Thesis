@@ -869,7 +869,7 @@ If the LLM tries to install a library already installed, the tool will skip the 
 
 \chapter{Experiments}
 \label{chap:experiments}
-\section{Experimental setup (quali classi di benchmark, cosa testi per ogni benchmark, come lo misuri)}
+\section{Experimental setup}
 The purpose of this chapter is to evaluate the performance and efficiency of the proposed \ac{GoT} framework against baseline reasoning paradigms. Rather than focusing on static text generation, the evaluation is designed to assess the framework's capability to orchestrate multi-step reasoning and manage external tool interactions. 
 All experiments were conducted using Gemini models, in particular \texttt{gemini-2.5-flash}, \texttt{gemini-2.5-flash-lite} and \texttt{gemini-3.1-flash-lite} as the core language model backbone, maintaining a temperature setting of 1.0 as the Gemini standard suggest.
 \\\\
@@ -897,7 +897,7 @@ Each split is divided again in categories:
 \paragraph{Number Theory}{Centered on the properties of integers, this section covers modular arithmetic, prime factorization, divisibility rules, and Diophantine equations, presenting problems that inherently require structured algorithmic logic.}
 \paragraph{Precalculus}{This final category bridges high-school math with university-level calculus, testing the model on trigonometry, vectors, matrices, logarithms, and infinite sequences.}
 
-\subsection{Results (metriche, grafici, tabelle)}
+\subsection{Results}
 \begin{table}[ht]
   \centering
   \begin{tabular}{llccccc}
@@ -961,7 +961,7 @@ If we look at the Gemini 3.1 Flash Lite result in each category as in \cref{fig:
 \end{figure}
 
 \newpage
-\subsection{Analysis (esempi di output, errori comuni, casi di successo)}
+\subsection{Analysis}
 \subsubsection{Output examples}
 In this subsection, we analyze three case studies for a comprehensive understanding of the main responses given by the \ac{LLM}.
 In order to avoid long message history, we select the most relevant part of the examples, which are then analyzed. 
@@ -1106,8 +1106,8 @@ Such component could also implement a fallback strategy for malformed tools that
 
 \chapter{Conclusion}
 \label{chap:conclusion}
-\section{Recap degli obiettivi e ricapitolo di come sono stati raggiunti}
-\section{Implicazioni future}
+\section{Research Objectives and Outcomes}
+\section{Future implications}
 
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
