@@ -88,7 +88,36 @@ Optional. Max a few lines.
 \label{chap:introduction}
 %----------------------------------------------------------------------------------------
 
-TODO
+The ability of \acp{LLM} to solve complex problems has improved dramatically
+in recent years, enabling their adoption in a wide range of real-world
+applications, from code generation to mathematical reasoning.
+% 
+Despite these advantages, the standard generation approaches still has limitations e.g., the lack of explainability,
+hallucinations, low output quality and the exploration of alternative solution paths is either absent or severely constrained.
+\\\\
+The introduction of prompt engineering techniques such as \ac{CoT} or \ac{ToT} partially adress these problems by structuring the reasoning process into intermediate steps or branching trees.
+%
+These approaches correspond to progressively expressive data structures,
+yet both remain constrained: linear sequences prevent backtracking,
+and trees does not allow the merging or reuse of intermediate results across
+different reasoning paths.
+%
+To overcome the structural limitations, the \ac{GoT}~\cite{besta2024got} architecture is introduced, representing the reasoning process as a directed graph in which thoughts can be generated, aggregated and refined, enabling the forms of exploration and combination that were not possible before. 
+%
+In its original formulation, the \ac{GoT} requires the user manually define the graph structure before execution begins, removing the possibility of a general purpose deployment. 
+\\\\
+This thesis aim to addresses this limitation by proposing a \ac{GoT} architecture based on a runtime generated graph, with a focus on the use of tools.
+%
+In particular, in order to solve some of the previously cited problems, several mechanism are designed such as a backtracking strategy that allows the system
+to recover from incorrect intermediate steps, a dynamic tool crafting
+mechanism where the \ac{LLM} generates and registers new tools
+at runtime when the existing toolset is insufficient, and an
+\ac{LLM}-as-a-judge evaluator for ensuring the quality of the response. 
+\\\\
+The framework is evaluated on the Hendrycks MATH benchmark~\cite{hendrycksmath2021}, 
+where the results suggest that \ac{GoT} improves reasoning robustness in sufficiently large models, with the backtracking and multi-path
+exploration mechanisms helping recover from incorrect intermediate steps,
+at the cost of increased latency and token consumption.
 
 \paragraph{Structure of the Thesis}
 Chapter~\ref{chap:background} of this thesis 
@@ -476,8 +505,8 @@ the actual trajectory is determined only during execution, reflecting the flexib
 
 
 \subsection{Dynamic Graph}
-TODO INTRODUCTION
-
+In the previous paragraphs, we introduced the static graph. However, it does not represent the actual graph of the framework. Instead, it is defined as a state machine that guides the execution of the processes in the actual graph, which we call the \textbf{dynamic graph}. 
+Figure~\ref{fig:runtime-graph-example} shows an example of a runtime-generated dynamic graph, illustrating how the static graph is translated into the actual execution graph.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.8\linewidth]{figures/runtime.pdf}
@@ -485,7 +514,6 @@ TODO INTRODUCTION
     \label{fig:runtime-graph-example}
 \end{figure}
 
-\mattianote{qui ci vuole qualche frase in più di introduzione dicendo che il grafo statico descritto nella sezione precedente è soltanto una macchina a stati che guida il processo, ma l `actual' graph of thoughts generato a runtime è quello descritto in questa sezione. Potremmo anche pensare di rinominarlo (da dynamic a `runtime o generated qualcosa') per renderlo più chiaro.}
 We define the dynamic graph as a directed graph $G = (N, E)$, where:
 \begin{itemize}
     \item $N$ = $\{n_1, n_2, ..., n_m\}$ is the set of nodes, where each node $n_i$ is a \textbf{runtime node}. 
