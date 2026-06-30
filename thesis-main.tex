@@ -892,26 +892,25 @@ Each split is divided again in categories:
 \paragraph{Precalculus}{This final category bridges high-school math with university-level calculus, testing the model on trigonometry, vectors, matrices, logarithms, and infinite sequences.}
 
 \subsection{Results}
-\note{Cambiare il nome delle versioni in Agentic GoT o qualcos'altro}
 \begin{table}[ht]
   \centering
   \begin{tabular}{llccccc}
     \toprule
-    \textbf{Model} & \textbf{Version} & \textbf{Accuracy} & \textbf{Avg. Time (s)} & \textbf{Avg. Cost (\$)} \\
+    \textbf{Model} & \textbf{Version} & \textbf{Accuracy} & \textbf{Avg. Time} & \textbf{Avg. Cost} \\
     \midrule
-    Gemini-2.5-flash-lite          & Graph & 69.17\% & 116.49 & \$ 0.01 \\
-    Gemini-2.5-flash-lite          & Zero-Shot CoT & 86.83\% & 11.30 &  $<$ \$ 0.01 \\
-    Gemini-2.5-flash    & Graph & 91.17\% & 92.67 & \$ 0.03 \\
-    Gemini-2.5-flash    & Zero-Shot CoT & 82.83\% & 14.62 & \$ 0.01 \\
-    Gemini-3.1-flash-lite  & Graph & 82.50\% & 29.58 & $<$ \$ 0.01 \\
-    Gemini-3.1-flash-lite  & Zero-Shot CoT & 61.50\% & 6.51 & $<$ \$ 0.01 \\
+    Gemini-2.5-flash-lite          & Agentic GoT & 69.17\% & 116.49s & \$ 0.01 \\
+    Gemini-2.5-flash-lite          & Zero-Shot CoT + Tools & 86.83\% & 11.30s &  $<$ \$ 0.01 \\
+    Gemini-2.5-flash    & Agentic GoT & 91.17\% & 92.67s & \$ 0.03 \\
+    Gemini-2.5-flash    & Zero-Shot CoT + Tools & 82.83\% & 14.62s & \$ 0.01 \\
+    Gemini-3.1-flash-lite  & Agentic GoT & 82.50\% & 29.58s & $<$ \$ 0.01 \\
+    Gemini-3.1-flash-lite  & Zero-Shot CoT + Tools & 61.50\% & 6.51s & $<$ \$ 0.01 \\
     \bottomrule
   \end{tabular}
   \caption{LLM general benchmark results}
   \label{tab:general-benchmark}
 \end{table}
 
-As shown in \cref{tab:general-benchmark}, \ac{GoT} performs better in larger models, while Gemini 2.5 Flash Lite has higher performance with the standard \ac{CoT} approach.
+As shown in \cref{tab:general-benchmark}, Agentic \ac{GoT} performs better in larger models, while Gemini 2.5 Flash Lite has higher performance with the standard \ac{CoT} approach.
 
 The average time and cost are also taken into account, showing that the \ac{GoT} architecture has similar cost and remaining an affordable price for using such technologies.
 Nevertheless, the average time can increase up to 10x in some cases, making GoT less suitable for simple and time-sensitive tasks. 
@@ -923,12 +922,12 @@ However, it remains a valuable tool for complex problems where multi-step reason
     \toprule
     \textbf{Model} & \textbf{Version} & \textbf{Errors} & \textbf{Tool Invocation} & \textbf{Tool Crafted} \\
     \midrule
-    Gemini-2.5-flash-lite          & Graph & 2.83\% & 4926.5 & 22 \\
-    Gemini-2.5-flash-lite          & Zero-Shot CoT & 1.83\% & 327.5 & N/A \\
-    Gemini-2.5-flash    & Graph & 1.33\% & 1428,5 & 413 \\
-    Gemini-2.5-flash    & Zero-Shot CoT & 5.83\% & 329 & N/A \\
-    Gemini-3.1-flash-lite  & Graph & 0.00\% & 704 & 50 \\
-    Gemini-3.1-flash-lite  & Zero-Shot CoT & 35.50\% & 2052 & N/A \\
+    Gemini-2.5-flash-lite          & Agentic GoT & 2.83\% & 4926.5 & 22 \\
+    Gemini-2.5-flash-lite          & Zero-Shot CoT + Tools & 1.83\% & 327.5 & N/A \\
+    Gemini-2.5-flash    & Agentic GoT & 1.33\% & 1428,5 & 413 \\
+    Gemini-2.5-flash    & Zero-Shot CoT + Tools & 5.83\% & 329 & N/A \\
+    Gemini-3.1-flash-lite  & Agentic GoT & 0.00\% & 704 & 50 \\
+    Gemini-3.1-flash-lite  & Zero-Shot CoT + Tools & 35.50\% & 2052 & N/A \\
     \bottomrule
   \end{tabular}
   \caption{Errors and Tool statistics}
@@ -1101,13 +1100,16 @@ Such component could also implement a fallback strategy for malformed tools that
 
 \chapter{Conclusion}
 \label{chap:conclusion}
-\section{Research Objectives and Outcomes}
-This thesis aims to develop a \ac{GoT} framework that automates the construction of the graph, removing the need for manual user graph construction.
+This thesis aims to develop an Agentic \ac{GoT} framework that automates the construction of the graph, removing the need for manual user graph construction.
 Furthermore, the architecture is implemented with a particular focus on tool integration, which was not introduced in the original version of \ac{GoT}, contributing to the rapidly evolving field of AI agents.
-In order to 
-\section{Future implications}
-
-
+The proposed approach also introduced features such as backtracking, LLM-as-a-judge, and crafting in order to improve the quality, robustness and transparency of the generated response.
+\\\\
+The experimental evaluation on the MATH benchmark against the Tool-Augmented Zero-Shot \ac{CoT} baseline provides initial evidence 
+that our Agentic GoT approach can reach strong robustness and accuracy for capable-enough base models.
+While the benchmark shows better performances in stronger models, at the same time, the evaluation highlights some limitations concerning the quality of crafted tools across models, the tool-management complexity and the increases token consumption.
+\\\\
+Finally, the proposed approach could represents a baseline for new contibutions in the field of tool-management architectures and \ac{LLM} graph structure approach. 
+Furthermore, future work could further develop Agentic \ac{GoT} by comparing it with stronger agentic baselines across different benchmarks, and by improving the quality of the approach through more effective tool crafting and invocation strategies.
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
