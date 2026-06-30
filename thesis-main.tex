@@ -623,19 +623,15 @@ In particular the initial prompt is:
 \end{quote} 
 
 \subsubsection{Step-by-step Execution}
-\note{
-    - Squashare alcune parti dell'esempio, ad esempio i tre messaggi AI radunarli in uno solo
-    - Non chiamarlo Simulated User, ma con un altro nome tipo Node Prompt o qualcosa del genere.  
-}
-Once the user sends the prompt to the system, the user does not interact with the \ac{LLM} again until the final response is produced. However, the conversation may include artificial user messages that are internally generated to improve the quality of the final response.
-In order to specify this difference, we define \textbf{User} as the real user prompt and \textbf{Simulated User} or the abbreviation \textbf{S. User} for artificial user messages.
+Once the user sends the prompt to the system, the user does not interact with the \ac{LLM} again until the final response is produced. However, the conversation may include artificial prompt messages that are internally used to improve the quality of the final response.
+In order to specify this difference, we define \textbf{User} as the real user prompt and \textbf{Node Prompt} for artificial prompt messages.
 \\\\ 
 At first, following the static graph, the \texttt{goal} node is visited, creating three tool reasoning paths and one reasoning mode path.
 \newline
 Then, a \texttt{tool\_reasoning} node is visited, calling the starting agent with the following conversation:
 \begin{itemize}
     \item[\textbf{User:}] ``Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{S. User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
+    \item[\textbf{Node Prompt:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
     \item[\textbf{AI:}] ``Craft a new tool: This problem requires solving an integral, which involves symbolic computation (...)"
 \end{itemize}
 
@@ -647,8 +643,7 @@ At this point, the graph visits the \texttt{tool\_calling} node with the previou
 
 The given response is taken for evaluation in the \texttt{response\_evaluation} node. In this case, the context given by the tool reasoning is eliminated in order to maintain a clean message history:
 \begin{itemize}
-    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{S. User:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted (...)''
+    \item[\textbf{Node Prompt:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$, Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted (...)"
     \item[\textbf{System:}] ``Score this solution based on correctness and following instructions."
     \item[\textbf{AI:}] ``Tool used in the response: Response"
     \item[\textbf{AI:}] ``{ 'score': 1, 'description': 'The response correctly identifies the need for a new tool for symbolic integration, which is a valid assessment given the problem. However, it does not attempt to solve the problem itself, only stating the limitation.', 'need\_tool\_crafting': true, 'problem\_complexity': 4 }"
@@ -658,12 +653,10 @@ The response does not passed the evaluation and the judge agent identifies the n
 \newline
 The message history passed in the \texttt{crafting} node contains the goal and the explanation given in the response:
 \begin{itemize}
-    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{Node Prompt:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
     \item[\textbf{AI:}] ``The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
     \item[\textbf{System:}] ``Use the context given to craft a tool to solve this problem using craft\_tool. It must be a function"
-    \item[\textbf{AI:}] It creates a new tool called \texttt{symbolic\_integration(expression: str, variable: str) -> str} \cref{lst:crafted-tool}
-    \item[\textbf{AI:}] It install the \texttt{sympy} dependencies
-    \item[\textbf{AI:}] Returning structured response: 
+    \item[\textbf{AI:}] It creates a new tool called \texttt{symbolic\_integration(expression: str, variable: str) -> str} \cref{lst:crafted-tool}, it install the \texttt{sympy} dependencies and it returns structured response: 
     \begin{description}
         \item[\texttt{response:}] ``I have created a tool that can solve the integral $\int x^2 \cdot e^{x^2} \, dx$ (...)'' 
         \item[\texttt{explanation:}] ``The problem requires symbolic integration. I have crafted a tool \texttt{symbolic\_integration} (...)''
@@ -675,7 +668,7 @@ The system now pick an another tool reasoning path with the new tool crafted and
 The next \texttt{tool\_reasoning} node is visited:
 \begin{itemize}
     \item[\textbf{PMH:}] Previous message history
-    \item[\textbf{S. User:}] ``Please, reason step by step (...)"
+    \item[\textbf{Node Prompt:}] ``Please, reason step by step (...)"
     \item[\textbf{AI:}] ``\texttt{symbolic\_integration} To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, the \texttt{symbolic\_integration} tool should be used. (...)''
 \end{itemize}
 
@@ -684,8 +677,7 @@ The \texttt{tool\_calling} node is now visited:
 \begin{itemize}
     \item[\textbf{PMH:}] Previous message history
     \item[\textbf{System:}] ``Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
-    \item[\textbf{AI:}] Tool agent calls \texttt{symbolic\_integration} 
-    \item[\textbf{AI:}] 
+    \item[\textbf{AI:}] Tool agent calls \texttt{symbolic\_integration} and generates the following response:
     \begin{description}
         \item[\texttt{response:}] ``The integral of $\int x^2 \cdot e^{x^2} \, dx$ is $\frac{x e^{x^2}}{2} - \frac{\sqrt{\pi}}{4} \operatorname{erfi}(x) + C$'' 
         \item[\texttt{explanation:}] ``The \texttt{symbolic\_integration} tool was used with the expression $x^2 \cdot e^{x^2}$ and variable $x$ to calculate the indefinite integral.''
@@ -1132,7 +1124,7 @@ Optional. Max 1 page.
 \chapter{Illustrative example}\label{appendix:illustrative-example}
 \begin{itemize}
     \item[\textbf{User:}] ``Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{S. User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
+    \item[\textbf{Node Prompt:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool"
     \item[\textbf{AI:}] ``Craft a new tool: This problem requires solving an integral, which involves symbolic computation. The existing tools (`summing`, `minus`, `square\_root`, `multiply`, `divide`) are designed for basic arithmetic operations on numerical values and do not support symbolic integration. Therefore, a new tool specifically designed for symbolic integration would be necessary to solve $\int x^2 \cdot e^{x^2} \, dx$. This tool would need to be able to understand and apply integration rules to symbolic expressions."
 \end{itemize}
 
@@ -1146,8 +1138,8 @@ At this point, the graph visits the \texttt{tool\_calling} node with the previou
 
 The given response is taken for evaluation in the \texttt{response\_evaluation} node. In this case, the context given by the tool reasoning is eliminated in order to maintain a clean message history:
 \begin{itemize}
-    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{S. User:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
+    \item[\textbf{Node Prompt:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{Node Prompt:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
     \item[\textbf{System:}] ``Score this solution based on correctness and following instructions."
     \item[\textbf{AI:}] ``Tool used in the response: Response"
     \item[\textbf{AI:}] ``{ 'score': 1, 'description': 'The response correctly identifies the need for a new tool for symbolic integration, which is a valid assessment given the problem. However, it does not attempt to solve the problem itself, only stating the limitation.', 'need\_tool\_crafting': true, 'problem\_complexity': 4 }"
@@ -1157,7 +1149,7 @@ The response does not passed the evaluation and the judge agent identifies the n
 \newline
 The message history passed in the \texttt{crafting} node contains the goal and the explanation given in the response:
 \begin{itemize}
-    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{Node Prompt:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
     \item[\textbf{AI:}] ``The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
     \item[\textbf{System:}] ``Use the context given to craft a tool to solve this problem using craft\_tool. It must be a function"
     \item[\textbf{AI:}] It creates a new tool called \texttt{symbolic\_integration(expression: str, variable: str) -> str} \cref{lst:crafted-tool}
@@ -1174,7 +1166,7 @@ The system now pick an another tool reasoning path with the new tool crafted and
 The next \texttt{tool\_reasoning} node is visited:
 \begin{itemize}
     \item[\textbf{PMH:}] Previous message history
-    \item[\textbf{S. User:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool."
+    \item[\textbf{Node Prompt:}] ``Please, reason step by step about how to use these tools to solve the problem, without solving it. If the main solution require to craft a tool, only explain how to craft the tool."
     \item[\textbf{AI:}] \texttt{symbolic\_integration} To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, the \texttt{symbolic\_integration} tool should be used. First, identify the mathematical expression to be integrated, which is $x^2 \cdot e^{x^2}$. Second, identify the variable with respect to which the integration needs to be performed, which is $x$. Finally, call the \texttt{symbolic\_integration} tool with these identified parameters.
 \end{itemize}
 
@@ -1193,8 +1185,8 @@ The \texttt{tool\_calling} node is now visited:
 
 Now there is the evaluation phase:
 \begin{itemize}
-    \item[\textbf{S. User:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
-    \item[\textbf{S. User:}]     
+    \item[\textbf{Node Prompt:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
+    \item[\textbf{Node Prompt:}]     
     \begin{description}
         \item[\texttt{response:}] ``The integral of $\int x^2 \cdot e^{x^2} \, dx$ is $\frac{x e^{x^2}}{2} - \frac{\sqrt{\pi}}{4} \operatorname{erfi}(x) + C$'' 
         \item[\texttt{explanation:}] ``The \texttt{symbolic\_integration} tool was used with the expression $x^2 \cdot e^{x^2}$ and variable $x$ to calculate the indefinite integral.''
