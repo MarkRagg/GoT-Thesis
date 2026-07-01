@@ -189,26 +189,6 @@ Their outputs are generated through statistical pattern matching learned from tr
     \label{fig:token-prediction}
 \end{figure}
 
-% \subsubsection{Training}
-% \mattianote{sezione un po' inutile a mio parere... giusto per riempire il documento, ma non credo ci sia bisogno dato che il contenuto c'è, magari commentiamola}
-% \note{Fatto}
-% Training is the really important part of how \acp{LLM} excel at generating text and responding to general knowledge questions.
-
-% Since we have now explained how an \ac{LLM} works behind the scenes, we also 
-% need to discuss their training to understand why they perform so well.
-
-% The capabilities of modern \acp{LLM} are not the result of a single algorithmic 
-% breakthrough, but rather the consequence of a dramatic and sustained growth in 
-% the scale of training data.
-
-% Before 2018, the growth of pre-training corpora was slow, and models remained 
-% limited in scope. The landscape began to shift with the release of models such 
-% as GPT-2, but it was GPT-3 in 2020 that marked a turning point: 
-% trained on hundreds of billions of tokens initially drawn from the webtext, books, Wikipedia, and other 
-% sources, it demonstrated that scale alone could unlock new 
-% capabilities~\cite{brown2020languagemodelsfewshotlearners}. We may note that the growing power of the \ac{GPU} plays an important role in the \acp{LLM} training speed.
-
-% Nowadays, the emphasis on increasing model parameter counts is gradually giving way to research on higher-level capabilities, including autonomous agents and more effective prompting strategies.
 \subsection{Prompt Engineering}
 Prompt engineering is a relatively new field of research that refers to the practice of designing and implementing prompts or instructions trying to guide the \ac{LLM} output. The main goal of prompt engineering is to optimize the \ac{LLM} output by solely refining the prompt~\cite{Mesk2023}.
 
@@ -861,9 +841,6 @@ If the LLM tries to install a library already installed, the tool will skip the 
 \chapter{Experiments}
 \label{chap:experiments}
 \section{Experimental setup}
-\note{\\
-- Pensare se cambiare o meno i grafici
-}
 The purpose of this chapter is to evaluate the performance and efficiency of the proposed framework against baseline reasoning paradigms. In this case, we use the Zero-Shot \ac{CoT} approach with the same tools as the Agentic \ac{GoT} architecture, ensuring equal conditions. Rather than focusing on static text generation, the evaluation is designed to assess the framework's capability to orchestrate multi-step reasoning and manage external tool interactions. 
 All experiments were conducted using Gemini models, in particular \texttt{gemini-2.5-flash}, \texttt{gemini-2.5-flash-lite} and \texttt{gemini-3.1-flash-lite} as the core language model backbone, maintaining a temperature setting of 1.0 as the Gemini standard suggest.
 \\\\
@@ -938,21 +915,15 @@ Looking at \cref{tab:general-statistics}, it is clear that the majority of incor
 \\\\
 Considering the models where the \ac{LLM} reaches a performance increasing, we examine in detail the result in order to understand where they are more consistent.
 %
-Gemini 2.5 Flash shows in \cref{fig:gemini-2.5-flash} a substantial improvement in the Geometry outcome, while Number Theory, Precalculus and Intermediate Algebra have a lower improvement. However, Algebra and Counting \& Probability have the same performances of Zero-Shot CoT architecture.
+Gemini 2.5 Flash shows in \cref{fig:accuracy} a substantial improvement in the Geometry outcome, while Number Theory, Precalculus and Intermediate Algebra have a lower improvement. However, Algebra and Counting \& Probability have the same performances of Zero-Shot CoT architecture.
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.9\linewidth]{figures/Gemini-2.5-Flash.pdf}
-    \caption{Accuracy of Gemini 2.5 Flash in each category.}
-    \label{fig:gemini-2.5-flash}
+    \includegraphics[width=1\linewidth]{figures/accuracy.pdf}
+    \caption{Accuracy of each model.}
+    \label{fig:accuracy}
 \end{figure}
 
-If we look at the Gemini 3.1 Flash Lite result in each category as in \cref{fig:gemini-3.1-flash-lite}, we see an overall performance increase, with Algebra and Number Theory categories nearing perfection.
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=.9\linewidth]{figures/Gemini-3.1-Flash-Lite.pdf}
-    \caption{Accuracy of Gemini 3.1 Flash Lite in each category.}
-    \label{fig:gemini-3.1-flash-lite}
-\end{figure}
+If we look at the Gemini 3.1 Flash Lite result in each category, we see an overall performance increase, with Algebra and Number Theory categories nearing perfection.
 
 \newpage
 \subsection{Analysis}
@@ -1046,7 +1017,7 @@ The \cref{tab:general-statistics} also shows the number of tool crafted for each
 \paragraph{Gemini 2.5 Flash Lite} This model has two critical issues that do not permit to use correctly the crafting tool. 
 First, it rarely consider the need of crafting a new tool, and when it does, the crafter agent usually negates the possibility to craft a tool saying ``I cannot craft new tool''.
 Second, if we analyze such tools, we notice that a large part of them does not respect the given standard. 
-In fact, there are a lot of placeholder functions that contain no codes, but only returned strings and duplicates, which are not considered tools because only one tool can have the same name. TODO APPENDIX
+In fact, there are a lot of placeholder functions that contain no codes, but only returned strings and duplicates, which are not considered tools because only one tool can have the same name \ref{lst:placeholder-example}.
 Furthermore, the tools created are rarely used and if the model tries to use a placeholder function it will be convinced that the problem cannot be resolved, leading it to produce a wrong output.
 
 \paragraph{Gemini 2.5 Flash} In this case, we have the opposite problem. If the previous model does not be able to craft tools, Gemini 2.5 Flash overuse this possibility, creating a wide range of functions. 
@@ -1271,8 +1242,8 @@ Example:
  
 \section{Output examples}
 \lstinputlisting[language=json, caption={Example of empty response, finish reason field has STOP as a reason.}, label={lst:empty-response}]{listings/empty_response_example.json}
-
 \lstinputlisting[language=Python, caption={optimize\_log\_expression tool crafted}, label={lst:tool-crafted-example}]{listings/optimize_log_expression.py}
+\lstinputlisting[language=Python, caption={Example of a placeholder function}, label={lst:placeholder-example}]{listings/placeholder_function.py}
 
 \backmatter
 
