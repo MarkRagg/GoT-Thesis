@@ -71,10 +71,6 @@ where the backtracking mechanism and multi-path exploration help recover from in
 
 \end{abstract}
 
-\begin{dedication} % this is optional
-Optional. Max a few lines.
-\end{dedication}
-
 %----------------------------------------------------------------------------------------
 \tableofcontents   
 \listoffigures     % (optional) comment if empty
@@ -94,7 +90,7 @@ applications, from code generation to mathematical reasoning.
 % 
 Despite these advantages, the standard generation approaches still has limitations e.g., the lack of explainability,
 hallucinations, low output quality and the exploration of alternative solution paths is either absent or severely constrained.
-\\\\
+
 The introduction of prompt engineering techniques such as \ac{CoT} or \ac{ToT} partially adress these problems by structuring the reasoning process into intermediate steps or branching trees.
 %
 These approaches correspond to progressively expressive data structures,
@@ -105,7 +101,7 @@ different reasoning paths.
 To overcome the structural limitations, the \ac{GoT}~\cite{besta2024got} architecture is introduced, representing the reasoning process as a directed graph in which thoughts can be generated, aggregated and refined, enabling the forms of exploration and combination that were not possible before. 
 %
 In its original formulation, the \ac{GoT} requires the user manually define the graph structure before execution begins, removing the possibility of a general purpose deployment. 
-\\\\
+
 This thesis aim to addresses this limitation by proposing an Agentic \ac{GoT} architecture based on a runtime generated graph, with a focus on the use of tools.
 %
 In particular, in order to solve some of the previously cited problems, several mechanism are designed such as a backtracking strategy that allows the system
@@ -113,7 +109,7 @@ to recover from incorrect intermediate steps, a dynamic tool crafting
 mechanism where the \ac{LLM} generates and registers new tools
 at runtime when the existing toolset is insufficient, and an
 \ac{LLM}-as-a-judge evaluator for ensuring the quality of the response. 
-\\\\
+
 The framework is evaluated on the Hendrycks MATH benchmark~\cite{hendrycksmath2021}, 
 where the results suggest that the proposed framework improves reasoning robustness in sufficiently large models, with the backtracking and multi-path
 exploration mechanisms helping recover from incorrect intermediate steps,
@@ -123,20 +119,20 @@ at the cost of increased latency and token consumption.
 Chapter~\ref{chap:background} of this thesis 
 introduces the background, covering \acp{LLM}, prompt engineering
 techniques, and the related works that motivate this thesis.
-\\
+%
 Then, with Chapter~\ref{chap:design}, the design of the proposed system,
 including the formal definition of the static and dynamic graph structures,
 the agent roles, and the execution model, will be presented.
-\\
+%
 Chapter~\ref{chap:implementation} describes the implementation of the previous proposed design, detailing the build automation,
 the agentic frameworks adopted, and the crafting methodology.
-\\
+%
 The effectiveness of the system is evaluated in Chapter~\ref{chap:experiments}, which reports the experimental
 results on the Hendrycks MATH benchmark, discussing performance, common errors, and representative case studies.
-\\
+%
 Then, Chapter~\ref{chap:discussion} discusses the implications of the results and the limitations
 of the proposed approach.
-\\
+%
 Eventually, Chapter~\ref{chap:conclusion} draws the conclusions and outlines directions for
 future work.
 
@@ -161,7 +157,7 @@ These systems are capable not only of understanding and generating text, but als
 \subsection{How they work}
 \acp{LLM} are autoregressive models that simply try to predict the next word in a sequence of characters,
 based on the context.
-\newline
+
 As shown in \cref{fig:tokenization}, the text given as input to the \ac{LLM} is preprocessed and divided into smaller units called \textit{tokens}.
 A token may represent a word, part of a word, or even a symbol, depending on the strategy chosen.
 %
@@ -283,7 +279,7 @@ application.
 \subsection{LangGraph}
 In 2024, a new module called LangGraph was released~\footnote{\url{https://docs.langchain.com/oss/python/langchain/philosophy}}.
 Rather than LangChain, which is focuses on simplifying the interaction with \acp{LLM} and neglet low-level details, LangGraph is a low-level framework, focuses entirely on agent orchestration.
-\\
+
 With LangGraph, developers can define complex agent workflows. 
 The core abstraction of LangGraph is the \textit{stateful directed graph}, where 
 each node represents a computational step and edges define the transitions between 
@@ -591,7 +587,7 @@ For this reason, the following pseudocode is provided to facilitate the understa
 \end{algorithm}
 \newpage
 In order to fully clarify the system mechanics, the following section guides the reader through a practical, step-by-step execution example.
-\\
+
 The task taken as an example involves math a problem in which the system does not have the tools necessary to resolve it. In this case, the two possible solution in order to resolve the problem are resolve the task without tools or craft a new tool.
 \\\\
 In particular the initial prompt is:
@@ -604,7 +600,7 @@ Once the user sends the prompt to the system, the user does not interact with th
 In order to specify this difference, we define \textbf{User} as the real user prompt and \textbf{Node Prompt} for artificial prompt messages.
 \\\\ 
 At first, following the static graph, the \texttt{goal} node is visited, creating three tool reasoning paths and one reasoning mode path.
-\newline
+
 Then, a \texttt{tool\_reasoning} node is visited, calling the starting agent with the following conversation:
 \begin{itemize}
     \item[\textbf{User:}] ``Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
@@ -627,7 +623,7 @@ The given response is taken for evaluation in the \texttt{response\_evaluation} 
 \end{itemize}
 
 The response does not passed the evaluation and the judge agent identifies the need of crafting a new tool. Then, following the algorithm, a new \texttt{crafting} node is created.
-\newline
+
 The message history passed in the \texttt{crafting} node contains the goal and the explanation given in the response:
 \begin{itemize}
     \item[\textbf{Node Prompt:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
@@ -641,7 +637,7 @@ The message history passed in the \texttt{crafting} node contains the goal and t
 \end{itemize}
 
 The system now pick an another tool reasoning path with the new tool crafted and the previous message history in order to give context of which tool is crafted and why.
-\newline
+
 The next \texttt{tool\_reasoning} node is visited:
 \begin{itemize}
     \item[\textbf{PMH:}] Previous message history
@@ -703,8 +699,7 @@ The second workflow is focused on the \textbf{releasing process}, it is triggere
 For this project, Poetry is also integrated with the GitHub Actions workflows, where it is used to install the dependencies and to run the tests in a clean environment.
 
 \subsection{MLOps}
-MLflow is adopted as the MLOps tool to manage the LLM lifecycle,
- including experimentation, reproducibility and deployment. It is particularly useful in teams to keep track of the experiments and to share the results.
+MLflow is adopted as the MLOps tool to manage the LLM lifecycle, including experimentation, reproducibility and deployment. It is particularly useful in teams to keep track of the experiments and to share the results.
 \\\\
 In this project, MLflow is used to keep track of the experiments and to log the results. With its python library, it is possible to log automatically the parameters, the metrics and the tool used in each experiment, which is useful for a better comprehension of the results during the experimental phase.
 \\\\
@@ -741,7 +736,7 @@ This interface allows the user to configure the system's behavior through a set 
 
 \subsubsection{Command example}
 The command line interface enables two types of execution: run a benchmark or run a custom prompt.
-\newline
+
 If we want to execute a benchmark, we need to specify which one, which architecture to use and the category if needed. We can also choose to specify or not the number of tasks to execute.
 For example, if we want to execute 10 prompts of the gsm8k benchmark with the graph architecture, the command will be:
 \begin{quote}
@@ -755,7 +750,7 @@ Instead, if we want to run a custom prompt like "what's the weather like?", the 
 \section{Agentic Frameworks}
 \subsection{LangChain/LangGraph}
 As mentioned in the previous chapter, LangChain is a framework that facilitates the integration with LLMs and the management of the reasoning process.
-\\
+
 In this project, LangChain is used in the following steps:
 \begin{itemize}
     \item \textbf{LLM/agent calls}: LangChain provides classes and methods to call third-party LLMs and to create agents with specific behaviours. In particular, the classes used are related to the \texttt{langchain\_google\_genai}. 
@@ -768,7 +763,7 @@ In this project, LangChain is used in the following steps:
 The LM Evaluation Harness is a library that provides a set of databases and evaluation metrics for evaluating the performance of LLMs on a variety of tasks.
 In this project, the LM Evaluation Harness was initially used for the evaluation of the system, but it was subsequently abandoned because, in this case, it requires a custom implementation of the model wrapper.
 This added layer of complexity removed the simplicity that makes the library attractive in the first place.
-\\
+
 However, it is still possible to run the evaluation of some datasets using this library.
 \subsection{Hugging Face Datasets}
 Hugging Face is a platform that provides a large collection of open-source models and datasets published by the community. 
@@ -788,9 +783,9 @@ For evaluation reasons, the LLMs use the same model with the same temperature, b
 A known limitation of current LLMs including state-of-the-art models like Gemini, emerges when dealing with high-complexity tasks: the model may fall into an infinite execution loop. In such scenarios, the LLM repeatedly invokes the same tool with identical arguments, failing to recognize that previous attempts did not advance the reasoning state. 
 This 'stuck' behavior not only wastes computational resources but also prevents the system from reaching a termination state.
 To prevent such scenarios, a maximumn \texttt{recursion\_limit} is added to the agent calls.  
-\\
+
 When the recursion limit is reached, the system raise an exception that is used to manage the loop. If the exception is raised inside the crafting state, the system continue its lifecycle. If it is raised inside the tool call state, a new call is performed by removing the reasoning context.
-\\
+
 This reset mechanism forces the LLM to approach the original goal from a new perspective by providing a clean context and an explicit constraint:
 
 \begin{quote}
@@ -801,9 +796,12 @@ By stripping away the redundant message history and injecting this meta-instruct
 
 \subsection{Agents system prompts}
 In order to optimize the performance of the system, each agent has a specific system prompt that defines its behavior and its role in the process. This is crucial to ensure that each agent focuses on its specific task and to avoid confusion between the different agents.
-\newline The prompts can be found in the appendix \cref{appendix:agent-prompts}; in general each of it contains a description of the agent role, some instructions on how to perform its task and a set of rules to follow. 
-\newline The crafter agent prompt \cref{appendix:crafter-agent-prompt} contains a few shot examples of how to craft a new tool, including bad examples of how not to craft a tool, in order to help the LLM to understand the format and the rules to follow.
-\newline For example, the judge agent prompt \cref{appendix:judge-agent-prompt} contains instructions on how to evaluate the solution, how to score it and how to decide the next step of the process.
+
+The prompts can be found in the appendix \cref{appendix:agent-prompts}; in general each of it contains a description of the agent role, some instructions on how to perform its task and a set of rules to follow. 
+
+The crafter agent prompt \cref{appendix:crafter-agent-prompt} contains a few shot examples of how to craft a new tool, including bad examples of how not to craft a tool, in order to help the LLM to understand the format and the rules to follow.
+
+For example, the judge agent prompt \cref{appendix:judge-agent-prompt} contains instructions on how to evaluate the solution, how to score it and how to decide the next step of the process.
 \\\\
 Each agent also has a set of tools that it can use, in particular:
 \begin{itemize}
@@ -819,7 +817,7 @@ In order to facilitate the management of the responses generated by the LLM, a s
 The format contains the final answer and the explanation of it. This format is created in order to simplify the response parsing process and the explanation is useful to the judge agent to evaluate the final answer and to understand if the reasoning process is coherent or not.
 \paragraph{Score}
 The format is used in the evaluation phase. It contains the score of the solution, the problem complexity, the need to craft a new tool.
-\\\\
+
 Each of these formats are used to fullfill the respective defined nodes.
 \section{Crafting methodology}
 The crafting process is a crucial aspect of the system. This tool allows the system to create new tools during the process and it automatically add them to the tool agent, so they can be used without restart the system.
@@ -834,7 +832,7 @@ This process is based on the following steps:
 \end{enumerate}
 
 In order to ensure that the system has the necessary libraries to correctly use the tool crafted, a specific tool can be used to install new libraries.
-\\
+
 The \texttt{install\_dependency} tool takes as argument the name of the library to install and it uses \texttt{poetry add} to install it. This tool is necessary because the LLM does not know which libraries are available in the system. 
 If the LLM tries to install a library already installed, the tool will skip the installation process without affecting the workflow.
 
@@ -932,9 +930,9 @@ In this subsection, we analyze three case studies for a comprehensive understand
 In order to avoid long message history, we select the most relevant part of the examples, which are then analyzed. 
 
 \paragraph{Wrong format detection} {Model: Gemini 2.5 Flash. Category: Algebra.
-\\
+
 Problem: ``What is the 100th term of the arithmetic sequence 6, 10, 14, 18, ...?''.
-\\
+
 Message history:
 \begin{enumerate}
     \item Initial reasoning: The agent suggests to use multiply and summing tools
@@ -953,9 +951,9 @@ Moreover, the use of tools validates the intermediate calculations, reducing the
 }
 
 \paragraph{Use of crafted tool} {Model: Gemini 2.5 Flash. Category: Intermediate Algebra
-\\
+
 Problem: ``Find the minimum value of $[2 \log_{10} x - \log_x \frac{1}{100}]$ for $x > 1.$''.
-\\
+
 Message history:
 \begin{enumerate}
     \item Initial reasoning: The agent suggests creating a new tool to optimize complex logarithmic expressions, describing the functionality that it should implement.
@@ -971,10 +969,10 @@ The generated function enables the system to solve the problem deterministically
 }
 
 \paragraph{Fallback strategy for infinite loop}{Model: Gemini 3.1 Flash Lite. Category: Counting \& Probability
-\\
+
 Problem: ``A turn consists of rolling a standard die and tossing a fair coin. The game is won when the die shows a 1 or a 6 and the coin shows heads. 
 What is the probability the game will be won before the fourth turn? Express your answer as a common fraction''.
-\\
+
 Message history:
 \begin{enumerate}
     \item First reasoning process path: The first reason $\rightarrow$ response $\rightarrow$ evaluation path is failed due to the errors in the explanation logic.
@@ -1108,8 +1106,7 @@ Finally, I would like to thank my friends and flatmates, who accompanied me thro
 At this point, the graph visits the \texttt{tool\_calling} node with the previous message history, asking for the generation of a solution:
 \begin{itemize}
     \item[\textbf{System:}] ``Please, resolve the problem with the tools given, you MUST follow the previous reasoning."
-    \item[\textbf{AI:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values. 
-    \newline 
+    \item[\textbf{AI:}] ``Response: To solve the integral $\int x^2 \cdot e^{x^2} \, dx$, a new tool needs to be crafted that can perform symbolic integration, as the existing tools are limited to basic arithmetic operations on numerical values.  
     Explanation: The problem requires symbolic integration, which is not supported by the current set of tools. A new tool for symbolic integration would be necessary."
 \end{itemize}
 
@@ -1123,7 +1120,7 @@ The given response is taken for evaluation in the \texttt{response\_evaluation} 
 \end{itemize}
 
 The response does not passed the evaluation and the judge agent identifies the need of crafting a new tool. Then, following the algorithm, a new \texttt{crafting} node is created.
-\newline
+
 The message history passed in the \texttt{crafting} node contains the goal and the explanation given in the response:
 \begin{itemize}
     \item[\textbf{Node Prompt:}] ``Original task: Solve this integral $\int x^2 \cdot e^{x^2} \, dx$"
@@ -1139,7 +1136,7 @@ The message history passed in the \texttt{crafting} node contains the goal and t
 \end{itemize}
 
 The system now pick an another tool reasoning path with the new tool crafted and the previous message history in order to give context of which tool is crafted and why.
-\newline
+
 The next \texttt{tool\_reasoning} node is visited:
 \begin{itemize}
     \item[\textbf{PMH:}] Previous message history
