@@ -19,6 +19,7 @@
 \academicyear{2026-2027}
 
 % Definition of acronyms
+\acrodef{AGoT}{Agentic Graph of Thoughts}
 \acrodef{GoT}[GoT]{Graph of Thoughts}
 \acrodef{GoO}{Graph of Operations}
 \acrodef{GRS}{Graph Reasoning State}
@@ -52,7 +53,7 @@ however,
 they rely on a single linear reasoning path,
 limiting the scalability of output quality.
 %
-This thesis introduces an Agentic \ac{GoT} architecture based on a runtime-generated graph,
+This thesis introduces an \ac{AGoT} architecture based on a runtime-generated graph,
 in which the \ac{LLM} reasoning is guided by a directed graph constructed dynamically during execution.
 %
 Such a graph contains various kinds of nodes, each representing a specific step: reasoning generation, tool invocation, response evaluation, and backtracking to alternative paths.
@@ -66,7 +67,7 @@ Intermediate reasoning process is evaluated by an \ac{LLM} judge with an adaptiv
 %
 The framework is evaluated on the Hendrycks MATH benchmark, comparing the proposed architecture against a Zero-Shot \ac{CoT} baseline across three different Gemini models.
 %
-The results suggest that the Agentic \ac{GoT} can make more robust models with stronger reasoning capabilities,
+The results suggest that the \ac{AGoT} can make more robust models with stronger reasoning capabilities,
 where the backtracking mechanism and multi-path exploration help recover from incorrect intermediate steps.
 
 \end{abstract}
@@ -102,7 +103,7 @@ To overcome the structural limitations, the \ac{GoT}~\cite{besta2024got} archite
 %
 In its original formulation, the \ac{GoT} requires the user manually define the graph structure before execution begins, removing the possibility of a general purpose deployment. 
 
-This thesis aim to addresses this limitation by proposing an Agentic \ac{GoT} architecture based on a runtime generated graph, with a focus on the use of tools.
+This thesis aim to addresses this limitation by proposing an \ac{AGoT} architecture based on a runtime generated graph, with a focus on the use of tools.
 %
 In particular, in order to solve some of the previously cited problems, several mechanism are designed such as a backtracking strategy that allows the system
 to recover from incorrect intermediate steps, a dynamic tool crafting
@@ -319,7 +320,7 @@ Figure~\ref{fig:cot-prompting} illustrates the differences between standard prom
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.9\linewidth]{figures/cot-prompting.png}
-    \caption{The differences between a normal prompt versus a few-shot \ac{CoT} and a zero-shot \ac{CoT}. Source:~\cite{kojimazeroshotcot}}
+    \caption[Differences between a normal prompt, few-shot CoT, and zero-shot CoT]{The differences between a normal prompt versus a few-shot \ac{CoT} and a zero-shot \ac{CoT}. Source:~\cite{kojimazeroshotcot}}
     \label{fig:cot-prompting}
 \end{figure}
 
@@ -353,19 +354,19 @@ Although the architecture just explained cannot be easily deployed in real-world
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1\linewidth]{figures/graph_of_thoughts.png}
-    \caption{Representation of different prompt engineering architectures. Source:~\cite{besta2024got}}
+    \caption[Representation of different prompt engineering architectures]{Representation of different prompt engineering architectures. Source:~\cite{besta2024got}}
     \label{fig:architectures-rep}
 \end{figure}
 
-\chapter{Design}
+\chapter{The AGoT Framework}
 \label{chap:design}
 This chapter presents the proposed approach in detail.
 We first formally define the problem and highlight the main challenges and requirements.
-Then, we describe the proposed Agentic \ac{GoT}, providing its formalization, including algorithmic details and execution strategies.
+Then, we describe the proposed \ac{AGoT}, providing its formalization, including algorithmic details and execution strategies.
 Lastly, we illustrate the approach with a concrete example to demonstrate its application.
 
 
-\section{Problem statement}
+\section{Problem statement and Requirements}
 \subsection{Task Definition}
 Before introducing the proposed approach, we first formally define the problem addressed in this work.
 
@@ -390,7 +391,7 @@ In order to address these challenges, the requirements are formalized as follows
 \end{itemize}
 
 \subsection{Assumptions}
-In order to simplify the problem and focus on the core aspects of the Agentic \ac{GoT} paradigm, we make the following assumptions:
+In order to simplify the problem and focus on the core aspects of the \ac{AGoT} paradigm, we make the following assumptions:
 
 \begin{itemize}
     \item \textbf{LLM capabilities}: We assume that the LLM has enough capabilities to use external tools to craft tools if needed to evaluate the generated solutions and to generate intermediate thoughts that are coherent and relevant to the problem at hand. This assumption is strictly dependent on the size of the LLM that we are using.
@@ -483,7 +484,7 @@ while the static graph structure defines the possible state transitions,
 the actual trajectory is determined only during execution, reflecting the flexible nature of these operations.
 
 
-\subsection{Dynamic Graph}
+\subsection{Dynamic Graph: a Memory of the Reasoning Process}
 In the previous paragraphs, we introduced the static graph. However, it does not represent the actual graph of the framework. Instead, it is defined as a state machine that guides the execution of the processes in the actual graph, which we call the \textbf{dynamic graph}. 
 Figure~\ref{fig:runtime-graph-example} shows an example of a runtime-generated dynamic graph, illustrating how the static graph is translated into the actual execution graph.
 \begin{figure}[h!]
@@ -493,18 +494,18 @@ Figure~\ref{fig:runtime-graph-example} shows an example of a runtime-generated d
     \label{fig:runtime-graph-example}
 \end{figure}
 
-We define the dynamic graph as a directed graph $G = (N, E)$, where:
+We define the dynamic graph as a directed graph $G_e = (N, E)$, where:
 \begin{itemize}
     \item $N$ = $\{n_1, n_2, ..., n_m\}$ is the set of nodes, where each node $n_i$ is a \textbf{runtime node}. 
     %
-    We treat the runtime node as an \textit{abstract base object} represented by the 3-tuple $n_i = (id, s_i, r_i)$,
-    where $id$ is the unique identifier of the node,
-    $s_i$ is the state of the static graph represented by the node,
-    $r_i$ is a binary value indicating whether the node is resolved.
+    We treat the runtime node as an \textit{abstract base object} represented as $n = (id_n, s_n, r_n)$,
+    where $id_n$ is the unique identifier of the node,
+    $s_n$ is the state of the static graph represented by the node,
+    $r_n$ is a binary value indicating whether the node is resolved.
     %
-    This abstraction allows for \textbf{node specialization}: depending on the state $s_i$, a node may extend the base 3-tuple with additional specialized attributes (e.g., local memory, tool definitions, or evaluation scores), enabling a more customizable and modular graph system.
+    This abstraction allows for \textbf{node specialization}: depending on the state $s_n$, a node may extend the base node with additional specialized attributes (e.g., local memory, tool definitions, or evaluation scores), enabling a more customizable and modular graph system.
 
-    \item $E$ = $\{e_1, e_2, ..., e_k\}$ is the set of directed edges, where each edge $e_j = (n_{i1}, n_{i2}, h_j) \in E$ represents a transition from node $n_{i1}$ to node $n_{i2}$ with the message history $h_j$. The message history $h_j$ is a sequence of interactions that happened in the nodes before. It is used to provide context and information to the \ac{LLM} during its reasoning process. The message history is sometimes manipulated by the system in order to provide the right behavior to the \ac{LLM} (e.g., crafting a tool instead of using it).
+    \item $E$ = $\{e_1, e_2, ..., e_k\}$ is the set of directed edges, where the edge is defined as $e = (n, n', h) \in E$ represents a transition from node $n$ to node $n'$ with the message history $h$. The message history $h$ is a sequence of interactions that happened in the nodes before. It is used to provide context and information to the \ac{LLM} during its reasoning process. The message history is sometimes manipulated by the system in order to provide the right behavior to the \ac{LLM} (e.g., crafting a tool instead of using it).
 \end{itemize}
 
 Concerning node specialization, we define the following extensions:
@@ -534,7 +535,7 @@ Each agent has its own state machine (see \cref{fig:agent-state-machine}) compos
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.4\linewidth]{figures/agent_model.jpeg}
-    \caption{Agent state machine: the default agent state machine used in Agentic \ac{GoT} for tool call. Source: \url{https://docs.langchain.com/oss/python/langchain/agents}}
+    \caption{Agent state machine: the default agent state machine used in \ac{AGoT} for tool call. Source: \url{https://docs.langchain.com/oss/python/langchain/agents}}
     \label{fig:agent-state-machine}
 \end{figure}
 %
@@ -841,7 +842,7 @@ If the LLM tries to install a library already installed, the tool will skip the 
 \chapter{Experiments}
 \label{chap:experiments}
 \section{Experimental setup}
-The purpose of this chapter is to evaluate the performance and efficiency of the proposed framework against baseline reasoning paradigms. In this case, we use the Zero-Shot \ac{CoT} approach with the same tools as the Agentic \ac{GoT} architecture, ensuring equal conditions. Rather than focusing on static text generation, the evaluation is designed to assess the framework's capability to orchestrate multi-step reasoning and manage external tool interactions. 
+The purpose of this chapter is to evaluate the performance and efficiency of the proposed framework against baseline reasoning paradigms. In this case, we use the Zero-Shot \ac{CoT} approach with the same tools as the \ac{AGoT} architecture, ensuring equal conditions. Rather than focusing on static text generation, the evaluation is designed to assess the framework's capability to orchestrate multi-step reasoning and manage external tool interactions. 
 All experiments were conducted using Gemini models, in particular \texttt{gemini-2.5-flash}, \texttt{gemini-2.5-flash-lite} and \texttt{gemini-3.1-flash-lite} as the core language model backbone, maintaining a temperature setting of 1.0 as the Gemini standard suggest.
 \\\\
 In order to guarantee a low variability of the results obtained, every benchmark or sub-category of the benchmark is tested twice, making the average of the two results.
@@ -852,7 +853,7 @@ To comprehensively capture the performance, efficiency, and robustness of the sy
 \begin{itemize}
     \item \textbf{Accuracy:} It is the fundamental metric. It is used to determined the percentage of successful answer. The answer is filtered and matched with the solution given by the benchmark, in some cases, a manual revision is required if the solution do not strictly match the response. A sub metric is defined to be more accurate in the analysis, which is the \textbf{Error rate} of the system. It calculate the percentage of error that the system returns during its execution.
     \item \textbf{Resource consumption:} In real-world deployment, evaluating the economic and computational sustainability of a framework is crucial. For this reason, we track three sub metric: the \textbf{Time} spent during the generation of the final response and the \textbf{Token consumption}, which is fundamental for calculating the real cost of a single response. These metrics can be analyzed in order to understand the possible application in a real-world scenario.
-    \item \textbf{Tool invocation:} Considering the nature of the system, a tool metric is mandatory in order to really understand if the proposed approach can have an advantage with the respect to others architectures. The sub metric chosen are the \textbf{Tool invocation}, representing how many tool are invoked and, in case of the Agentic \ac{GoT}, the \textbf{Tool crafted} count, adding also an analysis if the tool crafted are reused over the tasks or not.
+    \item \textbf{Tool invocation:} Considering the nature of the system, a tool metric is mandatory in order to really understand if the proposed approach can have an advantage with the respect to others architectures. The sub metric chosen are the \textbf{Tool invocation}, representing how many tool are invoked and, in case of the \ac{AGoT}, the \textbf{Tool crafted} count, adding also an analysis if the tool crafted are reused over the tasks or not.
 \end{itemize}
 
 \section{Hendrycks Math Benchmark}
@@ -871,42 +872,46 @@ Each split is divided again in categories:
 \subsection{Results}
 \begin{table}[ht]
   \centering
+  \resizebox{\linewidth}{!}{%
   \begin{tabular}{llccccc}
     \toprule
     \textbf{Model} & \textbf{Version} & \textbf{Accuracy} & \textbf{Avg. Time} & \textbf{Avg. Cost} \\
     \midrule
-    Gemini-2.5-flash-lite          & Agentic GoT & 69.17\% & 116.49s & \$ 0.01 \\
+    Gemini-2.5-flash-lite          & \ac{AGoT} & 69.17\% & 116.49s & \$ 0.01 \\
     Gemini-2.5-flash-lite          & Zero-Shot CoT + Tools & 86.83\% & 11.30s &  $<$ \$ 0.01 \\
-    Gemini-2.5-flash    & Agentic GoT & 91.17\% & 92.67s & \$ 0.03 \\
+    Gemini-2.5-flash    & \ac{AGoT} & 91.17\% & 92.67s & \$ 0.03 \\
     Gemini-2.5-flash    & Zero-Shot CoT + Tools & 82.83\% & 14.62s & \$ 0.01 \\
-    Gemini-3.1-flash-lite  & Agentic GoT & 82.50\% & 29.58s & $<$ \$ 0.01 \\
+    Gemini-3.1-flash-lite  & \ac{AGoT} & 82.50\% & 29.58s & $<$ \$ 0.01 \\
     Gemini-3.1-flash-lite  & Zero-Shot CoT + Tools & 61.50\% & 6.51s & $<$ \$ 0.01 \\
     \bottomrule
   \end{tabular}
+  }
   \caption{LLM general benchmark results}
   \label{tab:general-benchmark}
 \end{table}
 
-As shown in \cref{tab:general-benchmark}, Agentic \ac{GoT} performs better in larger models, while Gemini 2.5 Flash Lite has higher performance with the standard \ac{CoT} approach.
+As shown in \cref{tab:general-benchmark}, \ac{AGoT} performs better in larger models, while Gemini 2.5 Flash Lite has higher performance with the standard \ac{CoT} approach.
 
 The average time and cost are also taken into account, showing that our architecture has similar cost and remaining an affordable price for using such technologies.
-Nevertheless, the average time can increase up to 10x in some cases, making Agentic \ac{GoT} less suitable for simple and time-sensitive tasks. 
+Nevertheless, the average time can increase up to 10x in some cases, making \ac{AGoT} less suitable for simple and time-sensitive tasks. 
 However, it remains a valuable tool for complex problems where multi-step reasoning and error recovery justify the additional overhead.
-\\\\
+
 \begin{table}[ht]
   \centering
+  \resizebox{\linewidth}{!}{%
   \begin{tabular}{llccccc}
     \toprule
     \textbf{Model} & \textbf{Version} & \textbf{Errors} & \textbf{Tool Invocation} & \textbf{Tool Crafted} \\
     \midrule
-    Gemini-2.5-flash-lite          & Agentic GoT & 2.83\% & 4926.5 & 22 \\
+    Gemini-2.5-flash-lite          & \ac{AGoT} & 2.83\% & 4926.5 & 22 \\
     Gemini-2.5-flash-lite          & Zero-Shot CoT + Tools & 1.83\% & 327.5 & N/A \\
-    Gemini-2.5-flash    & Agentic GoT & 1.33\% & 1428,5 & 413 \\
+    Gemini-2.5-flash    & \ac{AGoT} & 1.33\% & 1428,5 & 413 \\
     Gemini-2.5-flash    & Zero-Shot CoT + Tools & 5.83\% & 329 & N/A \\
-    Gemini-3.1-flash-lite  & Agentic GoT & 0.00\% & 704 & 50 \\
+    Gemini-3.1-flash-lite  & \ac{AGoT} & 0.00\% & 704 & 50 \\
     Gemini-3.1-flash-lite  & Zero-Shot CoT + Tools & 35.50\% & 2052 & N/A \\
     \bottomrule
   \end{tabular}
+  }
   \caption{Errors and Tool statistics}
   \label{tab:general-statistics}
 \end{table}
@@ -990,7 +995,7 @@ This example shows the fallback strategy in action, demonstrating how it works a
 
 
 \subsubsection{Common errors}
-\paragraph{Agentic GoT}{The most common error in the Agentic \ac{GoT} architecture is the wrong format of the final answer. The Hendrycks benchmark requires the response to be wrapped in a \texttt{$\backslash\backslash boxed\{answer\}$} format, and the evaluation is performed in parallel with the structured output described before.
+\paragraph{\ac{AGoT}}{The most common error in the \ac{AGoT} architecture is the wrong format of the final answer. The Hendrycks benchmark requires the response to be wrapped in a \texttt{$\backslash\backslash boxed\{answer\}$} format, and the evaluation is performed in parallel with the structured output described before.
 While the structured output is always respected, the lighter models struggle to also maintain the expected format, often answering without it. 
 For evaluation purposes, if the \ac{LLM} does not respect the format, the response is still counted as correct, but the process requires additional manual effort.
 \\\\
@@ -1045,7 +1050,7 @@ On the other hand, weaker models tend to partially or fully ignore these instruc
 Overall, this suggests that the effectiveness of the architecture depends more on the instruction following ability of the base model than on the nature of the task itself.
 
 \subsection{Our Approach vs CoT}
-Looking at the results, we can observe that the Agentic \ac{GoT} does not outperform the Zero-Shot \ac{CoT} in terms of accuracy. However, it reduces the number of generated errors.
+Looking at the results, we can observe that the \ac{AGoT} does not outperform the Zero-Shot \ac{CoT} in terms of accuracy. However, it reduces the number of generated errors.
 This can be explained by the fact that the judge agent, which is used to ensure the quality of the answers, has a reasoning capability comparable to the agent that generates the response.
 This leads to a reduced ability to correctly assess the correctness of the produced output.
 \\\\
@@ -1058,7 +1063,7 @@ Despite its advantages, the proposed architecture also has several limitations t
 \\\\
 The first constraint is about the power of the model. In order to gain benefit by this architecture, the \ac{LLM} must support agents, tools and structured outputs.
 Therefore, these constraints are fundamental for the correct functioning of the system, such as the tool generation and the score assignment. 
-For these reasons, the Agentic \ac{GoT} cannot currently be used with Small Language Models or old \acp{LLM}, where the basic functions are not well performed and the tool crafting mechanism cannot be effectively applied as demonstrated by the results of Gemini 2.5 Flash Lite.
+For these reasons, the \ac{AGoT} cannot currently be used with Small Language Models or old \acp{LLM}, where the basic functions are not well performed and the tool crafting mechanism cannot be effectively applied as demonstrated by the results of Gemini 2.5 Flash Lite.
 \\\\
 However, the time spent by the system plays also a relevant role. 
 While some \ac{LLM} (e.g. Gemini 3.1 Flash Lite) has a reasonable average time for an answer, other models require significantly more time, with peaks of 5 to 10 minutes per response.
@@ -1071,16 +1076,16 @@ Such component could also implement a fallback strategy for malformed tools that
 
 \chapter{Conclusion}
 \label{chap:conclusion}
-This thesis aims to develop an Agentic \ac{GoT} framework that automates the construction of the graph, removing the need for manual user graph construction.
+This thesis aims to develop an \ac{AGoT} framework that automates the construction of the graph, removing the need for manual user graph construction.
 Furthermore, the architecture is implemented with a particular focus on tool integration, which was not introduced in the original version of \ac{GoT}, contributing to the rapidly evolving field of AI agents.
 The proposed approach also introduced features such as backtracking, LLM-as-a-judge, and crafting in order to improve the quality, robustness and transparency of the generated response.
 \\\\
 The experimental evaluation on the MATH benchmark against the Tool-Augmented Zero-Shot \ac{CoT} baseline provides initial evidence 
-that our Agentic \ac{GoT} approach can reach strong robustness and accuracy for capable-enough base models.
+that our \ac{AGoT} approach can reach strong robustness and accuracy for capable-enough base models.
 While the benchmark shows better performances in stronger models, at the same time, the evaluation highlights some limitations concerning the quality of crafted tools across models, the tool-management complexity and the increases token consumption.
 \\\\
 Finally, the proposed approach could represents a baseline for new contibutions in the field of tool-management architectures and \ac{LLM} graph structure approach. 
-Furthermore, future work could further develop Agentic \ac{GoT} by comparing it with stronger agentic baselines across different benchmarks, and by improving the quality of the approach through more effective tool crafting and invocation strategies.
+Furthermore, future work could further develop \ac{AGoT} by comparing it with stronger agentic baselines across different benchmarks, and by improving the quality of the approach through more effective tool crafting and invocation strategies.
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
