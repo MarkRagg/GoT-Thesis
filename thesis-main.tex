@@ -382,12 +382,13 @@ The goal is not to replace the original \ac{GoT} prompting framework, but to ada
     \item \textbf{Error propagation}: If there is an error in the early steps of the reasoning process, it will be propagated to the final solution. Without more exploration of alternatives, the model may not be able to recover from these errors and may produce incorrect solutions. 
 \end{itemize}
 
-In order to address these challenges, the requirements are formalized as follows:
+In order to address these challenges and the problem described before, the requirements are formalized as follows:
 
 \begin{itemize}
-    \item \textbf{Exploration of alternatives}: If the LLM answer does not satisfy evaluation criterias, the model should be able to explore alternatives, which may require the ability to backtrack and try different reasoning paths. 
-    \item \textbf{Separation of reasoning}: The system should allow starting a new reasoning process independently if a path leads to an incorrect solution, without affecting other trajectories.
-    \item \textbf{Structured and interpretable reasoning}: The reasoning process should be captured in a structured representation that enables traceability, interpretability, and evaluation of intermediate steps.
+    \item \textbf{R1 - Dynamic construction}: The system should construct the execution graph dynamically, without requiring the user to specify the graph structure in advance.
+    \item \textbf{R2 - Inspectability}: The execution graph should be explicitly represented and inspectable. It should record both successful and unsuccessful reasoning paths, allowing the complete reasoning process to be analyzed after execution.
+    \item \textbf{R3 - Tool integration}: The system should allow reasoning steps to either involve additional \ac{LLM} interactions or invoke external tools when required.
+    \item \textbf{R4 - Runtime capability extension}: The system should be able to extend its capabilities at runtime by generating new tools when the existing toolset is insufficient to solve the problem.
 \end{itemize}
 
 \subsection{Assumptions}
@@ -415,7 +416,7 @@ In fact, \ac{GoT} offers potential in terms of exploration, combination of diffe
 These advantages can be further enhanced by the use of external tools, which can provide additional capabilities, and permits to have a more autonomous system that can adapt to different problems and contexts.
 Furthermore, this structure and the possibility to create a new reasoning path, allows to create and register new tools at runtime, which can be used in the current reasoning process or in future ones, creating a sort of ``tool cache'' which cannot be possible in the previous approaches.  
 
-\subsection{Static Graph Structure}
+\subsection{Static Graph: The Agent's State Machine}
 As a \textbf{static graph}, we refer to the graph structure that is defined at the beginning of the process, which includes the definition of nodes and edges, as well as the rules for how they can be connected. 
 \Cref{fig:static-graph} illustrates the static graph structure, which provides a framework for how the reasoning process can be represented and how different thoughts can be connected to each other.
 
@@ -426,7 +427,7 @@ As a \textbf{static graph}, we refer to the graph structure that is defined at t
     \label{fig:static-graph}
 \end{figure}
 
-The static graph structure is defined as $G_s = (S, T)$, where $S$ is the set of possible states (e.g. Evaluation, Backtracking, Crafting etc.) and $T$ is the set of possible transitions between these states. 
+The static graph structure is defined as $G_s = (S, T)$, where $S$ is the set of workflow states (e.g. Evaluation, Backtracking, Crafting etc.) and $T \subseteq S \times S$ is the set of admissible transitions. 
 The states are the following:
 
 \paragraph{\_\_start\_\_ and \_\_end\_\_.} 
