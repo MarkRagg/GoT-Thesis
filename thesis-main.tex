@@ -43,15 +43,12 @@
 \frontmatter\frontispiece
 
 \begin{abstract}	
-Modern \acp{LLM} have demonstrated exceptional capabilities in solving complex problems,
-yet they exhibit structural limitations that reduce their reliability such as opaque reasoning processes
-and limited exploration of alternative solution paths.
+Modern \acp{LLM} exhibit structural limitations that reduce their reliability, including opaque
+reasoning, error propagation, and limited exploration of alternative solution paths.
 %
-Prompt engineering techniques, e.g., \ac{CoT},
-can improve reasoning process,
-however,
-they rely on a single linear reasoning path,
-limiting the scalability of output quality.
+Existing
+prompting techniques such as \ac{CoT}, \ac{ToT}, and \ac{GoT} partially make reasoning more explicit, but \ac{GoT}-style
+approaches usually require task-specific graph structures designed before execution.
 %
 This thesis introduces an \ac{AGoT} architecture based on a runtime-generated graph,
 in which the \ac{LLM} reasoning is guided by a directed graph constructed dynamically during execution.
